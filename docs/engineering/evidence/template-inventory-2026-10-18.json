@@ -1,0 +1,2561 @@
+{
+  "inspection_date": "2026-10-18",
+  "engine": "5.8.3-58210709+++UE5+Release-5.8",
+  "method": "UE Python commandlet; load assets; read Blueprint graph nodes and pin connections; compile in memory; load maps; no asset saves",
+  "runtime_playtest_performed": false,
+  "blueprints": [
+    {
+      "file": "Content/FirstPerson/Blueprints/BP_FirstPersonCharacter.uasset",
+      "sha256": "32d47177b176a430adb28897153e9bf5d2a3807bfca232815aa60ad58b6ae6a3",
+      "parent": "/Script/Engine.Character",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript",
+        "Move",
+        "Aim"
+      ],
+      "events": [
+        "Touch Jump End",
+        "Touch Jump Start",
+        "Secondary Thumbstick",
+        "Primary Thumbstick"
+      ],
+      "defaults": {
+        "ai_controller_class": "/Script/AIModule.AIController",
+        "auto_possess_ai": "<AutoPossessAI.PLACED_IN_WORLD: 1>",
+        "Target Touch UI": "/Game/Input/Touch/UI_TouchSimple.UI_TouchSimple_C",
+        "can_be_damaged": true,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ADJUST_IF_POSSIBLE_BUT_DONT_SPAWN_IF_COLLIDING: 3>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 1
+        },
+        {
+          "name": "Move",
+          "node_count": 9
+        },
+        {
+          "name": "Aim",
+          "node_count": 5
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 15
+        }
+      ]
+    },
+    {
+      "file": "Content/FirstPerson/Blueprints/BP_FirstPersonPlayerController.uasset",
+      "sha256": "0ad6c2154837e1aafbbd6da30c9f49697c031d8ae2221d481956f08e827edc14",
+      "parent": "/Script/Engine.PlayerController",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript",
+        "Should Use Touch Controls"
+      ],
+      "events": [
+        "ReceiveBeginPlay"
+      ],
+      "defaults": {
+        "player_camera_manager_class": "/Game/FirstPerson/Blueprints/BP_FirstPersonCameraManager.BP_FirstPersonCameraManager_C",
+        "Touch Controls Widget Class": "/Game/Input/Touch/UI_TouchSimple.UI_TouchSimple_C",
+        "Force Touch Controls": false,
+        "can_be_damaged": false,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 1
+        },
+        {
+          "name": "Should Use Touch Controls",
+          "node_count": 7
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 16
+        }
+      ]
+    },
+    {
+      "file": "Content/FirstPerson/Blueprints/BP_FirstPersonCameraManager.uasset",
+      "sha256": "3426584f105e39755833ebc2ede7b586cfde5a11fcebeecaf0eac37d819cce57",
+      "parent": "/Script/Engine.PlayerCameraManager",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript"
+      ],
+      "events": [],
+      "defaults": {
+        "can_be_damaged": false,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 1
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 0
+        }
+      ]
+    },
+    {
+      "file": "Content/FirstPerson/Blueprints/BP_FirstPersonGameMode.uasset",
+      "sha256": "b23709651a847a05a85c9e258d60d98f6a9bad15bcad798cd7c0b02c1729696e",
+      "parent": "/Script/Engine.GameModeBase",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript"
+      ],
+      "events": [],
+      "defaults": {
+        "default_pawn_class": "/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter.BP_FirstPersonCharacter_C",
+        "player_controller_class": "/Game/FirstPerson/Blueprints/BP_FirstPersonPlayerController.BP_FirstPersonPlayerController_C",
+        "hud_class": "/Script/Engine.HUD",
+        "can_be_damaged": false,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 1
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 0
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/BP_ShooterCharacter.uasset",
+      "sha256": "4a6fd12ffb4c2d39620e50b56ceffd165d49b14513b760ad2e73611f8da29615",
+      "parent": "/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter.BP_FirstPersonCharacter_C",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript",
+        "Is Weapon Already Owned",
+        "Is Dead",
+        "Get Weapon Target Location",
+        "Get Team"
+      ],
+      "events": [
+        "Die",
+        "Primary Thumbstick",
+        "Secondary Thumbstick",
+        "Touch Jump Start",
+        "Touch Jump End",
+        "ReceiveControllerChanged",
+        "ReceiveBeginPlay",
+        "ReceiveAnyDamage",
+        "On Weapon Activated",
+        "Add Weapon Class",
+        "Update Weapon HUD",
+        "Add Weapon Recoil",
+        "Play Firing Montage",
+        "Attach Weapon Meshes",
+        "Touch Switch Weapon",
+        "Touch Shoot End",
+        "Touch Shoot Start",
+        "Set Team"
+      ],
+      "defaults": {
+        "ai_controller_class": "/Script/AIModule.AIController",
+        "auto_possess_ai": "<AutoPossessAI.PLACED_IN_WORLD: 1>",
+        "Current HP": 500.0,
+        "Team Byte": 0,
+        "Player Controller": null,
+        "Owned Weapons": "[]",
+        "Current Weapon": null,
+        "Max HP": 500.0,
+        "Dead Tag": "Dead",
+        "Player Tag": "Player",
+        "can_be_damaged": true,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ADJUST_IF_POSSIBLE_BUT_DONT_SPAWN_IF_COLLIDING: 3>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 2
+        },
+        {
+          "name": "Is Weapon Already Owned",
+          "node_count": 13
+        },
+        {
+          "name": "Is Dead",
+          "node_count": 4
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 163
+        },
+        {
+          "name": "Get Weapon Target Location",
+          "node_count": 10
+        },
+        {
+          "name": "Get Team",
+          "node_count": 2
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/BP_ShooterPlayerController.uasset",
+      "sha256": "09b782fa391a18ae14f483c725a3cd1dad796e9cd2efe926f7d9d6fd4192f0fd",
+      "parent": "/Game/FirstPerson/Blueprints/BP_FirstPersonPlayerController.BP_FirstPersonPlayerController_C",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript",
+        "Should Spawn Enemy NPCs",
+        "GetTeamScore",
+        "Get Team"
+      ],
+      "events": [
+        "OnDestroyed_Event",
+        "ReceiveBeginPlay",
+        "ReceivePossess",
+        "Update Health UI",
+        "Update Bullet UI",
+        "Set Team"
+      ],
+      "defaults": {
+        "player_camera_manager_class": "/Game/FirstPerson/Blueprints/BP_FirstPersonCameraManager.BP_FirstPersonCameraManager_C",
+        "Bullet Counter UI": null,
+        "Team Byte": 0,
+        "can_be_damaged": false,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 2
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 44
+        },
+        {
+          "name": "GetTeamScore",
+          "node_count": 2
+        },
+        {
+          "name": "Should Spawn Enemy NPCs",
+          "node_count": 2
+        },
+        {
+          "name": "Get Team",
+          "node_count": 3
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/BP_ShooterGameMode.uasset",
+      "sha256": "ee20f85b829deb145afc069ce6d1fc4444994b705f63ced602bb7dbe6e370287",
+      "parent": "/Script/Engine.GameModeBase",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript",
+        "ChoosePlayerStart",
+        "Should Spawn Enemy NPCs",
+        "GetTeamScore"
+      ],
+      "events": [
+        "ReceiveBeginPlay",
+        "IncrementTeamScore"
+      ],
+      "defaults": {
+        "default_pawn_class": "/Game/Variant_Shooter/Blueprints/BP_ShooterCharacter.BP_ShooterCharacter_C",
+        "player_controller_class": "/Game/Variant_Shooter/Blueprints/BP_ShooterPlayerController.BP_ShooterPlayerController_C",
+        "hud_class": "/Script/Engine.HUD",
+        "TeamScores": "{1: 0, 0: 0}",
+        "Score Updated": "<Delegate 'DelegateBase' <Unbound>>",
+        "Number of Local Players": 1,
+        "Current Player Start Assignment": 0,
+        "can_be_damaged": false,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 1
+        },
+        {
+          "name": "ChoosePlayerStart",
+          "node_count": 21
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 16
+        },
+        {
+          "name": "Score Updated",
+          "node_count": 1
+        },
+        {
+          "name": "GetTeamScore",
+          "node_count": 4
+        },
+        {
+          "name": "Should Spawn Enemy NPCs",
+          "node_count": 4
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/AI/BP_ShooterNPC.uasset",
+      "sha256": "81befe8c8d4b58d3ee94579d0998f5469fc6081a8bf2e51b7253de7abd4174f1",
+      "parent": "/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter.BP_FirstPersonCharacter_C",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript",
+        "Has Weapon",
+        "Get Weapon Target Location"
+      ],
+      "events": [
+        "Die",
+        "Start Shooting",
+        "Stop Shooting",
+        "ReceiveBeginPlay",
+        "ReceiveAnyDamage",
+        "On Semi Weapon Refire",
+        "Attach Weapon Meshes"
+      ],
+      "defaults": {
+        "ai_controller_class": "/Game/Variant_Shooter/Blueprints/AI/BP_ShooterAIController.BP_ShooterAIController_C",
+        "auto_possess_ai": "<AutoPossessAI.PLACED_IN_WORLD_OR_SPAWNED: 3>",
+        "Weapon": null,
+        "Current HP": 100.0,
+        "Weapon Class": "/Game/Variant_Shooter/Blueprints/Pickups/Weapons/BP_ShooterWeapon_Pistol.BP_ShooterWeapon_Pistol_C",
+        "Aim Range": 10000.0,
+        "Aim Variance Half Angle": 10.0,
+        "Min Aim Offset Z": -35.0,
+        "Max Aim Offset Z": 60.0,
+        "On Death": "<Delegate 'DelegateBase' <Unbound>>",
+        "Current Aim Target": null,
+        "Is Shooting": false,
+        "Team Byte": 1,
+        "Dead Tag": "Dead",
+        "can_be_damaged": true,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ADJUST_IF_POSSIBLE_BUT_DONT_SPAWN_IF_COLLIDING: 3>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 2
+        },
+        {
+          "name": "Has Weapon",
+          "node_count": 4
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 67
+        },
+        {
+          "name": "On Death",
+          "node_count": 1
+        },
+        {
+          "name": "Get Weapon Target Location",
+          "node_count": 41
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/AI/BP_ShooterAIController.uasset",
+      "sha256": "0e974fa72ec46b948f863513e2b28c347eed757e0a49cc765d641aed6a3d872e",
+      "parent": "/Script/AIModule.AIController",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript",
+        "Construct Bullet Transform"
+      ],
+      "events": [
+        "Set Current Target",
+        "Clear Current Target",
+        "On Death",
+        "ReceivePossess"
+      ],
+      "defaults": {
+        "Team Tag": "Enemy",
+        "Current Target Enemy": null,
+        "can_be_damaged": false,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 1
+        },
+        {
+          "name": "Construct Bullet Transform",
+          "node_count": 2
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 20
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/AI/BP_ShooterNPCSpawner.uasset",
+      "sha256": "061778ad79375b980e5710f36957c0aec3536a8cbf104743eb669d2aea1cb8a5",
+      "parent": "/Script/Engine.Actor",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript"
+      ],
+      "events": [
+        "Spawn Enemy",
+        "On NPC Died",
+        "ReceiveBeginPlay"
+      ],
+      "defaults": {
+        "Should Spawn Enemies Immediately": true,
+        "Initial Spawn Delay": 5.0,
+        "NPC Class": "/Game/Variant_Shooter/Blueprints/AI/BP_ShooterNPC.BP_ShooterNPC_C",
+        "Spawn Count": 1,
+        "Respawn Delay": 5.0,
+        "can_be_damaged": true,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 1
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 25
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/Pickups/BP_ShooterPickup.uasset",
+      "sha256": "1e541db34831b1cdc86eec4f5d6f2a3ce89fbe8c417d6d2e8744cc466b843393",
+      "parent": "/Script/Engine.Actor",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript",
+        "Spin"
+      ],
+      "events": [
+        "Enable Pickup",
+        "ReceiveTick",
+        "ReceiveBeginPlay"
+      ],
+      "defaults": {
+        "ProjectileOffset": "<Struct 'Vector' {x: 100.000000, y: 0.000000, z: -10.000000}>",
+        "FirstPersonCharacterReference": null,
+        "Spawn Time": 4.0,
+        "Target Class": null,
+        "Weapon Class": "/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase.BP_ShooterWeaponBase_C",
+        "Weapon Type": "<Struct 'DataTableRowHandle' {data_table: \"/Script/Engine.DataTable'/Game/Variant_Shooter/Blueprints/Pickups/DT_WeaponList.DT_WeaponList'\", row_name: \"\"}>",
+        "can_be_damaged": true,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 1
+        },
+        {
+          "name": "Spin",
+          "node_count": 8
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 35
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase.uasset",
+      "sha256": "61c7e7b7f30ac9399b4052476bd2640f106028fb908cf76801d7bf03ae46cee5",
+      "parent": "/Script/Engine.Actor",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript",
+        "Calculate Bullet Spawn Transform",
+        "Fire Bullet"
+      ],
+      "events": [
+        "On Weapon Owner Destroyed",
+        "Start Firing",
+        "Stop Firing",
+        "Fire",
+        "Activate Weapon",
+        "Deactivate Weapon",
+        "Fire Cooldown Expired",
+        "ReceiveBeginPlay"
+      ],
+      "defaults": {
+        "Bullet Class": "/Game/Variant_Shooter/Blueprints/Pickups/Projectiles/BP_ShooterProjectile_Bullet.BP_ShooterProjectile_Bullet_C",
+        "Current Bullets": 10,
+        "Mag Size": 10,
+        "Firing Montage": null,
+        "Aim Variance": 0.0,
+        "Firing Recoil": 0.0,
+        "Refire Rate": 0.5,
+        "Full Auto": true,
+        "Time of Last Shot": 0.0,
+        "Is Firing": false,
+        "Refire Timer": "<Struct 'TimerHandle' {}>",
+        "First Person Anim Instance": "/Game/Variant_Shooter/Anims/ABP_FP_Weapon.ABP_FP_Weapon_C",
+        "Third Person Anim Instance": "/Game/Variant_Shooter/Anims/ABP_TP_Rifle.ABP_TP_Rifle_C",
+        "Shot Loudness": 1.0,
+        "Shot Noise Range": 300.0,
+        "Noise Tag": "None",
+        "Pawn Owner": null,
+        "can_be_damaged": true,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 1
+        },
+        {
+          "name": "Calculate Bullet Spawn Transform",
+          "node_count": 16
+        },
+        {
+          "name": "Fire Bullet",
+          "node_count": 31
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 75
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/Pickups/Projectiles/BP_ShooterProjectileBase.uasset",
+      "sha256": "8b548948a39e7660d67aac6e0c477b4300af5db83996814da51876f2ef99b559",
+      "parent": "/Script/Engine.Actor",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript"
+      ],
+      "events": [
+        "Process Hit",
+        "On Projectile Hit",
+        "ReceiveHit",
+        "ReceiveBeginPlay"
+      ],
+      "defaults": {
+        "Physics Force": 100.0,
+        "Noise Loudness": 3.0,
+        "Noise Range": 1000.0,
+        "Noise Tag": "Projectile",
+        "Damage": 25.0,
+        "Damage Owner": false,
+        "Explode on Hit": false,
+        "Explosion Radius": 500.0,
+        "Deferred Destruction Time": 5.0,
+        "Damage Type": "/Script/Engine.DamageType",
+        "Explosion Damaged Actors": "set([])",
+        "can_be_damaged": true,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 1
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 89
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/Pickups/Projectiles/BP_Shooter_GrenadeExplosion.uasset",
+      "sha256": "ef79804e35fef5143dbc8040aee59bee077d47b1e3be82b0ec6d1449cdb58d3f",
+      "parent": "/Script/Engine.Pawn",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript"
+      ],
+      "events": [
+        "ReceiveBeginPlay"
+      ],
+      "defaults": {
+        "ai_controller_class": "/Script/AIModule.AIController",
+        "auto_possess_ai": "<AutoPossessAI.PLACED_IN_WORLD: 1>",
+        "can_be_damaged": true,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ADJUST_IF_POSSIBLE_BUT_DONT_SPAWN_IF_COLLIDING: 3>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 1
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 7
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/Pickups/Weapons/BP_ShooterWeapon_Pistol.uasset",
+      "sha256": "45e17efd7bc7b5b6660caf80e148ac54c2df91c456fae61eeaa4029773650a5c",
+      "parent": "/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase.BP_ShooterWeaponBase_C",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript"
+      ],
+      "events": [
+        "ReceiveBeginPlay",
+        "ReceiveTick",
+        "ReceiveActorBeginOverlap"
+      ],
+      "defaults": {
+        "can_be_damaged": true,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 2
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 6
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/Pickups/Weapons/BP_ShooterWeapon_Rifle.uasset",
+      "sha256": "e865b6f27c4282f74999c4fbc50b7022b44d6d7062021bf6ad388d6fdaaf110d",
+      "parent": "/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase.BP_ShooterWeaponBase_C",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript"
+      ],
+      "events": [
+        "ReceiveBeginPlay",
+        "ReceiveTick",
+        "ReceiveActorBeginOverlap"
+      ],
+      "defaults": {
+        "can_be_damaged": true,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 2
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 6
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/Blueprints/Pickups/Weapons/BP_ShooterWeapon_GrenadeLauncher.uasset",
+      "sha256": "168eb272a89f759afd01aeeb256af8b045d17d153e9fca8da90427279ec2cf75",
+      "parent": "/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase.BP_ShooterWeaponBase_C",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript"
+      ],
+      "events": [
+        "ReceiveBeginPlay",
+        "ReceiveTick",
+        "ReceiveActorBeginOverlap"
+      ],
+      "defaults": {
+        "can_be_damaged": true,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 2
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 6
+        }
+      ]
+    },
+    {
+      "file": "Content/Variant_Shooter/UI/UI_Shooter.uasset",
+      "sha256": "26be4983c9fd6b03c285fc996ca4ad9cdeee279d612bada7797429a30947ecbf",
+      "parent": "/Script/UMG.UserWidget",
+      "compile_ok": true,
+      "functions": [],
+      "events": [
+        "Get Updated Score",
+        "PreConstruct",
+        "Construct"
+      ],
+      "defaults": {
+        "NewVar": 0
+      },
+      "graphs": [
+        {
+          "name": "EventGraph",
+          "node_count": 12
+        }
+      ]
+    },
+    {
+      "file": "Content/LevelPrototyping/Interactable/Door/BP_DoorFrame.uasset",
+      "sha256": "4386d7d71b8d5241fd8150aa47900711eb0d8bd069c00de25fce07f011d698fa",
+      "parent": "/Script/Engine.Actor",
+      "compile_ok": true,
+      "functions": [
+        "UserConstructionScript",
+        "Set Mesh"
+      ],
+      "events": [
+        "Open Door",
+        "Close Door",
+        "ReceiveBeginPlay",
+        "ReceiveActorEndOverlap",
+        "ReceiveActorBeginOverlap"
+      ],
+      "defaults": {
+        "Door Size": "<Struct 'Vector' {x: 400.000000, y: 100.000000, z: 400.000000}>",
+        "Door Frame": true,
+        "Door Frame Scale": 1.0,
+        "Door": null,
+        "Closed Position": "<Struct 'Vector' {x: 0.000000, y: 0.000000, z: 0.000000}>",
+        "Door Detection Adjust": "<Struct 'Vector' {x: 100.000000, y: 400.000000, z: 0.000000}>",
+        "Door Thickness": 0.2,
+        "Split Door": false,
+        "Door Frame Overide Material": null,
+        "Add Door": true,
+        "Door2": null,
+        "Closed Position_0": "<Struct 'Vector' {x: 0.000000, y: 0.000000, z: 0.000000}>",
+        "can_be_damaged": true,
+        "spawn_collision_handling_method": "<SpawnActorCollisionHandlingMethod.ALWAYS_SPAWN: 1>"
+      },
+      "graphs": [
+        {
+          "name": "UserConstructionScript",
+          "node_count": 99
+        },
+        {
+          "name": "Set Mesh",
+          "node_count": 10
+        },
+        {
+          "name": "EventGraph",
+          "node_count": 39
+        }
+      ]
+    }
+  ],
+  "maps": [
+    {
+      "path": "/Game/FirstPerson/Lvl_FirstPerson",
+      "load_ok": true,
+      "gameplay_actors": [
+        {
+          "name": "PlayerStart",
+          "class": "PlayerStart",
+          "path": "/Game/FirstPerson/Lvl_FirstPerson.Lvl_FirstPerson:PersistentLevel.PlayerStart_0"
+        }
+      ],
+      "actor_class_counts": {
+        "WorldDataLayers": 1,
+        "StaticMeshActor": 55,
+        "SkyAtmosphere": 1,
+        "PlayerStart": 1,
+        "WorldPartitionMiniMap": 1,
+        "SkyLight": 1,
+        "DirectionalLight": 1,
+        "ExponentialHeightFog": 1,
+        "VolumetricCloud": 1
+      }
+    },
+    {
+      "path": "/Game/Variant_Shooter/Lvl_ArenaShooter",
+      "load_ok": true,
+      "gameplay_actors": [
+        {
+          "name": "PlayerStart",
+          "class": "PlayerStart",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.PlayerStart_UAID_F4A475FF15A38E6A02_1934479509"
+        },
+        {
+          "name": "BP_Pickup_Rifle",
+          "class": "BP_ShooterPickup_C",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.BP_Rifle_C_UAID_F4A475FF15A38E6A02_1934453488",
+          "properties": {
+            "ProjectileOffset": "<Struct 'Vector' {x: 100.000000, y: 0.000000, z: -10.000000}>",
+            "FirstPersonCharacterReference": null,
+            "Spawn Time": 4.0,
+            "Target Class": null,
+            "Weapon Class": "/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase.BP_ShooterWeaponBase_C",
+            "Weapon Type": "<Struct 'DataTableRowHandle' {data_table: \"/Script/Engine.DataTable'/Game/Variant_Shooter/Blueprints/Pickups/DT_WeaponList.DT_WeaponList'\", row_name: \"Pistol\"}>"
+          }
+        },
+        {
+          "name": "BP_Pickup_Rifle3",
+          "class": "BP_ShooterPickup_C",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.BP_Rifle_C_UAID_F4A475FF15A38E6A02_1934387429",
+          "properties": {
+            "ProjectileOffset": "<Struct 'Vector' {x: 100.000000, y: 0.000000, z: -10.000000}>",
+            "FirstPersonCharacterReference": null,
+            "Spawn Time": 4.0,
+            "Target Class": null,
+            "Weapon Class": "/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase.BP_ShooterWeaponBase_C",
+            "Weapon Type": "<Struct 'DataTableRowHandle' {data_table: \"/Script/Engine.DataTable'/Game/Variant_Shooter/Blueprints/Pickups/DT_WeaponList.DT_WeaponList'\", row_name: \"Rifle\"}>"
+          }
+        },
+        {
+          "name": "PlayerStart3",
+          "class": "PlayerStart",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.PlayerStart_UAID_F4A475FF15A38E6A02_1934400439"
+        },
+        {
+          "name": "BP_Pickup_Rifle4",
+          "class": "BP_ShooterPickup_C",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.BP_Rifle_C_UAID_F4A475FF15A38E6A02_1934447482",
+          "properties": {
+            "ProjectileOffset": "<Struct 'Vector' {x: 100.000000, y: 0.000000, z: -10.000000}>",
+            "FirstPersonCharacterReference": null,
+            "Spawn Time": 4.0,
+            "Target Class": null,
+            "Weapon Class": "/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase.BP_ShooterWeaponBase_C",
+            "Weapon Type": "<Struct 'DataTableRowHandle' {data_table: \"/Script/Engine.DataTable'/Game/Variant_Shooter/Blueprints/Pickups/DT_WeaponList.DT_WeaponList'\", row_name: \"Pistol\"}>"
+          }
+        },
+        {
+          "name": "PlayerStart4",
+          "class": "PlayerStart",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.PlayerStart_UAID_F4A475FF15A38E6A02_1934455489"
+        },
+        {
+          "name": "PlayerStart2",
+          "class": "PlayerStart",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.PlayerStart_UAID_F4A475FF15A38E6A02_1934444480"
+        },
+        {
+          "name": "PlayerStart6",
+          "class": "PlayerStart",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.PlayerStart_UAID_F4A475FF15A38E6A02_1934418455"
+        },
+        {
+          "name": "RecastNavMesh-Default",
+          "class": "RecastNavMesh",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.RecastNavMesh_UAID_F4A475FF15A38E6A02-Default"
+        },
+        {
+          "name": "BP_Pickup_Rifle5",
+          "class": "BP_ShooterPickup_C",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.BP_Rifle_C_UAID_F4A475FF15A38E6A02_1934411448",
+          "properties": {
+            "ProjectileOffset": "<Struct 'Vector' {x: 100.000000, y: 0.000000, z: -10.000000}>",
+            "FirstPersonCharacterReference": null,
+            "Spawn Time": 4.0,
+            "Target Class": null,
+            "Weapon Class": "/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase.BP_ShooterWeaponBase_C",
+            "Weapon Type": "<Struct 'DataTableRowHandle' {data_table: \"/Script/Engine.DataTable'/Game/Variant_Shooter/Blueprints/Pickups/DT_WeaponList.DT_WeaponList'\", row_name: \"Rifle\"}>"
+          }
+        },
+        {
+          "name": "BP_DoorFrame",
+          "class": "BP_DoorFrame_C",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.BP_DoorFrame_C_UAID_F4A475FF15A38E6A02_1934498529",
+          "properties": {
+            "Door Size": "<Struct 'Vector' {x: 200.000000, y: 150.000000, z: 250.000000}>",
+            "Door Frame": true,
+            "Door Frame Scale": 0.5,
+            "Door": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.BP_DoorFrame_C_UAID_F4A475FF15A38E6A02_1934498529.NODE_AddStaticMeshComponent-6",
+            "Closed Position": "<Struct 'Vector' {x: 0.000000, y: 0.000000, z: 0.000000}>",
+            "Door Detection Adjust": "<Struct 'Vector' {x: 201.272028, y: 300.000000, z: 0.000000}>",
+            "Door Thickness": 0.5,
+            "Split Door": true,
+            "Door Frame Overide Material": "/Game/FirstPerson/MI_FirstPersonColorway.MI_FirstPersonColorway",
+            "Add Door": true,
+            "Door2": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.BP_DoorFrame_C_UAID_F4A475FF15A38E6A02_1934498529.NODE_AddStaticMeshComponent-7",
+            "Closed Position_0": "<Struct 'Vector' {x: 0.000000, y: 0.000000, z: 0.000000}>"
+          }
+        },
+        {
+          "name": "PlayerStart5",
+          "class": "PlayerStart",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.PlayerStart_UAID_F4A475FF15A38E6A02_1934530553"
+        },
+        {
+          "name": "BP_ShooterNPCSpawner",
+          "class": "BP_ShooterNPCSpawner_C",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.BP_ShooterNPCSpawner_C_UAID_F02F74551BF52E9002_1264403655",
+          "properties": {
+            "Should Spawn Enemies Immediately": true,
+            "Initial Spawn Delay": 5.0,
+            "NPC Class": "/Game/Variant_Shooter/Blueprints/AI/BP_ShooterNPC.BP_ShooterNPC_C",
+            "Spawn Count": 1,
+            "Respawn Delay": 5.0
+          }
+        },
+        {
+          "name": "BP_Pickup_Rifle2",
+          "class": "BP_ShooterPickup_C",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.BP_Rifle_C_UAID_F4A475FF15A38E6A02_1934392433",
+          "properties": {
+            "ProjectileOffset": "<Struct 'Vector' {x: 100.000000, y: 0.000000, z: -10.000000}>",
+            "FirstPersonCharacterReference": null,
+            "Spawn Time": 4.0,
+            "Target Class": null,
+            "Weapon Class": "/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase.BP_ShooterWeaponBase_C",
+            "Weapon Type": "<Struct 'DataTableRowHandle' {data_table: \"/Script/Engine.DataTable'/Game/Variant_Shooter/Blueprints/Pickups/DT_WeaponList.DT_WeaponList'\", row_name: \"GrenadeLauncher\"}>"
+          }
+        },
+        {
+          "name": "BP_ShooterNPCSpawner2",
+          "class": "BP_ShooterNPCSpawner_C",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.BP_ShooterNPCSpawner_C_UAID_F02F74551BF52E9002_1279630656",
+          "properties": {
+            "Should Spawn Enemies Immediately": true,
+            "Initial Spawn Delay": 5.0,
+            "NPC Class": "/Game/Variant_Shooter/Blueprints/AI/BP_ShooterNPC.BP_ShooterNPC_C",
+            "Spawn Count": 1,
+            "Respawn Delay": 5.0
+          }
+        },
+        {
+          "name": "NavMeshBoundsVolume",
+          "class": "NavMeshBoundsVolume",
+          "path": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.NavMeshBoundsVolume_UAID_F4A475FF15A38E6A02_1934427462"
+        }
+      ],
+      "actor_class_counts": {
+        "WorldDataLayers": 1,
+        "StaticMeshActor": 98,
+        "PlayerStart": 6,
+        "VolumetricCloud": 1,
+        "BP_WobbleTarget_C": 5,
+        "SkyLight": 1,
+        "PostProcessVolume": 1,
+        "BP_ShooterPickup_C": 5,
+        "BP_JumpPad_C": 5,
+        "WorldPartitionMiniMap": 1,
+        "SkyAtmosphere": 1,
+        "ExponentialHeightFog": 1,
+        "RecastNavMesh": 1,
+        "BP_DoorFrame_C": 1,
+        "BP_ShooterNPCSpawner_C": 2,
+        "DirectionalLight": 1,
+        "NavMeshBoundsVolume": 1
+      }
+    }
+  ],
+  "map_settings": [
+    {
+      "path": "/Game/FirstPerson/Lvl_FirstPerson",
+      "settings": [
+        {
+          "object": "/Game/FirstPerson/Lvl_FirstPerson.Lvl_FirstPerson:PersistentLevel.WorldSettings_1",
+          "game_mode_override": "<Object '/Game/FirstPerson/Blueprints/BP_FirstPersonGameMode.BP_FirstPersonGameMode_C' Class 'BlueprintGeneratedClass'>"
+        }
+      ]
+    },
+    {
+      "path": "/Game/Variant_Shooter/Lvl_ArenaShooter",
+      "settings": [
+        {
+          "object": "/Game/Variant_Shooter/Lvl_ArenaShooter.Lvl_ArenaShooter:PersistentLevel.WorldSettings",
+          "game_mode_override": "<Object '/Game/Variant_Shooter/Blueprints/BP_ShooterGameMode.BP_ShooterGameMode_C' Class 'BlueprintGeneratedClass'>"
+        }
+      ]
+    }
+  ],
+  "weapons": [
+    {
+      "name": "Pistol",
+      "Current Bullets": "10",
+      "Mag Size": "10",
+      "Full Auto": "False",
+      "Refire Rate": "0.25",
+      "Bullet Class": "<Object '/Game/Variant_Shooter/Blueprints/Pickups/Projectiles/BP_ShooterProjectile_Bullet.BP_ShooterProjectile_Bullet_C' Class 'BlueprintGeneratedClass'>",
+      "Firing Recoil": "-0.05",
+      "Aim Variance": "15.0"
+    },
+    {
+      "name": "Rifle",
+      "Current Bullets": "40",
+      "Mag Size": "40",
+      "Full Auto": "True",
+      "Refire Rate": "0.1",
+      "Bullet Class": "<Object '/Game/Variant_Shooter/Blueprints/Pickups/Projectiles/BP_ShooterProjectile_Bullet.BP_ShooterProjectile_Bullet_C' Class 'BlueprintGeneratedClass'>",
+      "Firing Recoil": "-0.1",
+      "Aim Variance": "30.0"
+    },
+    {
+      "name": "GrenadeLauncher",
+      "Current Bullets": "5",
+      "Mag Size": "5",
+      "Full Auto": "False",
+      "Refire Rate": "0.5",
+      "Bullet Class": "<Object '/Game/Variant_Shooter/Blueprints/Pickups/Projectiles/BP_ShooterProjectile_Grenade.BP_ShooterProjectile_Grenade_C' Class 'BlueprintGeneratedClass'>",
+      "Firing Recoil": "-0.3",
+      "Aim Variance": "20.0"
+    }
+  ],
+  "weapon_table": [
+    {
+      "Name": "GrenadeLauncher",
+      "Static Mesh": "/Game/Weapons/GrenadeLauncher/Meshes/SM_GrenadeLauncher.SM_GrenadeLauncher",
+      "Spawn Actor": "/Game/Variant_Shooter/Blueprints/Pickups/Weapons/BP_ShooterWeapon_GrenadeLauncher.BP_ShooterWeapon_GrenadeLauncher_C"
+    },
+    {
+      "Name": "Pistol",
+      "Static Mesh": "/Game/Weapons/Pistol/Meshes/SM_Pistol.SM_Pistol",
+      "Spawn Actor": "/Game/Variant_Shooter/Blueprints/Pickups/Weapons/BP_ShooterWeapon_Pistol.BP_ShooterWeapon_Pistol_C"
+    },
+    {
+      "Name": "Rifle",
+      "Static Mesh": "/Game/Weapons/Rifle/Meshes/SM_Rifle.SM_Rifle",
+      "Spawn Actor": "/Game/Variant_Shooter/Blueprints/Pickups/Weapons/BP_ShooterWeapon_Rifle.BP_ShooterWeapon_Rifle_C"
+    }
+  ],
+  "inputs": [
+    {
+      "asset": "IMC_Default",
+      "mappings": [
+        {
+          "action": "/Game/Input/Actions/IA_Jump.IA_Jump",
+          "key": "SpaceBar"
+        },
+        {
+          "action": "/Game/Input/Actions/IA_Jump.IA_Jump",
+          "key": "Gamepad_FaceButton_Bottom"
+        },
+        {
+          "action": "/Game/Input/Actions/IA_Move.IA_Move",
+          "key": "W"
+        },
+        {
+          "action": "/Game/Input/Actions/IA_Move.IA_Move",
+          "key": "S"
+        },
+        {
+          "action": "/Game/Input/Actions/IA_Move.IA_Move",
+          "key": "A"
+        },
+        {
+          "action": "/Game/Input/Actions/IA_Move.IA_Move",
+          "key": "D"
+        },
+        {
+          "action": "/Game/Input/Actions/IA_Move.IA_Move",
+          "key": "Up"
+        },
+        {
+          "action": "/Game/Input/Actions/IA_Move.IA_Move",
+          "key": "Down"
+        },
+        {
+          "action": "/Game/Input/Actions/IA_Move.IA_Move",
+          "key": "Right"
+        },
+        {
+          "action": "/Game/Input/Actions/IA_Move.IA_Move",
+          "key": "Left"
+        },
+        {
+          "action": "/Game/Input/Actions/IA_Move.IA_Move",
+          "key": "Gamepad_Left2D"
+        },
+        {
+          "action": "/Game/Input/Actions/IA_Look.IA_Look",
+          "key": "Gamepad_Right2D"
+        }
+      ]
+    },
+    {
+      "asset": "IMC_MouseLook",
+      "mappings": [
+        {
+          "action": "/Game/Input/Actions/IA_MouseLook.IA_MouseLook",
+          "key": "Mouse2D"
+        }
+      ]
+    },
+    {
+      "asset": "IMC_Weapons",
+      "mappings": [
+        {
+          "action": "/Game/Variant_Shooter/Input/Actions/IA_SwapWeapon.IA_SwapWeapon",
+          "key": "LeftShift"
+        },
+        {
+          "action": "/Game/Variant_Shooter/Input/Actions/IA_SwapWeapon.IA_SwapWeapon",
+          "key": "Gamepad_FaceButton_Top"
+        },
+        {
+          "action": "/Game/Variant_Shooter/Input/Actions/IA_Shoot.IA_Shoot",
+          "key": "LeftMouseButton"
+        },
+        {
+          "action": "/Game/Variant_Shooter/Input/Actions/IA_Shoot.IA_Shoot",
+          "key": "Gamepad_RightTriggerAxis"
+        },
+        {
+          "action": "/Game/Variant_Shooter/Input/Actions/IA_Shoot.IA_Shoot",
+          "key": "Gamepad_RightShoulder"
+        }
+      ]
+    }
+  ],
+  "state_tree_states": [
+    "Default",
+    "Dead",
+    "Move to Investigate Location",
+    "Wait at Investigate Location",
+    "Investigate Location",
+    "Find Roam Location",
+    "Move to Roam Location",
+    "Idle at Roam Location",
+    "Search for Enemy",
+    "Find Sniping Location",
+    "Move to Sniping Location",
+    "Wait at Sniping Location",
+    "Attack Enemy",
+    "Armed States",
+    "Root"
+  ],
+  "warnings": [
+    "Arena map load recreated RecastNavMesh due serialized maxTiles mismatch; navigation runtime not tested."
+  ],
+  "critical_graphs": [
+    {
+      "asset": "/Game/Variant_Shooter/Blueprints/BP_ShooterCharacter",
+      "graph": "EventGraph",
+      "nodes": [
+        {
+          "id": "K2Node_CustomEvent_0",
+          "class": "K2Node_CustomEvent",
+          "title": "Die",
+          "pins": [
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_ExecutionSequence_2:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_ExecutionSequence_2",
+          "class": "K2Node_ExecutionSequence",
+          "title": "Sequence",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CustomEvent_0:then"
+              ]
+            },
+            {
+              "name": "then_0",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_Message_1:execute"
+              ]
+            },
+            {
+              "name": "then_1",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_Knot_17:InputPin"
+              ]
+            },
+            {
+              "name": "then_2",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_12:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CallFunction_12",
+          "class": "K2Node_CallFunction",
+          "title": "Delay",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_ExecutionSequence_2:then_2"
+              ]
+            },
+            {
+              "name": "Duration",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Float (single-precision)",
+              "value": "5.000000",
+              "links": []
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_13:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CallFunction_13",
+          "class": "K2Node_CallFunction",
+          "title": "Destroy Actor",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_12:then"
+              ]
+            }
+          ]
+        }
+      ],
+      "excerpt_only": true
+    },
+    {
+      "asset": "/Game/Variant_Shooter/Blueprints/BP_ShooterPlayerController",
+      "graph": "EventGraph",
+      "nodes": [
+        {
+          "id": "K2Node_Event_1",
+          "class": "K2Node_Event",
+          "title": "Event On Possess",
+          "pins": [
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_AssignDelegate_0:execute"
+              ]
+            },
+            {
+              "name": "PossessedPawn",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Pawn Object Reference",
+              "value": "",
+              "links": [
+                "K2Node_AssignDelegate_0:self",
+                "K2Node_Message_2:self"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CustomEvent_0",
+          "class": "K2Node_CustomEvent",
+          "title": "OnDestroyed_Event",
+          "pins": [
+            {
+              "name": "OutputDelegate",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Delegate",
+              "value": "",
+              "links": [
+                "K2Node_AssignDelegate_0:Delegate"
+              ]
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_ExecutionSequence_0:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_AssignDelegate_0",
+          "class": "K2Node_AssignDelegate",
+          "title": "Assign On Destroyed",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_Event_1:then"
+              ]
+            },
+            {
+              "name": "self",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Actor Object Reference",
+              "value": "",
+              "links": [
+                "K2Node_Event_1:PossessedPawn"
+              ]
+            },
+            {
+              "name": "Delegate",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Delegate (by ref)",
+              "value": "",
+              "links": [
+                "K2Node_CustomEvent_0:OutputDelegate"
+              ]
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_Message_2:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_SpawnActorFromClass_0",
+          "class": "K2Node_SpawnActorFromClass",
+          "title": "SpawnActor BP Shooter Character",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_18:then"
+              ]
+            },
+            {
+              "name": "Class",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Actor Class Reference",
+              "value": "/Game/Variant_Shooter/Blueprints/BP_ShooterCharacter.BP_ShooterCharacter_C",
+              "links": []
+            },
+            {
+              "name": "SpawnTransform",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Transform",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_6:ReturnValue"
+              ]
+            },
+            {
+              "name": "CollisionHandlingOverride",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "ESpawnActorCollisionHandlingMethod Enum",
+              "value": "Undefined",
+              "links": []
+            },
+            {
+              "name": "TransformScaleMethod",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "ESpawnActorScaleMethod Enum",
+              "value": "MultiplyWithRoot",
+              "links": []
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_9:execute"
+              ]
+            },
+            {
+              "name": "ReturnValue",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "BP Shooter Character Object Reference",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_9:InPawn"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CallFunction_9",
+          "class": "K2Node_CallFunction",
+          "title": "Possess",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_SpawnActorFromClass_0:then"
+              ]
+            },
+            {
+              "name": "InPawn",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Pawn Object Reference",
+              "value": "",
+              "links": [
+                "K2Node_SpawnActorFromClass_0:ReturnValue"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_ExecutionSequence_0",
+          "class": "K2Node_ExecutionSequence",
+          "title": "Sequence",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CustomEvent_0:then"
+              ]
+            },
+            {
+              "name": "then_0",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_MacroInstance_0:exec"
+              ]
+            },
+            {
+              "name": "then_1",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_18:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CallFunction_18",
+          "class": "K2Node_CallFunction",
+          "title": "GetAllActorsOfClassWithTag",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_ExecutionSequence_0:then_1"
+              ]
+            },
+            {
+              "name": "ActorClass",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Actor Class Reference",
+              "value": "/Script/Engine.PlayerStart",
+              "links": []
+            },
+            {
+              "name": "Tag",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Name",
+              "value": "None",
+              "links": [
+                "K2Node_Select_0:ReturnValue"
+              ]
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_SpawnActorFromClass_0:execute"
+              ]
+            },
+            {
+              "name": "OutActors",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Array of Player Start Object References",
+              "value": "",
+              "links": [
+                "K2Node_CallArrayFunction_0:TargetArray"
+              ]
+            }
+          ]
+        }
+      ],
+      "excerpt_only": true
+    },
+    {
+      "asset": "/Game/Variant_Shooter/Blueprints/AI/BP_ShooterNPCSpawner",
+      "graph": "EventGraph",
+      "nodes": [
+        {
+          "id": "K2Node_Event_0",
+          "class": "K2Node_Event",
+          "title": "Event BeginPlay",
+          "pins": [
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_Message_0:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CustomEvent_0",
+          "class": "K2Node_CustomEvent",
+          "title": "Spawn Enemy",
+          "pins": [
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_SpawnActorFromClass_2:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_VariableGet_0",
+          "class": "K2Node_VariableGet",
+          "title": "Get Spawn Capsule",
+          "pins": [
+            {
+              "name": "Spawn Capsule",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Capsule Collision Object Reference",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_0:self"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CallFunction_0",
+          "class": "K2Node_CallFunction",
+          "title": "Get World Transform",
+          "pins": [
+            {
+              "name": "self",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Scene Component Object Reference",
+              "value": "",
+              "links": [
+                "K2Node_VariableGet_0:Spawn Capsule"
+              ]
+            },
+            {
+              "name": "ReturnValue",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Transform",
+              "value": "",
+              "links": [
+                "K2Node_SpawnActorFromClass_2:SpawnTransform"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CustomEvent_1",
+          "class": "K2Node_CustomEvent",
+          "title": "On NPC Died",
+          "pins": [
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_MacroInstance_0: "
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CallFunction_1",
+          "class": "K2Node_CallFunction",
+          "title": "RetriggerableDelay",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_Knot_1:OutputPin"
+              ]
+            },
+            {
+              "name": "Duration",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Float (single-precision)",
+              "value": "0.2",
+              "links": [
+                "K2Node_VariableGet_1:Respawn Delay"
+              ]
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_2:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_VariableGet_1",
+          "class": "K2Node_VariableGet",
+          "title": "Get Respawn Delay",
+          "pins": [
+            {
+              "name": "Respawn Delay",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Float (single-precision)",
+              "value": "0.0",
+              "links": [
+                "K2Node_CallFunction_1:Duration"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_VariableGet_5",
+          "class": "K2Node_VariableGet",
+          "title": "Get Spawn Count",
+          "pins": [
+            {
+              "name": "Spawn Count",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Integer",
+              "value": "0",
+              "links": [
+                "K2Node_MacroInstance_0:Value"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_MacroInstance_0",
+          "class": "K2Node_MacroInstance",
+          "title": "Decrement Int",
+          "pins": [
+            {
+              "name": " ",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CustomEvent_1:then"
+              ]
+            },
+            {
+              "name": "Value",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Integer (by ref)",
+              "value": "",
+              "links": [
+                "K2Node_VariableGet_5:Spawn Count"
+              ]
+            },
+            {
+              "name": "  ",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_IfThenElse_0:execute"
+              ]
+            },
+            {
+              "name": "Result",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Integer",
+              "value": "",
+              "links": [
+                "K2Node_PromotableOperator_1:A"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_IfThenElse_0",
+          "class": "K2Node_IfThenElse",
+          "title": "Branch",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_MacroInstance_0:  "
+              ]
+            },
+            {
+              "name": "Condition",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Boolean",
+              "value": "true",
+              "links": [
+                "K2Node_PromotableOperator_1:ReturnValue"
+              ]
+            },
+            {
+              "name": "else",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_Knot_1:InputPin"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CallFunction_2",
+          "class": "K2Node_CallFunction",
+          "title": "Spawn Enemy",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_1:then"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CallFunction_3",
+          "class": "K2Node_CallFunction",
+          "title": "Delay",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_IfThenElse_1:then"
+              ]
+            },
+            {
+              "name": "Duration",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Float (single-precision)",
+              "value": "0.2",
+              "links": [
+                "K2Node_VariableGet_4:Initial Spawn Delay"
+              ]
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_4:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_VariableGet_3",
+          "class": "K2Node_VariableGet",
+          "title": "Get NPC Class",
+          "pins": [
+            {
+              "name": "NPC Class",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "BP Shooter NPC Class Reference",
+              "value": "",
+              "links": [
+                "K2Node_SpawnActorFromClass_2:Class"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_VariableGet_4",
+          "class": "K2Node_VariableGet",
+          "title": "Get Initial Spawn Delay",
+          "pins": [
+            {
+              "name": "Initial Spawn Delay",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Float (single-precision)",
+              "value": "0.0",
+              "links": [
+                "K2Node_CallFunction_3:Duration"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CallFunction_4",
+          "class": "K2Node_CallFunction",
+          "title": "Spawn Enemy",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_3:then"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_IfThenElse_1",
+          "class": "K2Node_IfThenElse",
+          "title": "Branch",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_Message_0:then"
+              ]
+            },
+            {
+              "name": "Condition",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Boolean",
+              "value": "true",
+              "links": [
+                "K2Node_CommutativeAssociativeBinaryOperator_0:ReturnValue"
+              ]
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_3:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_VariableGet_6",
+          "class": "K2Node_VariableGet",
+          "title": "Get Should Spawn Enemies Immediately",
+          "pins": [
+            {
+              "name": "Should Spawn Enemies Immediately",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Boolean",
+              "value": "false",
+              "links": [
+                "K2Node_CommutativeAssociativeBinaryOperator_0:B"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_PromotableOperator_1",
+          "class": "K2Node_PromotableOperator",
+          "title": "integer <= integer",
+          "pins": [
+            {
+              "name": "A",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Integer",
+              "value": "",
+              "links": [
+                "K2Node_MacroInstance_0:Result"
+              ]
+            },
+            {
+              "name": "ReturnValue",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Boolean",
+              "value": "",
+              "links": [
+                "K2Node_IfThenElse_0:Condition"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_Knot_1",
+          "class": "K2Node_Knot",
+          "title": "Reroute Node",
+          "pins": [
+            {
+              "name": "InputPin",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_IfThenElse_0:else"
+              ]
+            },
+            {
+              "name": "OutputPin",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_1:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_SpawnActorFromClass_2",
+          "class": "K2Node_SpawnActorFromClass",
+          "title": "SpawnActor",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CustomEvent_0:then"
+              ]
+            },
+            {
+              "name": "Class",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Actor Class Reference",
+              "value": "",
+              "links": [
+                "K2Node_VariableGet_3:NPC Class"
+              ]
+            },
+            {
+              "name": "SpawnTransform",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Transform",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_0:ReturnValue"
+              ]
+            },
+            {
+              "name": "CollisionHandlingOverride",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "ESpawnActorCollisionHandlingMethod Enum",
+              "value": "AdjustIfPossibleButAlwaysSpawn",
+              "links": []
+            },
+            {
+              "name": "TransformScaleMethod",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "ESpawnActorScaleMethod Enum",
+              "value": "MultiplyWithRoot",
+              "links": []
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_AddDelegate_1:execute"
+              ]
+            },
+            {
+              "name": "ReturnValue",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "BP Shooter NPC Object Reference",
+              "value": "",
+              "links": [
+                "K2Node_AddDelegate_1:self"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_AddDelegate_1",
+          "class": "K2Node_AddDelegate",
+          "title": "Bind Event to On Death",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_SpawnActorFromClass_2:then"
+              ]
+            },
+            {
+              "name": "self",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "BP Shooter NPC Object Reference",
+              "value": "",
+              "links": [
+                "K2Node_SpawnActorFromClass_2:ReturnValue"
+              ]
+            },
+            {
+              "name": "Delegate",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Delegate (by ref)",
+              "value": "",
+              "links": [
+                "K2Node_CreateDelegate_1:OutputDelegate"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CreateDelegate_1",
+          "class": "K2Node_CreateDelegate",
+          "title": "Create Event",
+          "pins": [
+            {
+              "name": "OutputDelegate",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Delegate",
+              "value": "",
+              "links": [
+                "K2Node_AddDelegate_1:Delegate"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CallFunction_5",
+          "class": "K2Node_CallFunction",
+          "title": "GetGameMode",
+          "pins": [
+            {
+              "name": "ReturnValue",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Game Mode Base Object Reference",
+              "value": "",
+              "links": [
+                "K2Node_Message_0:self"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_Message_0",
+          "class": "K2Node_Message",
+          "title": "Should Spawn Enemy NPCs",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_Event_0:then"
+              ]
+            },
+            {
+              "name": "self",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Object Reference",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_5:ReturnValue"
+              ]
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_IfThenElse_1:execute"
+              ]
+            },
+            {
+              "name": "Should Spawn",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Boolean",
+              "value": "false",
+              "links": [
+                "K2Node_CommutativeAssociativeBinaryOperator_0:A"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CommutativeAssociativeBinaryOperator_0",
+          "class": "K2Node_CommutativeAssociativeBinaryOperator",
+          "title": "AND Boolean",
+          "pins": [
+            {
+              "name": "A",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Boolean",
+              "value": "false",
+              "links": [
+                "K2Node_Message_0:Should Spawn"
+              ]
+            },
+            {
+              "name": "B",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Boolean",
+              "value": "false",
+              "links": [
+                "K2Node_VariableGet_6:Should Spawn Enemies Immediately"
+              ]
+            },
+            {
+              "name": "ReturnValue",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Boolean",
+              "value": "false",
+              "links": [
+                "K2Node_IfThenElse_1:Condition"
+              ]
+            }
+          ]
+        }
+      ],
+      "excerpt_only": true
+    },
+    {
+      "asset": "/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterPickup",
+      "graph": "EventGraph",
+      "nodes": [
+        {
+          "id": "K2Node_ComponentBoundEvent_0",
+          "class": "K2Node_ComponentBoundEvent",
+          "title": "On Component Begin Overlap (SphereCollision)",
+          "pins": [
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_Message_1:execute"
+              ]
+            },
+            {
+              "name": "OtherActor",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Actor Object Reference",
+              "value": "",
+              "links": [
+                "K2Node_Message_1:self"
+              ]
+            },
+            {
+              "name": "OtherBodyIndex",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Integer",
+              "value": "0",
+              "links": []
+            },
+            {
+              "name": "bFromSweep",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Boolean",
+              "value": "false",
+              "links": []
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CallFunction_14",
+          "class": "K2Node_CallFunction",
+          "title": "Set Timer by Event",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_15:then"
+              ]
+            },
+            {
+              "name": "Delegate",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Delegate",
+              "value": "",
+              "links": [
+                "K2Node_CustomEvent_0:OutputDelegate"
+              ]
+            },
+            {
+              "name": "Time",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Float (single-precision)",
+              "value": "0.0",
+              "links": [
+                "K2Node_VariableGet_3:Spawn Time"
+              ]
+            },
+            {
+              "name": "bLooping",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Boolean",
+              "value": "false",
+              "links": []
+            },
+            {
+              "name": "bMaxOncePerFrame",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Boolean",
+              "value": "false",
+              "links": []
+            },
+            {
+              "name": "InitialStartDelay",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Float (single-precision)",
+              "value": "0.000000",
+              "links": []
+            },
+            {
+              "name": "InitialStartDelayVariance",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Float (single-precision)",
+              "value": "0.000000",
+              "links": []
+            }
+          ]
+        },
+        {
+          "id": "K2Node_CustomEvent_0",
+          "class": "K2Node_CustomEvent",
+          "title": "Enable Pickup",
+          "pins": [
+            {
+              "name": "OutputDelegate",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Delegate",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_14:Delegate"
+              ]
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_20:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_VariableGet_3",
+          "class": "K2Node_VariableGet",
+          "title": "Get Spawn Time",
+          "pins": [
+            {
+              "name": "Spawn Time",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Float (single-precision)",
+              "value": "0.0",
+              "links": [
+                "K2Node_CallFunction_14:Time"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_Message_1",
+          "class": "K2Node_Message",
+          "title": "Add Weapon Class",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_ComponentBoundEvent_0:then"
+              ]
+            },
+            {
+              "name": "self",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Object Reference",
+              "value": "",
+              "links": [
+                "K2Node_ComponentBoundEvent_0:OtherActor"
+              ]
+            },
+            {
+              "name": "Weapon Class",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "BP Shooter Weapon Base Class Reference",
+              "value": "",
+              "links": [
+                "K2Node_VariableGet_0:Weapon Class"
+              ]
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_CallFunction_19:execute"
+              ]
+            }
+          ]
+        }
+      ],
+      "excerpt_only": true
+    },
+    {
+      "asset": "/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase",
+      "graph": "Fire Bullet",
+      "nodes": [
+        {
+          "id": "K2Node_MacroInstance_0",
+          "class": "K2Node_MacroInstance",
+          "title": "Decrement Int",
+          "pins": [
+            {
+              "name": " ",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_ExecutionSequence_1:then_0"
+              ]
+            },
+            {
+              "name": "Value",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Integer (by ref)",
+              "value": "",
+              "links": [
+                "K2Node_VariableGet_10:Current Bullets"
+              ]
+            },
+            {
+              "name": "  ",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_IfThenElse_0:execute"
+              ]
+            },
+            {
+              "name": "Result",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Integer",
+              "value": "",
+              "links": [
+                "K2Node_PromotableOperator_2:A"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_PromotableOperator_2",
+          "class": "K2Node_PromotableOperator",
+          "title": "integer <= integer",
+          "pins": [
+            {
+              "name": "A",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Integer",
+              "value": "",
+              "links": [
+                "K2Node_MacroInstance_0:Result"
+              ]
+            },
+            {
+              "name": "ReturnValue",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Boolean",
+              "value": "",
+              "links": [
+                "K2Node_IfThenElse_0:Condition"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_IfThenElse_0",
+          "class": "K2Node_IfThenElse",
+          "title": "Branch",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_MacroInstance_0:  "
+              ]
+            },
+            {
+              "name": "Condition",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Boolean",
+              "value": "true",
+              "links": [
+                "K2Node_PromotableOperator_2:ReturnValue"
+              ]
+            },
+            {
+              "name": "then",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_VariableSet_1:execute"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_VariableGet_10",
+          "class": "K2Node_VariableGet",
+          "title": "Get Current Bullets",
+          "pins": [
+            {
+              "name": "Current Bullets",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Integer",
+              "value": "0",
+              "links": [
+                "K2Node_MacroInstance_0:Value"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_VariableSet_1",
+          "class": "K2Node_VariableSet",
+          "title": "Set Current Bullets",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_IfThenElse_0:then"
+              ]
+            },
+            {
+              "name": "Current Bullets",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Integer",
+              "value": "0",
+              "links": [
+                "K2Node_VariableGet_11:Mag Size"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_VariableGet_11",
+          "class": "K2Node_VariableGet",
+          "title": "Get Mag Size",
+          "pins": [
+            {
+              "name": "Mag Size",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Integer",
+              "value": "0",
+              "links": [
+                "K2Node_VariableSet_1:Current Bullets"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "K2Node_ExecutionSequence_1",
+          "class": "K2Node_ExecutionSequence",
+          "title": "Sequence",
+          "pins": [
+            {
+              "name": "execute",
+              "direction": "<EdGraphPinDirection.EGPD_INPUT: 0>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_Knot_4:OutputPin"
+              ]
+            },
+            {
+              "name": "then_0",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_MacroInstance_0: "
+              ]
+            },
+            {
+              "name": "then_1",
+              "direction": "<EdGraphPinDirection.EGPD_OUTPUT: 1>",
+              "type": "Exec",
+              "value": "",
+              "links": [
+                "K2Node_Knot_5:InputPin"
+              ]
+            }
+          ]
+        }
+      ],
+      "excerpt_only": true
+    }
+  ]
+}

@@ -6,29 +6,30 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 
 ## 当前迭代范围
 
-当前先做 GM 原型：点击死亡、前后阶段切换、增减敌人 AI、一键接入监控。对应的拾取、终端、权限道具和关卡触发交互暂缓，具体边界见 [GM 原型范围](docs/design/gm-prototype.md)。正式游戏的阶段规则仍保留，GM 强制切阶段是测试例外。
+当前目标是完整可玩的原型：正常游戏交互与 GM 配套实现。玩家应能通过实际拾取、短战斗、阶段循环和监控黑入走通关卡；GM 提供点击死亡、前后阶段切换、增减敌人和一键接入监控，帮助调试同一套系统。此前“只做 GM、暂缓实际交互”的范围已取消。
 
-当前技术路线采用纯蓝图，先用调试按钮面板调用统一功能入口；C++ 按后续实际需求引入，依据见[技术路线评估](docs/engineering/blueprint-cpp.md)。本轮只完成文档与选型，尚未实现 GM 功能。
+当前继续优先复用蓝图模板，实际交互与调试按钮调用统一能力；C++ 按明确需求引入，依据见[技术路线评估](docs/engineering/blueprint-cpp.md)。本轮完成[模板盘点](docs/engineering/template-inventory.md)与范围纠正，尚未实现项目专用循环、黑入或 GM。
 
 ## 当前工程
 
 - 引擎关联版本：`OFFAIR.uproject` 中的 `5.8`。
 - 当前仓库以蓝图资产为主，未发现 `Source/` 或项目 C++ 模块声明。
 - 默认启动地图：`/Game/FirstPerson/Lvl_FirstPerson`。
-- 已有第一人称模板、射击变体、武器、敌人与关卡灰盒资产；具体复用能力仍需在编辑器中验证。
+- 已通过 UE 读取射击角色、武器、敌人等 19 个关键蓝图的图表与配置，并全部完成内存编译；两张地图加载成功。实际 PIE 战斗和导航仍待验证。
 - 阶段循环与黑入机制目前是设计目标，本次文档整理不代表功能已经实现。
 
 ## 文档导航
 
 | 文档 | 用途 |
 | --- | --- |
-| [当前 GM 原型范围](docs/design/gm-prototype.md) | 本期五类操作、暂缓玩法、命令语义与边界 |
+| [模板能力盘点](docs/engineering/template-inventory.md) | 已验证资产、实际地图配置、复用注意点与可玩原型缺口 |
+| [GM 配套工具范围](docs/design/gm-prototype.md) | 与真实交互共同实现的五类调试操作及边界 |
 | [蓝图与 C++ 技术路线](docs/engineering/blueprint-cpp.md) | 当前纯蓝图选择、职责划分与后续引入 C++ 的条件 |
-| [游戏需求与后续关卡](docs/design/game-design.md) | 正式玩法目标、流程图解读及后续交互关卡建议 |
+| [游戏需求与原型关卡](docs/design/game-design.md) | 当前完整可玩目标、流程图解读及关卡建议 |
 | [阶段循环与世界重置](docs/design/stage-loop.md) | 阶段推进时机、状态模型、重置范围与异常规则 |
 | [监控摄像机黑入](docs/design/camera-hacking.md) | 连接、切换视角、转向、退出及循环联动 |
 | [工程落地计划](docs/engineering/prototype-plan.md) | 仓库现状、建议职责划分、实现顺序与完成标准 |
-| [原型验收清单](docs/qa/prototype-acceptance.md) | 当前 GM 验收及后续完整玩法检查 |
+| [原型验收清单](docs/qa/prototype-acceptance.md) | 正常游戏流程与 GM 工具的双入口验收 |
 | [待决策事项](docs/open-decisions.md) | 需要团队确认的选择、建议和影响 |
 | [领域术语](CONTEXT.md) | 统一“阶段”“循环”“初始状态”等概念 |
 | [代理协作约定](AGENTS.md) | 后续代理在本仓库工作的规则 |

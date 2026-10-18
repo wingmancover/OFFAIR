@@ -14,18 +14,18 @@ Epic 将蓝图的快速原型迭代列为优势，并指出 C++ 的性能收益�
 
 ## 当前职责划分
 
-以下名称为建议，并非已经创建的资产。根据实际图规模可以合并小型职责，不为每个动作强行增加一个类。
+当前实际资产与职责如下。运行时保持纯蓝图；编辑器生成脚本方便审阅和重复构建，不是游戏脚本运行时，也不要求增加项目 C++ 模块。
 
 | 部分 | 蓝图承载方式 | 主要职责 |
 | --- | --- | --- |
-| GM 界面 | `WBP_GMPanel` | 六个主按钮、设备选择、只读状态与结果；不直接改阶段和敌人数 |
-| GM 调度 | PlayerController 上的专用组件或独立蓝图对象 | 统一校验和分派命令、处理面板焦点；正式玩法不依赖 GM 面板存在 |
-| 会话与阶段 | GameInstance 保存会话进度，GameMode 或阶段管理对象执行重建 | 当前／待生效／目标阶段分开，防重复重置、失败恢复与新旧尝试隔离 |
-| 阶段数据 | 蓝图结构体配合配置资产或数据表 | 阶段顺序、出生点、敌人初始数量及监控初始状态 |
-| 敌人生成 | 专用生成管理对象，复用已验证 NPC 模板 | 生成点、实例登记、数量上限、移除清理与重置 |
-| 监控 | 监控 Actor 与 PlayerController | 转向、视角、输入、正常退出与异常中断 |
+| GM 界面 | `BP_PrototypeHUD` | Canvas 绘制六个按钮与命中区域；派发 `GMAction`，不直接改世界状态 |
+| 输入与 GM 调度 | `BP_OFFAIRController` 与 `BP_RunDirector` | 原生键盘事件与统一操作入口，正常流程不依赖 GM |
+| 会话与阶段 | `BP_OFFAIRSession` 与 `BP_RunDirector` | 当前／待生效／目标阶段分开，重建验证成功后提交进度 |
+| 阶段配置 | Director 的 `Stage Setup` 与两阶段基线函数 | 配置场景引用与关键条件，当前明确限定为 0、1 两阶段 |
+| FPS 与敌人 | 模板派生玩家／控制器／GameMode，原模板 NPC 与武器 | 保留战斗，替换自动复活职责；登记真实 AI，移除不发击杀奖励 |
+| 监控 | 地图中的 CameraActor 与 Director | 真实设备朝向、视角、输入、侦测及统一退出清理 |
 
-首版入口采用运行时 UMG 调试面板。Widget Blueprint 可以布局界面并实现脚本交互，不需要为了几个按钮先增加原生控制台支持。[官方 UMG 入门](https://dev.epicgames.com/documentation/en-us/unreal-engine/umg-ui-designer-quick-start-guide-in-unreal-engine)
+首版使用蓝图 Canvas HUD 与可点击命中区域，保留模板的武器／生命 UMG。这样可以用现有蓝图编辑 API 完成可复现的按钮接入；后续需要响应式布局或中文字体资产时可迁移到 UMG，操作接口不变。不需要为六个按钮增加原生控制台支持。
 
 地图重置先采用重载后应用目标阶段配置；测试加载等待及初始化可靠性后再决定是否改为原地恢复。改用 C++ 与改用原地重置是两个独立选择，C++ 本身不会自动缩短地图加载时间。
 
@@ -39,7 +39,7 @@ Epic 将蓝图的快速原型迭代列为优势，并指出 C++ 的性能收益�
 | 性能分析确实定位到大量 AI 或密集蓝图计算 | 已测得的热点算法或批量处理 | 单体行为调参、动画和 UI |
 | 需要蓝图未暴露的引擎能力或稳定的原生控制台入口 | 小型原生接口与命令适配层 | 已有玩法逻辑和面板 |
 
-C++ 的文本存储更便于 diff 和合并，Epic 也提供蓝图 Diff 工具。本轮已用本机 UE 的 Python commandlet 验证资产加载、图表节点与连线读取、内存编译和地图加载；复杂图表改写、实际操作试玩及打包通道仍需在实现迭代验证。这些边界应如实记录，不因此自动更换项目语言。[官方对比与协作说明](https://dev.epicgames.com/documentation/en-us/unreal-engine/coding-in-unreal-engine-blueprint-vs-cplusplus)
+C++ 的文本存储更便于 diff 和合并，Epic 也提供蓝图 Diff 工具。本轮已通过本机 UE 官方图表 API 生成和编译运行时资产，并完成 PIE 集成验证；作者脚本在 `Tools/unreal/`，标准命令见 README。打包发布仍未验证。[官方对比与协作说明](https://dev.epicgames.com/documentation/en-us/unreal-engine/coding-in-unreal-engine-blueprint-vs-cplusplus)
 
 如果以后明确需要在 Unreal 原生控制台输入带参数的命令，可评估薄层 C++ `UFUNCTION(Exec)` 入口，再调用同一套游戏能力。`Exec` 只在特定类中生效；`BlueprintCallable` 只是蓝图可调用，并不等于注册了控制台命令。当前 GM 动作名不会被描述成现成控制台语法。[官方 UFunctions 说明](https://dev.epicgames.com/documentation/unreal-engine/ufunctions-in-unreal-engine?lang=en-US)
 
@@ -49,4 +49,4 @@ GM 层只提出死亡、切阶段、增减敌人和连接监控的请求；世�
 
 如果后续迁移，优先把稳定规则放到可向蓝图暴露的 C++ 基类或组件，保留关卡参数、UI 和表现资产。迁移需要调整引用并重新测试，不承诺一键无成本转换。每次迁移应由明确问题驱动，不同时重写所有模板与地图。
 
-本轮未新增 `Source/`、原生模块或项目插件配置。首个实现迭代需运行正常游玩与 GM 用例，并记录测试地图和结果；本次模板编译结果不能替代功能实现后的运行验证。
+本轮未新增 `Source/`、原生模块或持久化项目插件配置。PythonScriptPlugin 仅通过编辑器启动参数临时启用，正常打开工程游玩不需要它。实际验证及限制见[实现验证记录](../qa/prototype-implementation-validation.md)。

@@ -1,0 +1,193 @@
+{
+  "phase": "reg_recovery",
+  "started": 132763.046,
+  "entered": 132793.765,
+  "passed": [
+    "startup",
+    "interaction_distance_guard",
+    "same_stage_death_and_duplicate_guard",
+    "normal_anchor_pickup",
+    "pending_waits_for_death",
+    "guard_moves_on_navigation",
+    "death_applies_next_baseline",
+    "real_weapon_pickup",
+    "real_weapon_defeats_guard",
+    "normal_access_card_pickup",
+    "normal_monitor_hack",
+    "remote_rotation_clamps_and_body_restore",
+    "normal_playthrough_complete",
+    "completed_restart_restores_new_game",
+    "stage_boundary_and_invalid_target_guards",
+    "gm_disable_guards_all_entries",
+    "normal_permission_and_gm_override",
+    "remote_death_restores_input_and_camera",
+    "gm_enemy_lifecycle_and_no_kill_reward",
+    "monitor_loss_returns_to_body",
+    "ten_reset_cycles_without_state_or_actor_leaks",
+    "default_camera_detection_and_alarm_lock",
+    "camera_orientation_changes_real_detection",
+    "configured_kill_condition_and_wrong_target_rejection",
+    "initialization_failure_recovers_without_losing_progress"
+  ],
+  "events": [
+    {
+      "test": "startup",
+      "detail": "OFFAIR player/controller/session/director initialized",
+      "seconds": 0.5
+    },
+    {
+      "test": "interaction_distance_guard",
+      "detail": "",
+      "seconds": 0.5
+    },
+    {
+      "test": "same_stage_death_and_duplicate_guard",
+      "detail": "",
+      "seconds": 1.28
+    },
+    {
+      "test": "normal_anchor_pickup",
+      "detail": "",
+      "seconds": 1.91
+    },
+    {
+      "test": "pending_waits_for_death",
+      "detail": "",
+      "seconds": 2.61
+    },
+    {
+      "test": "guard_moves_on_navigation",
+      "detail": "15.6 cm of AI movement",
+      "seconds": 3.56
+    },
+    {
+      "test": "death_applies_next_baseline",
+      "detail": "",
+      "seconds": 3.56
+    },
+    {
+      "test": "real_weapon_pickup",
+      "detail": "BP_ShooterWeapon_Pistol_C",
+      "seconds": 5.27
+    },
+    {
+      "test": "real_weapon_defeats_guard",
+      "detail": "",
+      "seconds": 7.03
+    },
+    {
+      "test": "normal_access_card_pickup",
+      "detail": "",
+      "seconds": 7.39
+    },
+    {
+      "test": "normal_monitor_hack",
+      "detail": "",
+      "seconds": 9.44
+    },
+    {
+      "test": "remote_rotation_clamps_and_body_restore",
+      "detail": "",
+      "seconds": 9.47
+    },
+    {
+      "test": "normal_playthrough_complete",
+      "detail": "No GM action was used; real movement, pickup, weapon projectiles and normal terminal entry",
+      "seconds": 13.73
+    },
+    {
+      "test": "completed_restart_restores_new_game",
+      "detail": "",
+      "seconds": 14.56
+    },
+    {
+      "test": "stage_boundary_and_invalid_target_guards",
+      "detail": "",
+      "seconds": 14.56
+    },
+    {
+      "test": "gm_disable_guards_all_entries",
+      "detail": "",
+      "seconds": 14.58
+    },
+    {
+      "test": "normal_permission_and_gm_override",
+      "detail": "",
+      "seconds": 15.39
+    },
+    {
+      "test": "remote_death_restores_input_and_camera",
+      "detail": "",
+      "seconds": 16.22
+    },
+    {
+      "test": "gm_enemy_lifecycle_and_no_kill_reward",
+      "detail": "",
+      "seconds": 16.25
+    },
+    {
+      "test": "monitor_loss_returns_to_body",
+      "detail": "",
+      "seconds": 17.23
+    },
+    {
+      "test": "ten_reset_cycles_without_state_or_actor_leaks",
+      "detail": "",
+      "seconds": 25.38
+    },
+    {
+      "test": "default_camera_detection_and_alarm_lock",
+      "detail": "",
+      "seconds": 26.91
+    },
+    {
+      "test": "camera_orientation_changes_real_detection",
+      "detail": "",
+      "seconds": 28.44
+    },
+    {
+      "test": "configured_kill_condition_and_wrong_target_rejection",
+      "detail": "",
+      "seconds": 29.89
+    },
+    {
+      "test": "initialization_failure_recovers_without_losing_progress",
+      "detail": "",
+      "seconds": 31.53
+    }
+  ],
+  "status": "passed",
+  "last_shot": 132770.031,
+  "waypoint": 4,
+  "normal_gm_calls": 0,
+  "snapshots": [],
+  "observation": {
+    "stage": 0,
+    "position": [
+      -160.0,
+      0.0,
+      98.1499981880188
+    ],
+    "hp": 500.0,
+    "remote": false,
+    "alarm": false,
+    "live_enemies": 0
+  },
+  "last_observation": 132792.796,
+  "run_before": 2,
+  "guard_start": [
+    1550.0,
+    0.0,
+    98.1499981880188
+  ],
+  "body_before_remote": [
+    1791.429739624691,
+    -408.04710593790855,
+    98.15000109417679
+  ],
+  "regression_gm_calls": 42,
+  "wait_run": 22,
+  "repeat_count": 10,
+  "error": "",
+  "elapsed_seconds": 31.53
+}

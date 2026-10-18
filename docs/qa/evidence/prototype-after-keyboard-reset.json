@@ -1,0 +1,21 @@
+{
+  "Initialized": true,
+  "Stage": 1,
+  "CoreCollected": false,
+  "AccessCollected": false,
+  "RemoteActive": false,
+  "GMOpen": false,
+  "Alarm": false,
+  "Completed": false,
+  "EnemyCount": 1,
+  "PromptText": "",
+  "StatusText": "Follow the signs. E interacts. R restarts a loop.",
+  "RemoteYaw": 180.0,
+  "RemotePitch": -18.0,
+  "ready_for_input": true,
+  "position": [
+    -160.0,
+    0.0,
+    98.1499981880188
+  ]
+}

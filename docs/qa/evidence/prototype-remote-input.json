@@ -1,0 +1,21 @@
+{
+  "Initialized": true,
+  "Stage": 0,
+  "CoreCollected": false,
+  "AccessCollected": false,
+  "RemoteActive": true,
+  "GMOpen": false,
+  "Alarm": false,
+  "Completed": false,
+  "EnemyCount": 0,
+  "PromptText": "",
+  "StatusText": "REMOTE LINK. Turn the camera away from the corridor. E / Q returns\nto your body.",
+  "RemoteYaw": 190.96945905685425,
+  "RemotePitch": -18.85741436481476,
+  "ready_for_input": true,
+  "position": [
+    134.3795349110225,
+    -189.93825703621422,
+    98.1499981880188
+  ]
+}

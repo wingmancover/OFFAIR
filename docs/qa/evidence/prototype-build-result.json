@@ -1,0 +1,35 @@
+{
+  "blueprints": [
+    "/Game/OFFAIR/Core/BP_OFFAIRSession.BP_OFFAIRSession",
+    "/Game/OFFAIR/Core/BP_RunDirector.BP_RunDirector",
+    "/Game/OFFAIR/Core/BP_OFFAIRPlayer.BP_OFFAIRPlayer",
+    "/Game/OFFAIR/Core/BP_OFFAIRController.BP_OFFAIRController",
+    "/Game/OFFAIR/Core/BP_OFFAIRGameMode.BP_OFFAIRGameMode",
+    "/Game/OFFAIR/UI/BP_PrototypeHUD.BP_PrototypeHUD"
+  ],
+  "compiled": true,
+  "navigation_ready": true,
+  "navigation_actor": "/Game/OFFAIR/Levels/Lvl_Prototype.Lvl_Prototype:PersistentLevel.RecastNavMesh-OFFAIR",
+  "navigation_projections": [
+    [
+      -0.0,
+      -0.0,
+      10.0
+    ],
+    [
+      800.0,
+      -0.0,
+      10.0
+    ],
+    [
+      1550.0,
+      -0.0,
+      10.0
+    ],
+    [
+      2400.0,
+      -0.0,
+      10.0
+    ]
+  ]
+}

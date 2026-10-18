@@ -2,6 +2,8 @@
 
 本文件是阶段语义与重置边界的规范入口。R-03 至 R-06 为[已确认需求](game-design.md)；条件锁定、事件冲突及失败处理等细节采用下述原型建议，并在[待决策事项](../open-decisions.md)中保留确认入口。
 
+当前真实拾取与击杀触发交互暂缓，以 [GM 原型](gm-prototype.md)验证底层能力。正常死亡仍遵守以下核心规则；GM 前后阶段跳转可显式绕过条件立即重建目标阶段，属于开发测试例外，不改变正式玩法。
+
 ## 核心规则
 
 1. 当前阶段决定本次循环使用的世界初始状态。
@@ -32,6 +34,7 @@ stateDiagram-v2
     Initializing --> RecoveryRequired: 初始状态应用失败
     Playing --> Playing: 关键条件满足，记录待生效阶段
     Playing --> Resetting: 接受一次死亡事件
+    Playing --> Resetting: GM 强制跳转到指定相邻阶段
     Resetting --> Playing: 目标初始状态应用成功
     Resetting --> RecoveryRequired: 重置失败
     RecoveryRequired --> Resetting: 重试已锁定目标
@@ -95,6 +98,8 @@ stateDiagram-v2
 任何新增的跨循环道具、任务日志、知识标记或摄像机永久改向，都必须明确列出持久化规则，不能由某对象恰好未被销毁而意外保留。仅用于表现且不影响玩法的音效或粒子也应清理，避免复活后继续播放上一轮事件。
 
 ## 一次死亡重置的顺序建议
+
+GM 跳转复用下述重建与提交过程：第 1 步改为接受有效 GM 跳转请求，第 2 步改用经校验的相邻阶段作为目标，其余清理与恢复步骤共用。原因记录为 GM 跳转，不伪造玩家死亡或关键条件事件。
 
 1. 只在 `Playing` 接受一次有效玩家死亡；立即进入 `Resetting`，拒绝后续伤害、拾取、击杀与交互进度事件。
 2. 将 `PendingStageId`（若存在）或 `CurrentStageId` 固定为 `ResetTargetStageId`，检查目标配置存在且有效。

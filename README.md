@@ -4,6 +4,12 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 
 玩家未满足当前阶段的关键条件时，死亡会让世界回到该阶段的初始状态；满足条件后，下一次死亡复活才会从后续阶段的初始状态开始。监控黑入允许玩家切换到设备视角并调整朝向，为自己的行动创造机会。
 
+## 当前迭代范围
+
+当前先做 GM 原型：点击死亡、前后阶段切换、增减敌人 AI、一键接入监控。对应的拾取、终端、权限道具和关卡触发交互暂缓，具体边界见 [GM 原型范围](docs/design/gm-prototype.md)。正式游戏的阶段规则仍保留，GM 强制切阶段是测试例外。
+
+当前技术路线采用纯蓝图，先用调试按钮面板调用统一功能入口；C++ 按后续实际需求引入，依据见[技术路线评估](docs/engineering/blueprint-cpp.md)。本轮只完成文档与选型，尚未实现 GM 功能。
+
 ## 当前工程
 
 - 引擎关联版本：`OFFAIR.uproject` 中的 `5.8`。
@@ -16,11 +22,13 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 
 | 文档 | 用途 |
 | --- | --- |
-| [游戏需求与原型关卡](docs/design/game-design.md) | 已确认需求、原型边界、流程图解读及建议关卡 |
+| [当前 GM 原型范围](docs/design/gm-prototype.md) | 本期五类操作、暂缓玩法、命令语义与边界 |
+| [蓝图与 C++ 技术路线](docs/engineering/blueprint-cpp.md) | 当前纯蓝图选择、职责划分与后续引入 C++ 的条件 |
+| [游戏需求与后续关卡](docs/design/game-design.md) | 正式玩法目标、流程图解读及后续交互关卡建议 |
 | [阶段循环与世界重置](docs/design/stage-loop.md) | 阶段推进时机、状态模型、重置范围与异常规则 |
 | [监控摄像机黑入](docs/design/camera-hacking.md) | 连接、切换视角、转向、退出及循环联动 |
 | [工程落地计划](docs/engineering/prototype-plan.md) | 仓库现状、建议职责划分、实现顺序与完成标准 |
-| [原型验收清单](docs/qa/prototype-acceptance.md) | 可复现的功能、边界与体验检查 |
+| [原型验收清单](docs/qa/prototype-acceptance.md) | 当前 GM 验收及后续完整玩法检查 |
 | [待决策事项](docs/open-decisions.md) | 需要团队确认的选择、建议和影响 |
 | [领域术语](CONTEXT.md) | 统一“阶段”“循环”“初始状态”等概念 |
 | [代理协作约定](AGENTS.md) | 后续代理在本仓库工作的规则 |

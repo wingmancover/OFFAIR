@@ -19,6 +19,7 @@ def run_case(state, world, director, pawn, session, now, require, invoke, record
         invoke(director, 'GMAction', index)
 
     def baseline():
+        require(not p('WeaponCollected'), 'Weapon pickup state leaked across reset')
         require(not p('RemoteActive') and not p('GMOpen'), 'Input/control mode leaked across reset')
         require(not p('AccessCollected') and not p('HackedOnce') and not p('Alarm'), 'Run progress leaked across reset')
         require(abs(float(p('RemoteYaw')) - 180) < 0.01, 'Camera direction was not reset')

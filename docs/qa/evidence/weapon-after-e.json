@@ -1,0 +1,14 @@
+{
+  "phase": "ready",
+  "started": 10798.937,
+  "weapon": true,
+  "weapon_count": 1,
+  "hp": 500.0,
+  "enemy_position": [
+    1616.023047551438,
+    -9.431863935919695,
+    98.1499981880188
+  ],
+  "prompt": "",
+  "seconds": 16.31
+}

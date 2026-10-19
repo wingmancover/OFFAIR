@@ -167,19 +167,52 @@ def tick(delta):
             if 'guard_start' not in state:
                 state['guard_start'] = [enemy_pos.x, enemy_pos.y, enemy_pos.z]
             moved = ((enemy_pos.x - state['guard_start'][0])**2 + (enemy_pos.y - state['guard_start'][1])**2)**0.5
-            if moved < 12:
-                require(now - state['entered'] < 12, 'Guard AI did not move on the generated navigation mesh')
+            require(moved < 2, 'Guard moved before weapon pickup')
+            require(float(prop(pawn, 'Current HP')) == 500.0, 'Guard damaged player before weapon pickup')
+            require(prop(pawn, 'Current Weapon') is None, 'Weapon acquired without E interaction')
+            if now - state['entered'] < 1.5:
                 return
-            record('guard_moves_on_navigation', f'{moved:.1f} cm of AI movement')
+            record('guard_waits_for_weapon')
+            invoke(director, 'Interact')
+            require(not prop(director, 'WeaponCollected'), 'Distant interaction acquired weapon')
             record('death_applies_next_baseline')
             phase('weapon')
         elif mode == 'weapon':
-            aim(world, pc, u.Vector(1500, 0, 150))
-            move_to(pawn, (835, 0))
+            pickup = prop(director, 'WeaponPickup')
+            if move_to(pawn, (pickup.get_actor_location().x - 140, 0), 20):
+                if 'weapon_wait' not in state:
+                    state['weapon_wait'] = now
+                require(prop(pawn, 'Current Weapon') is None, 'Proximity picked up weapon automatically')
+                if now - state['weapon_wait'] < 0.5:
+                    return
+                aim(world, pc, pickup.get_actor_location() + u.Vector(-1000, 0, 300))
+                phase('weapon_look_away')
+        elif mode == 'weapon_look_away':
+            if now - state['entered'] < 0.15:
+                return
+            invoke(director, 'Interact')
+            require(not prop(director, 'WeaponCollected'), 'Weapon collected while looking away')
+            aim(world, pc, prop(director, 'WeaponPickup').get_actor_location())
+            phase('weapon_interact')
+        elif mode == 'weapon_interact':
+            if now - state['entered'] < 0.15:
+                return
+            require('[E] Pick up pistol' in prop(director, 'PromptText'), 'Missing E weapon prompt')
+            invoke(director, 'Interact')
             if prop(pawn, 'Current Weapon') is not None:
                 pawn.character_movement.stop_movement_immediately()
                 record('real_weapon_pickup', prop(pawn, 'Current Weapon').get_class().get_name())
-                phase('combat')
+                invoke(director, 'Interact')
+                require(len(prop(pawn, 'Owned Weapons')) == 1, 'Repeated E duplicated weapon')
+                phase('guard_active')
+        elif mode == 'guard_active':
+            enemy_pos = prop(director, 'KeyEnemy').get_actor_location()
+            moved = ((enemy_pos.x - state['guard_start'][0])**2 + (enemy_pos.y - state['guard_start'][1])**2)**0.5
+            if moved < 12:
+                require(now - state['entered'] < 12, 'Guard did not start after E weapon pickup')
+                return
+            record('guard_moves_on_navigation', f'{moved:.1f} cm after weapon pickup')
+            phase('combat')
         elif mode == 'combat':
             enemy = prop(director, 'KeyEnemy')
             if prop(director, 'GuardRewarded'):

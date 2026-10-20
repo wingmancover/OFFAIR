@@ -20,9 +20,9 @@
 | --- | --- | --- |
 | 拾取纸条 | `SYSTEM ERROR` / `Death is required to reset the subject.` | 中央深色底板，标题白色、正文红色，三秒 |
 | S1 复活 | `What the hell... What just happened?` | 底部中央，浅青色心理对白，三秒 |
-| S2 复活 | `Didn't I just die? Wait...` / `Why is there a gun where that box was?` | 底部中央，浅青色，分两行显示三秒 |
+| S2 复活 | `Didn't I just die? Wait...` / `Why is there a gun where that box was?` | 底部中央，浅青色，分两行显示五秒（用户试玩后延长两秒） |
 
-心理对白按阶段初始状态在每次进入或重试 S1/S2 时显示，不新增跨循环的“一次性已读”存档。普通交互、警报、监控提示保留；灯光整体调整与翻越不在本轮范围。
+心理对白按阶段初始状态在每次进入或重试 S1/S2 时显示，不新增跨循环的“一次性已读”存档。普通交互、警报、监控提示保留。后续已获授权先调整曝光、过亮区域与提示对比度，翻越继续延后。
 
 ## 重置与 GM
 

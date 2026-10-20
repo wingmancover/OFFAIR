@@ -1,5 +1,7 @@
 # OFFAIR 原型实现验证
 
+后续灯光、曝光和提示对比度调整见[可读性验证记录](readability-validation.md)。
+
 最新三阶段纸条、盒子陷阱与叙事对白实现见[三阶段验证记录](narrative-prototype-validation.md)，下文两阶段流程为历史记录。
 
 最新的直接黑入、俯仰与模型瞄准点调整见[2026-10-19 验证记录](direct-camera-validation.md)；旧终端路线仅保留为下文历史结果。

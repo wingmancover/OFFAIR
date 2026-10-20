@@ -284,7 +284,7 @@ def build_core():
         b.set('ThoughtRemaining', 3.0)
     def thought2(b):
         b.set('ThoughtText', "Didn't I just die? Wait...\nWhy is there a gun where that box was?")
-        b.set('ThoughtRemaining', 3.0)
+        b.set('ThoughtRemaining', 5.0)
     g.when(g.eq(g.get('Stage'), 1), thought1)
     g.when(g.eq(g.get('Stage'), 2), thought2)
     local(g, 'RefreshControls')

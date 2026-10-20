@@ -51,6 +51,41 @@ def update_narrative_layout():
     return {'note': note.get_path_name(), 'trap_box': cache.get_path_name(), 'trap_spawn': spawn.get_path_name()}
 
 
+def update_readability_layout():
+    """Only tune presentation. Never move or resize gameplay props."""
+    actors = u.get_editor_subsystem(u.EditorActorSubsystem)
+    by_label = {a.get_actor_label(): a for a in actors.get_all_level_actors()}
+    for label, intensity in {'OF_Sun': 1.5, 'OF_Light0': 2000.0,
+                             'OF_Light1': 2000.0, 'OF_Light2': 2000.0,
+                             'OF_Light3': 2000.0, 'OF_ScanLight': 2800.0}.items():
+        if label in by_label:
+            by_label[label].light_component.set_intensity(intensity)
+    if 'OF_Sky' in by_label:
+        by_label['OF_Sky'].light_component.set_intensity(0.6)
+    fill = by_label.get('OF_ReadabilityFill')
+    if not fill:
+        fill = actors.spawn_actor_from_class(u.PointLight, u.Vector(2700, 0, 380))
+        fill.set_actor_label('OF_ReadabilityFill')
+    fill.light_component.set_mobility(u.ComponentMobility.MOVABLE)
+    fill.light_component.set_intensity(500.0)
+    fill.light_component.set_light_color(u.LinearColor(0.65, 0.75, 1.0, 1))
+    fill.light_component.set_editor_property('attenuation_radius', 1100.0)
+    volume = by_label.get('OF_ReadabilityExposure')
+    if not volume:
+        volume = actors.spawn_actor_from_class(u.PostProcessVolume, u.Vector())
+        volume.set_actor_label('OF_ReadabilityExposure')
+    volume.set_editor_property('unbound', True)
+    volume.set_editor_property('priority', 10.0)
+    settings = volume.get_editor_property('settings')
+    for name, value in {'auto_exposure_min_brightness': 3.0,
+                        'auto_exposure_max_brightness': 3.0,
+                        'auto_exposure_bias': 0.0, 'bloom_intensity': 0.15}.items():
+        settings.set_editor_property('override_' + name, True)
+        settings.set_editor_property(name, value)
+    volume.set_editor_property('settings', settings)
+    return volume
+
+
 def build_level(classes, output_dir):
     levels = u.get_editor_subsystem(u.LevelEditorSubsystem)
     actors = u.get_editor_subsystem(u.EditorActorSubsystem)
@@ -230,6 +265,7 @@ def build_level(classes, output_dir):
     for name, actor in refs.items():
         director.set_editor_property(name, actor)
     update_narrative_layout()
+    update_readability_layout()
     assert levels.save_current_level()
     report = {'map': MAP_PATH, 'director': director.get_path_name(),
               'references': {name: actor.get_path_name() for name, actor in refs.items()},

@@ -125,7 +125,7 @@ def run_case(state, world, director, pawn, session, now, require, invoke, record
         phase('reg_old_countdown_wait')
     elif mode == 'reg_old_countdown_wait':
         require(run == state['isolated_run'], 'Old note countdown killed a new attempt')
-        if now-state['entered'] < 3.5:
+        if now-state['entered'] < 5.5:
             return False
         require(p('ThoughtText') == '' and float(p('ThoughtRemaining')) == 0, 'Second thought did not expire')
         record('old_countdown_isolated_and_second_thought_expires')

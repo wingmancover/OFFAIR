@@ -1,0 +1,13 @@
+{
+  "phase": "done",
+  "status": "passed",
+  "started": 24855.234,
+  "events": [
+    "real_E_card_after_damage_fixture",
+    "permission_fixture_camera_prompt",
+    "real_E_remote"
+  ],
+  "entered": 24883.218,
+  "stage": 2,
+  "seconds": 27.98
+}

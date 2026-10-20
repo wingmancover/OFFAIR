@@ -26,7 +26,7 @@ def build_hud(blueprints, paths):
         return g.engine('KismetStringLibrary', 'Conv_IntToString', 'ReturnValue', InInt=value)
 
     g = graph('Label')
-    g.engine('HUD', 'DrawText', Text=g.param('Text'), TextColor='(R=0.88,G=0.95,B=1.0,A=1.0)',
+    g.engine('HUD', 'DrawText', Text=g.param('Text'), TextColor='(R=0.97,G=0.98,B=1.0,A=1.0)',
              ScreenX=g.param('X'), ScreenY=g.param('Y'),
              Scale=g.math('Multiply_DoubleDouble', A=g.param('Size'), B=2.0), bScalePosition=False)
 
@@ -55,7 +55,7 @@ def build_hud(blueprints, paths):
     g = graph('DrawPrototype')
     g.guard(g.valid(g.get('Director')))
     width = g.math('Subtract_DoubleDouble', A=g.get('ScreenWidth'), B=40.0)
-    rect(g, 20.0, 18.0, width, 174.0)
+    rect(g, 20.0, 18.0, width, 174.0, '(R=0.005,G=0.01,B=0.018,A=0.96)')
     label(g, state(g, 'ObjectiveText'), 34.0, 50.0, 1.15)
     label(g, state(g, 'StatusText'), 34.0, 90.0, 0.95)
     info = concat(g, 'STAGE ', num(g, state(g, 'Stage')))
@@ -66,8 +66,17 @@ def build_hud(blueprints, paths):
     label(g, 'WASD move | LMB fire | SHIFT swap | SPACE jump | E interact | Q return | R rewind | F1 GM',
           34.0, g.math('Add_DoubleDouble', A=footer_y, B=13.0), 0.9)
     prompt_y = g.math('Multiply_DoubleDouble', A=g.get('ScreenHeight'), B=0.73)
-    label(g, state(g, 'PromptText'), 34.0, prompt_y, 1.4)
+    def prompt(b):
+        text = state(b, 'PromptText')
+        tw = b.engine('HUD', 'GetTextSize', 'OutWidth', Text=text, Scale=2.8)
+        rect(b, 20.0, b.math('Subtract_DoubleDouble', A=prompt_y, B=10.0),
+             b.math('Add_DoubleDouble', A=tw, B=30.0), 52.0,
+             '(R=0.005,G=0.01,B=0.018,A=0.97)')
+        label(b, text, 34.0, prompt_y, 1.4)
+    prompt_length = g.engine('KismetStringLibrary', 'Len', 'ReturnValue', S=state(g, 'PromptText'))
+    g.when(g.math('Greater_IntInt', A=prompt_length, B=0), prompt)
     def remote(b):
+        rect(b, 20.0, 194.0, 900.0, 42.0, '(R=0.005,G=0.01,B=0.018,A=0.97)')
         label(b, 'REMOTE CAMERA / MOUSE TO PAN / E OR Q TO RETURN', 34.0, 202.0, 1.15)
     g.when(state(g, 'RemoteActive'), remote)
     g.call('DrawGM')

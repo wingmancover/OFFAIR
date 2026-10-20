@@ -5,6 +5,15 @@ import unreal as u
 MAP_PATH = '/Game/OFFAIR/Levels/Lvl_Prototype'
 
 
+def retire_camera_terminal():
+    """Hide the three legacy authored terminal actors without breaking old refs."""
+    labels = {'OF_Terminal', 'OF_TerminalScreen', 'OF_TerminalLabel'}
+    for actor in u.get_editor_subsystem(u.EditorActorSubsystem).get_all_level_actors():
+        if actor.get_actor_label() in labels:
+            actor.set_actor_hidden_in_game(True)
+            actor.set_actor_enable_collision(False)
+
+
 def build_level(classes, output_dir):
     levels = u.get_editor_subsystem(u.LevelEditorSubsystem)
     actors = u.get_editor_subsystem(u.EditorActorSubsystem)
@@ -187,6 +196,7 @@ def build_level(classes, output_dir):
             'EnemySpawn': enemy_spawn, 'GMSpawn': gm_spawn}
     for name, actor in refs.items():
         director.set_editor_property(name, actor)
+    retire_camera_terminal()
     assert levels.save_current_level()
     report = {'map': MAP_PATH, 'director': director.get_path_name(),
               'references': {name: actor.get_path_name() for name, actor in refs.items()},

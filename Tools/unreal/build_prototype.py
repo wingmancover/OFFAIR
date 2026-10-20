@@ -9,7 +9,7 @@ from pathlib import Path
 import unreal as u
 
 sys.path.insert(0, str(Path(__file__).parent))
-from graph_builder import Graph, LIB, EDITOR, create_bp, compile_bp, declare, member, pin, put, generated_class, class_path, save
+from graph_builder import Graph, LIB, EDITOR, create_bp, compile_bp, declare, member, pin, pin_type, put, generated_class, class_path, save
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'Saved' / 'PrototypeBuild'
@@ -24,6 +24,7 @@ NPC = '/Game/Variant_Shooter/Blueprints/AI/BP_ShooterNPC.BP_ShooterNPC_C'
 WEAPON = '/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase.BP_ShooterWeaponBase_C'
 PICKUP = '/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterPickup.BP_ShooterPickup_C'
 DIRECTOR_ONLY = '-OFFAIRDirectorOnly' in u.SystemLibrary.get_command_line() or '--director-only' in sys.argv
+INCLUDE_HUD = '--include-hud' in sys.argv
 DEFER_SAVE = '--defer-save' in sys.argv
 if DEFER_SAVE and not DIRECTOR_ONLY:
     raise ValueError('--defer-save requires --director-only; full builds also save the map')
@@ -41,12 +42,13 @@ BP = {
     'hud': create_bp(BASE + '/UI/BP_PrototypeHUD', '/Script/Engine.HUD'),
 }
 PATH = {k: class_path(v) for k, v in BP.items()}
+EDIT_KEYS = ({'director', 'hud'} if INCLUDE_HUD else {'director'}) if DIRECTOR_ONLY else set(BP)
 
 # Preserve function identities during regeneration. Clear all generated bodies
 # before compiling any dependent Blueprint; deleting function graphs would
 # rename their replacements and invalidate callers in other generated assets.
 for key, bp in BP.items():
-    if DIRECTOR_ONLY and key != 'director':
+    if key not in EDIT_KEYS:
         continue
     for graph in LIB.list_graphs(bp):
         if graph.get_name() == 'UserConstructionScript':
@@ -57,7 +59,7 @@ for key, bp in BP.items():
 
 
 def vars_(key, definitions):
-    if DIRECTOR_ONLY and key != 'director':
+    if key not in EDIT_KEYS:
         return
     for name, kind in definitions.items():
         member(BP[key], name, kind)
@@ -68,6 +70,7 @@ vars_('session', {'CurrentStage': 'int', 'PendingStage': 'int', 'ResetTarget': '
                   'ResetBusy': 'bool', 'RunNumber': 'int', 'GMEnabled': 'bool'})
 vars_('director', {
     'WeaponCollected': 'bool', 'WeaponInteractDistance': 'real',
+    'CameraInteractDistance': 'real', 'CameraPromptVisible': 'bool',
     'Session': PATH['session'], 'Player': SHOOTER, 'Controller': PC,
     'CoreItem': ACTOR, 'AccessItem': ACTOR, 'Terminal': ACTOR,
     'StageGate': ACTOR, 'ExitGate': ACTOR, 'WeaponPickup': ACTOR,
@@ -84,7 +87,7 @@ vars_('director', {
     'ConditionEvent': 'name', 'ConditionTarget': 'name',
 })
 vars_('hud', {'Director': PATH['director'], 'ScreenWidth': 'real', 'ScreenHeight': 'real'})
-for name in ['CoreItem', 'AccessItem', 'Terminal', 'StageGate', 'ExitGate', 'WeaponPickup', 'Monitor', 'EnemySpawn', 'GMSpawn', 'MaxEnemies', 'ConditionEvent', 'ConditionTarget', 'WeaponInteractDistance']:
+for name in ['CoreItem', 'AccessItem', 'Terminal', 'StageGate', 'ExitGate', 'WeaponPickup', 'Monitor', 'EnemySpawn', 'GMSpawn', 'MaxEnemies', 'ConditionEvent', 'ConditionTarget', 'WeaponInteractDistance', 'CameraInteractDistance']:
     LIB.set_blueprint_variable_instance_editable(BP['director'], name, True)
     LIB.set_blueprint_variable_category(BP['director'], name, 'Stage Setup')
 compile_bp(BP['director'])
@@ -99,6 +102,7 @@ FUNCTIONS = {
         ('GMStage', {'Delta': 'int'}, {}), ('GMAdd', {}, {}), ('GMRemove', {}, {}),
         ('AddEnemy', {'KeyGuard': 'bool'}, {}), ('PollEnemies', {}, {}),
         ('Interact', {}, {}), ('CanInteract', {'Target': ACTOR}, {'Result': 'bool'}),
+        ('InteractionPoint', {'Target': ACTOR}, {'Point': VECTOR}),
         ('CollectWeapon', {}, {}), ('SetEnemyCombat', {'Enemy': NPC, 'Enabled': 'bool'}, {}),
         ('MarkCondition', {'EventId': 'name', 'TargetId': 'name'}, {}),
         ('EnterRemote', {'BypassAccess': 'bool'}, {}), ('ExitRemote', {}, {}),
@@ -108,12 +112,12 @@ FUNCTIONS = {
         ('TickSurveillance', {'Delta': 'real'}, {}), ('UpdateFeedback', {}, {}),
         ('UpdateExit', {}, {}), ('CheckFinish', {}, {}), ('GMAction', {'Action': 'int'}, {}),
     ],
-    'hud': [('DrawPrototype', {}, {}), ('DrawGM', {}, {}),
+    'hud': [('DrawPrototype', {}, {}), ('DrawGM', {}, {}), ('DrawCameraPrompt', {}, {}),
             ('Label', {'Text': 'string', 'X': 'real', 'Y': 'real', 'Size': 'real'}, {}),
             ('GMButton', {'Label': 'string', 'Y': 'real', 'HitName': 'name'}, {})],
 }
 for key, definitions in FUNCTIONS.items():
-    if DIRECTOR_ONLY and key != 'director':
+    if key not in EDIT_KEYS:
         continue
     for name, inputs, outputs in definitions:
         declare(BP[key], name, inputs, outputs)
@@ -121,7 +125,7 @@ for key, definitions in FUNCTIONS.items():
 
 # This authoring script owns only its generated event graphs.
 for key in BP:
-    if DIRECTOR_ONLY and key != 'director':
+    if key not in EDIT_KEYS:
         continue
     graph = LIB.find_event_graph(BP[key])
     if graph:
@@ -192,7 +196,7 @@ def build_core():
     g.set('Initialized', False)
     g.set('FailureText', '')
     local(g, 'RefreshControls')
-    essential = ['CoreItem', 'AccessItem', 'Terminal', 'StageGate', 'ExitGate', 'WeaponPickup', 'Monitor', 'EnemySpawn', 'GMSpawn']
+    essential = ['CoreItem', 'AccessItem', 'StageGate', 'ExitGate', 'WeaponPickup', 'Monitor', 'EnemySpawn', 'GMSpawn']
     for name in essential:
         yes, no = g.branch(g.valid(g.get(name)))
         no.set('FailureText', 'Missing level reference: ' + name)
@@ -219,6 +223,7 @@ def build_core():
     set_session(g, 'ResetTarget', target)
     set_session(g, 'ResetBusy', True)
     g.set('GMOpen', False)
+    g.set('CameraPromptVisible', False)
     local(g, 'ExitRemote')
     local(g, 'RefreshControls')
     g.set('StatusText', 'REWINDING / rebuilding the stage...')
@@ -265,23 +270,46 @@ def build_core():
 
 
 def build_interactions():
+    # Pickup origins are on the plinth. Aim at the rendered, spinning mesh instead.
+    g = g_('InteractionPoint')
+    target = g.param('Target')
+    yes, no = g.branch(object_equal(g, target, g.get('WeaponPickup')))
+    pickup = yes.cast(target, PICKUP)
+    mesh = yes.get('StaticMesh', pickup, PICKUP)
+    center = yes.engine('KismetSystemLibrary', 'GetComponentBounds', 'Origin', Component=mesh)
+    yes.ret(Point=center)
+    no.ret(Point=location(no, target))
+
     g = g_('CanInteract')
     target = g.param('Target')
     g.guard(g.valid(target), lambda no: no.ret(Result=False))
     g.guard(g.valid(g.get('Player')), lambda no: no.ret(Result=False))
-    distance = g.engine('Actor', 'GetDistanceTo', 'ReturnValue', self=g.get('Player'), OtherActor=target)
+    point = g.call('InteractionPoint', 'Point', Target=target)
+    distance = g.engine('KismetMathLibrary', 'VSize', 'ReturnValue', A=g.math('Subtract_VectorVector', A=point, B=location(g, g.get('Player'))))
     weapon_target = object_equal(g, target, g.get('WeaponPickup'))
+    monitor_target = object_equal(g, target, g.get('Monitor'))
     limit = g.engine('KismetMathLibrary', 'SelectFloat', 'ReturnValue', A=g.get('WeaponInteractDistance'), B=230.0, bPickA=weapon_target)
+    limit = g.engine('KismetMathLibrary', 'SelectFloat', 'ReturnValue', A=g.get('CameraInteractDistance'), B=limit, bPickA=monitor_target)
     g.guard(g.math('LessEqual_DoubleDouble', A=distance, B=limit), lambda no: no.ret(Result=False))
     camera = g.engine('GameplayStatics', 'GetPlayerCameraManager', 'ReturnValue', PlayerIndex=0)
     view_pos = g.engine('PlayerCameraManager', 'GetCameraLocation', 'ReturnValue', self=camera)
     view_rot = g.engine('PlayerCameraManager', 'GetCameraRotation', 'ReturnValue', self=camera)
     forward = g.engine('KismetMathLibrary', 'GetForwardVector', 'ReturnValue', InRot=view_rot)
-    direction = g.math('Subtract_VectorVector', A=location(g, target), B=view_pos)
+    direction = g.math('Subtract_VectorVector', A=point, B=view_pos)
     direction = g.engine('KismetMathLibrary', 'Normal', 'ReturnValue', A=direction, Tolerance=0.0001)
     facing_limit = g.engine('KismetMathLibrary', 'SelectFloat', 'ReturnValue', A=0.96, B=0.45, bPickA=weapon_target)
+    facing_limit = g.engine('KismetMathLibrary', 'SelectFloat', 'ReturnValue', A=0.999, B=facing_limit, bPickA=monitor_target)
     facing = g.math('Greater_DoubleDouble', A=g.math('Dot_VectorVector', A=forward, B=direction), B=facing_limit)
-    los = g.engine('Controller', 'LineOfSightTo', 'ReturnValue', self=g.get('Controller'), Other=target, ViewPoint=view_pos, bAlternateChecks=False)
+    if 'IgnoredActors' not in g.editor.list_local_variable_names():
+        g.editor.add_local_variable('IgnoredActors', pin_type('array:' + ACTOR), '')
+    array_node = g.own(g.editor.add_get_local_variable_node('IgnoredActors'))
+    ignored = pin(array_node, 'IgnoredActors', True)
+    g.call('/Script/Engine.KismetArrayLibrary.Array_Clear', TargetArray=ignored)
+    g.call('/Script/Engine.KismetArrayLibrary.Array_Add', TargetArray=ignored, NewItem=g.get('Player'))
+    g.call('/Script/Engine.KismetArrayLibrary.Array_Add', TargetArray=ignored, NewItem=target)
+    blocked = g.engine('KismetSystemLibrary', 'LineTraceSingle', 'ReturnValue', Start=view_pos, End=point,
+        TraceChannel='TraceTypeQuery1', bTraceComplex=True, ActorsToIgnore=ignored, DrawDebugType='None', bIgnoreSelf=True)
+    los = g.not_(blocked)
     g.ret(Result=g.and_(facing, los))
 
     g = g_('MarkCondition')
@@ -316,16 +344,16 @@ def build_interactions():
     def collect(b):
         b.set('AccessCollected', True)
         show_actor(b, b.get('AccessItem'), False, False)
-        b.set('StatusText', 'ACCESS CARD COLLECTED. Find the blue surveillance terminal.')
+        b.set('StatusText', 'ACCESS CARD COLLECTED. Look at the camera and press E to hack it.')
         b.log('OFFAIR_ACCESS_COLLECTED')
     g.when(access, collect)
-    terminal = g.and_(g.eq(g.get('Stage'), 1), g.call('CanInteract', 'Result', Target=g.get('Terminal')))
+    monitor = g.and_(g.eq(g.get('Stage'), 1), g.call('CanInteract', 'Result', Target=g.get('Monitor')))
     def connect(b):
         yes, no = b.branch(b.get('AccessCollected'))
         yes.call('EnterRemote', BypassAccess=False)
-        no.set('StatusText', 'TERMINAL LOCKED. Defeat the guard and collect the access card.')
+        no.set('StatusText', 'CAMERA LOCKED. Defeat the guard and collect the access card.')
         b.tail = [yes.tail, no.tail]
-    g.when(terminal, connect)
+    g.when(monitor, connect)
 
     g = g_('CollectWeapon')
     ready(g)
@@ -464,8 +492,10 @@ def build_remote():
     g.guard(g.not_(g.get('RemoteActive')))
     g.guard(g.valid(g.get('Monitor')))
     g.guard(g.or_(g.get('AccessCollected'), g.param('BypassAccess')))
+    g.when(g.not_(g.param('BypassAccess')), lambda b: b.guard(b.call('CanInteract', 'Result', Target=b.get('Monitor'))))
     g.set('SavedView', g.engine('Controller', 'GetControlRotation', 'ReturnValue', self=g.get('Controller')))
     g.set('RemoteActive', True)
+    g.set('CameraPromptVisible', False)
     g.set('HackedOnce', True)
     g.set('GMOpen', False)
     g.engine('PlayerController', 'SetViewTargetWithBlend', self=g.get('Controller'), NewViewTarget=g.get('Monitor'), BlendTime=0.15)
@@ -506,7 +536,7 @@ def build_remote():
     ready(g)
     g.guard(g.and_(g.get('RemoteActive'), g.not_(g.get('GMOpen')), g.valid(g.get('Monitor'))))
     yaw = g.math('Add_DoubleDouble', A=g.get('RemoteYaw'), B=g.math('Multiply_DoubleDouble', A=g.param('DeltaX'), B=0.25))
-    pitch = g.math('Subtract_DoubleDouble', A=g.get('RemotePitch'), B=g.math('Multiply_DoubleDouble', A=g.param('DeltaY'), B=0.25))
+    pitch = g.math('Add_DoubleDouble', A=g.get('RemotePitch'), B=g.math('Multiply_DoubleDouble', A=g.param('DeltaY'), B=0.25))
     g.set('RemoteYaw', g.engine('KismetMathLibrary', 'FClamp', 'ReturnValue', Value=yaw, Min=80.0, Max=280.0))
     g.set('RemotePitch', g.engine('KismetMathLibrary', 'FClamp', 'ReturnValue', Value=pitch, Min=-45.0, Max=5.0))
     g.engine('Actor', 'K2_SetActorRotation', self=g.get('Monitor'), NewRotation=g.rot(g.get('RemotePitch'), g.get('RemoteYaw')), bTeleportPhysics=True)
@@ -586,6 +616,7 @@ def build_tick():
     local(g, 'UpdateFeedback')
 
     g = g_('UpdateFeedback')
+    g.set('CameraPromptVisible', False)
     ready(g)
     g.set('PromptText', '')
     stage0, stage1 = g.branch(g.eq(g.get('Stage'), 0))
@@ -603,11 +634,12 @@ def build_tick():
     stage0_weapon_near = stage0.and_(stage0.not_(stage0.get('WeaponCollected')), stage0.call('CanInteract', 'Result', Target=stage0.get('WeaponPickup')))
     stage0.when(stage0.and_(stage0.math('EqualEqual_NameName', A=stage0.get('ConditionEvent'), B='EnemyKilled'), stage0_weapon_near),
                 lambda b: b.set('PromptText', '[E] Pick up pistol'))
-    stage1.when(stage1.get('GuardRewarded'), lambda b: b.set('ObjectiveText', 'LOOP 1 / TAKE THE CARD TO THE TERMINAL'))
-    stage1.when(stage1.get('AccessCollected'), lambda b: b.set('ObjectiveText', 'LOOP 1 / TURN THE CAMERA, THEN REACH THE EXIT'))
+    stage1.when(stage1.get('GuardRewarded'), lambda b: b.set('ObjectiveText', 'LOOP 1 / COLLECT THE GUARD ACCESS CARD'))
+    stage1.when(stage1.get('AccessCollected'), lambda b: b.set('ObjectiveText', 'LOOP 1 / LOOK AT THE CAMERA / E TO HACK'))
     access_near = stage1.and_(stage1.get('GuardRewarded'), stage1.not_(stage1.get('AccessCollected')), stage1.call('CanInteract', 'Result', Target=stage1.get('AccessItem')))
     stage1.when(access_near, lambda b: b.set('PromptText', '[E] Collect access card'))
-    stage1.when(stage1.call('CanInteract', 'Result', Target=stage1.get('Terminal')), lambda b: b.set('PromptText', '[E] Connect to surveillance camera (access card required)'))
+    camera_near = stage1.call('CanInteract', 'Result', Target=stage1.get('Monitor'))
+    stage1.set('CameraPromptVisible', stage1.and_(camera_near, stage1.get('AccessCollected'), stage1.not_(stage1.get('RemoteActive')), stage1.not_(stage1.get('GMOpen'))))
     stage1.when(stage1.get('RemoteActive'), lambda b: b.set('PromptText', 'MOUSE: turn camera     [E / Q] Return to body'))
     stage1.when(stage1.get('Alarm'), lambda b: b.set('ObjectiveText', 'ALARM / EXIT LOCKED / R TO RETRY'))
 
@@ -714,6 +746,7 @@ def set_defaults():
     d = u.get_default_object(generated_class(BP['director']))
     d.set_editor_property('MaxEnemies', 8)
     d.set_editor_property('WeaponInteractDistance', 300.0)
+    d.set_editor_property('CameraInteractDistance', 1500.0)
     d.set_editor_property('ConditionEvent', 'ItemAcquired')
     d.set_editor_property('ConditionTarget', 'Anchor')
     tick = d.get_editor_property('primary_actor_tick')
@@ -737,20 +770,22 @@ build_tick()
 finish_events()
 if not DIRECTOR_ONLY:
     build_controller_input()
-from prototype_hud import build_hud
-if not DIRECTOR_ONLY:
-    build_hud(BP, PATH)
+if not DIRECTOR_ONLY or INCLUDE_HUD:
+    import importlib
+    import prototype_hud
+    importlib.reload(prototype_hud).build_hud(BP, PATH)
 for key, bp in BP.items():
-    if not DIRECTOR_ONLY or key == 'director':
+    if key in EDIT_KEYS:
         compile_bp(bp)
 set_defaults()
 for key, bp in BP.items():
-    if (not DIRECTOR_ONLY or key == 'director') and not DEFER_SAVE:
+    if key in EDIT_KEYS and not DEFER_SAVE:
         save(bp)
-from prototype_level import build_level
 if not DIRECTOR_ONLY:
-    build_level({k: generated_class(v) for k, v in BP.items()}, OUT)
+    import importlib
+    import prototype_level
+    importlib.reload(prototype_level).build_level({k: generated_class(v) for k, v in BP.items()}, OUT)
 (OUT / ('director-update-result.json' if DIRECTOR_ONLY else 'build-result.json')).write_text(json.dumps({
-    'blueprints': [bp.get_path_name() for key, bp in BP.items() if not DIRECTOR_ONLY or key == 'director'],
+    'blueprints': [bp.get_path_name() for key, bp in BP.items() if key in EDIT_KEYS],
     'compiled': True, 'saved': not DEFER_SAVE}, indent=2), encoding='utf-8')
 u.log('OFFAIR_BUILD_COMPLETE')

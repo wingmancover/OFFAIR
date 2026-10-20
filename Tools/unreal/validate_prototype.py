@@ -12,7 +12,9 @@ import unreal as u
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).parent))
-from runtime_regressions import run_case
+import importlib
+import runtime_regressions
+run_case = importlib.reload(runtime_regressions).run_case
 OUT = ROOT / 'Saved' / 'PrototypeTests'
 OUT.mkdir(parents=True, exist_ok=True)
 RESULT = OUT / 'runtime-result.json'
@@ -192,7 +194,7 @@ def tick(delta):
                 return
             invoke(director, 'Interact')
             require(not prop(director, 'WeaponCollected'), 'Weapon collected while looking away')
-            aim(world, pc, prop(director, 'WeaponPickup').get_actor_location())
+            aim(world, pc, invoke(director, 'InteractionPoint', prop(director, 'WeaponPickup')))
             phase('weapon_interact')
         elif mode == 'weapon_interact':
             if now - state['entered'] < 0.15:
@@ -237,25 +239,32 @@ def tick(delta):
                 require(prop(director, 'AccessCollected'), 'Normal access-card pickup failed')
                 record('normal_access_card_pickup')
                 state['waypoint'] = 0
-                phase('terminal')
-        elif mode == 'terminal':
-            route = [(1600, -420), (1830, -410)]
+                phase('camera_approach')
+        elif mode == 'camera_approach':
+            route = [(1800, 0)]
             waypoint = route[state['waypoint']]
-            target = prop(director, 'Terminal').get_actor_location()
+            target = prop(director, 'Monitor').get_actor_location()
             aim(world, pc, target)
             if move_to(pawn, waypoint, 40):
                 state['waypoint'] += 1
                 if state['waypoint'] == len(route):
-                    body_pos = pawn.get_actor_location()
-                    state['body_before_remote'] = [body_pos.x, body_pos.y, body_pos.z]
-                    invoke(director, 'Interact')
-                    require(prop(director, 'RemoteActive'), 'Normal terminal interaction failed')
-                    record('normal_monitor_hack')
-                    phase('remote')
+                    phase('camera_interact')
+        elif mode == 'camera_interact':
+            if now - state['entered'] < 0.15:
+                return
+            require(prop(director, 'CameraPromptVisible'), 'Camera hack prompt missing')
+            body_pos = pawn.get_actor_location()
+            state['body_before_remote'] = [body_pos.x, body_pos.y, body_pos.z]
+            invoke(director, 'Interact')
+            require(prop(director, 'RemoteActive'), 'Looking at camera did not hack it')
+            record('normal_monitor_hack')
+            phase('remote')
         elif mode == 'remote':
             invoke(director, 'PanRemote', 1000.0, 1000.0)
             require(abs(float(prop(director, 'RemoteYaw')) - 280) < 0.01, 'Yaw limit failed')
-            require(abs(float(prop(director, 'RemotePitch')) + 45) < 0.01, 'Pitch limit failed')
+            require(abs(float(prop(director, 'RemotePitch')) - 5) < 0.01, 'Pitch upper limit failed')
+            invoke(director, 'PanRemote', 0.0, -1000.0)
+            require(abs(float(prop(director, 'RemotePitch')) + 45) < 0.01, 'Pitch lower limit failed')
             before = state['body_before_remote']
             pos = pawn.get_actor_location()
             require(abs(pos.x - before[0]) < 5 and abs(pos.y - before[1]) < 5, 'Body moved during remote control')
@@ -268,7 +277,7 @@ def tick(delta):
             route = [(2090, -410), (2090, 0), (2360, 0), (3030, 0), (3570, 0)]
             if prop(director, 'Completed'):
                 require(not prop(director, 'Alarm'), 'Completed despite alarm')
-                record('normal_playthrough_complete', 'No GM action was used; real movement, pickup, weapon projectiles and normal terminal entry')
+                record('normal_playthrough_complete', 'No GM action was used; real movement, pickup, weapon projectiles and direct camera interaction')
                 phase('done')
                 return
             require(not prop(director, 'Alarm'), 'Rotated camera still detected escape route')
@@ -284,7 +293,10 @@ def tick(delta):
         finish('failed', traceback.format_exc())
 
 
-require(EDITOR.load_level(LEVEL), 'Prototype map could not load')
+# Preserve unsaved map edits when validating in the already-open editor.
+editor_world = UE.get_editor_world()
+if not editor_world or editor_world.get_path_name().split('.')[0] != LEVEL:
+    require(EDITOR.load_level(LEVEL), 'Prototype map could not load')
 handle = u.register_slate_post_tick_callback(tick)
 EDITOR.editor_request_begin_play()
 write_result()

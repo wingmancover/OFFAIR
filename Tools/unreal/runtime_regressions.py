@@ -28,6 +28,19 @@ def run_case(state, world, director, pawn, session, now, require, invoke, record
         require(len(u.GameplayStatics.get_all_actors_of_class(world, u.PlayerController)) == 1, 'Duplicate player controllers')
         require(len(u.GameplayStatics.get_all_actors_of_class(world, u.AIController)) == int(p('EnemyCount')), 'Orphan AI controllers')
 
+    def look_at(target):
+        pc = u.GameplayStatics.get_player_controller(world, 0)
+        camera = u.GameplayStatics.get_player_camera_manager(world, 0)
+        pc.set_control_rotation(u.MathLibrary.find_look_at_rotation(camera.get_camera_location(), target))
+
+    def place_and_look(position, target):
+        pawn.set_actor_location(u.Vector(*position), False, True)
+        pawn.character_movement.stop_movement_immediately()
+        # Use the current body's eye height, avoiding the previous camera cache.
+        pc = u.GameplayStatics.get_player_controller(world, 0)
+        eye = pawn.get_actor_location() + u.Vector(0, 0, 71)
+        pc.set_control_rotation(u.MathLibrary.find_look_at_rotation(eye, target))
+
     if mode == 'reg_start':
         require(current == 0, 'New game did not restore stage 0')
         baseline()
@@ -200,5 +213,96 @@ def run_case(state, world, director, pawn, session, now, require, invoke, record
         baseline()
         require(current == 1 and not p('FailureText'), 'Recovery failed to restore valid stage configuration')
         record('initialization_failure_recovers_without_losing_progress')
+        place_and_look((655, 0, 98), invoke(director, 'InteractionPoint', p('WeaponPickup')))
+        phase('reg_weapon_model')
+    elif mode == 'reg_weapon_model':
+        if now - state['entered'] < 0.6:
+            return False
+        point = invoke(director, 'InteractionPoint', p('WeaponPickup'))
+        center = u.SystemLibrary.get_component_bounds(p('WeaponPickup').get_editor_property('StaticMesh'))[0]
+        require((point-center).length() < 1.0, 'Weapon aim point does not follow rendered mesh bounds')
+        require(invoke(director, 'CanInteract', p('WeaponPickup')), 'Looking at visible gun model cannot interact')
+        look_at(p('WeaponPickup').get_actor_location())
+        phase('reg_weapon_base')
+    elif mode == 'reg_weapon_base':
+        if now - state['entered'] < 0.6:
+            return False
+        require(not invoke(director, 'CanInteract', p('WeaponPickup')), 'Looking at gun plinth still triggers pickup')
+        record('weapon_targets_visible_model_instead_of_plinth')
+        place_and_look((1800, 0, 98), p('Monitor').get_actor_location())
+        phase('reg_direct_no_access')
+    elif mode == 'reg_direct_no_access':
+        if now - state['entered'] < 0.6:
+            return False
+        require(invoke(director, 'CanInteract', p('Monitor')), 'Camera fixture is not visible')
+        require(not p('CameraPromptVisible'), 'Hack prompt offered before acquiring card')
+        invoke(director, 'Interact')
+        require(not p('RemoteActive'), 'Direct camera hack bypassed permission')
+        record('direct_camera_requires_access_card')
+        # Explicit boundary fixture: kill through normal damage and collect the real drop.
+        u.GameplayStatics.apply_damage(p('KeyEnemy'), 10000, u.GameplayStatics.get_player_controller(world, 0), pawn, None)
+        invoke(director, 'PollEnemies')
+        card = p('AccessItem').get_actor_location()
+        place_and_look((card.x - 110, card.y, 98), card)
+        phase('reg_direct_collect_card')
+    elif mode == 'reg_direct_collect_card':
+        if now - state['entered'] < 0.6:
+            return False
+        invoke(director, 'Interact')
+        require(p('AccessCollected'), 'Boundary fixture could not collect real access card')
+        place_and_look((1800, 0, 98), p('Monitor').get_actor_location())
+        phase('reg_direct_clear')
+    elif mode == 'reg_direct_clear':
+        if now - state['entered'] < 0.6:
+            return False
+        require(p('CameraPromptVisible'), f"Visible authorized camera has no prompt: access={p('AccessCollected')} remote={p('RemoteActive')} can={invoke(director, 'CanInteract', p('Monitor'))}")
+        invoke(director, 'Interact')
+        require(p('RemoteActive') and not p('CameraPromptVisible'), 'Direct hack did not enter or clear prompt')
+        before = float(p('RemotePitch'))
+        invoke(director, 'PanRemote', 0.0, 20.0)
+        require(float(p('RemotePitch')) > before, 'Positive mouse Y did not pitch upward')
+        invoke(director, 'PanRemote', 0.0, -40.0)
+        require(float(p('RemotePitch')) < before, 'Negative mouse Y did not pitch downward')
+        invoke(director, 'ExitRemote')
+        record('direct_camera_enters_and_pitch_sign_is_consistent')
+        pc = u.GameplayStatics.get_player_controller(world, 0)
+        pc.set_control_rotation(u.Rotator(0, 90, 0))
+        phase('reg_direct_look_away')
+    elif mode == 'reg_direct_look_away':
+        if now - state['entered'] < 0.6:
+            return False
+        require(not p('CameraPromptVisible'), 'Camera prompt remains when looking away')
+        invoke(director, 'EnterRemote', False)
+        require(not p('RemoteActive'), 'Normal entry bypassed camera aim check')
+        record('direct_camera_rejects_looking_away')
+        place_and_look((1100, 0, 98), p('Monitor').get_actor_location())
+        phase('reg_direct_distance')
+    elif mode == 'reg_direct_distance':
+        if now - state['entered'] < 0.6:
+            return False
+        invoke(director, 'EnterRemote', False)
+        require(not p('RemoteActive') and not p('CameraPromptVisible'), 'Camera accepted out-of-range hack')
+        record('direct_camera_rejects_beyond_1500_cm')
+        place_and_look((1830, -410, 98), p('Monitor').get_actor_location())
+        phase('reg_direct_wall')
+    elif mode == 'reg_direct_wall':
+        if now - state['entered'] < 0.6:
+            return False
+        require(pawn.get_distance_to(p('Monitor')) < 1500, 'Wall fixture is also out of range')
+        require(not invoke(director, 'CanInteract', p('Monitor')), 'Camera interaction passed through corridor side wall')
+        invoke(director, 'EnterRemote', False)
+        require(not p('RemoteActive') and not p('CameraPromptVisible'), 'Wall did not block prompt/entry')
+        record('direct_camera_wall_blocks_prompt_and_entry')
+        place_and_look((1800, 0, 98), p('Monitor').get_actor_location())
+        phase('reg_direct_restored')
+    elif mode == 'reg_direct_restored':
+        if now - state['entered'] < 0.6:
+            return False
+        require(p('CameraPromptVisible'), 'Camera prompt did not return after clearing obstruction')
+        legacy = [a for a in u.GameplayStatics.get_all_actors_of_class(world, u.Actor)
+                  if a.get_actor_label() in ('OF_Terminal', 'OF_TerminalScreen', 'OF_TerminalLabel')]
+        require(len(legacy) == 3 and all(a.get_editor_property('hidden') and not a.get_actor_enable_collision() for a in legacy),
+                'Legacy terminal remains visible or blocking after reset')
+        record('direct_camera_prompt_recovers_and_legacy_terminal_hidden')
         return True
     return False

@@ -1,5 +1,7 @@
 # OFFAIR 原型实现验证
 
+最新的直接黑入、俯仰与模型瞄准点调整见[2026-10-19 验证记录](direct-camera-validation.md)；旧终端路线仅保留为下文历史结果。
+
 2026-10-19 枪械 E 拾取与守卫待机调整另见[本轮验证记录](weapon-interaction-validation.md)。下文保留 2026-10-18 的历史结果，不能将旧的自动拾枪步骤视为当前操作。
 
 验证日期：2026-10-18。环境为本机 Unreal Engine 5.8.3，Windows，单人 PIE。运行时为纯蓝图；本记录区分编辑器构建、自动化运行和真实界面操作。此次迭代以 `39751c5` 为基线，经过验证的配置、作者脚本和资产哈希见[产物清单](evidence/prototype-artifact-manifest.json)。

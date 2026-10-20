@@ -1,0 +1,242 @@
+{
+  "phase": "reg_direct_restored",
+  "started": 13630.375,
+  "entered": 13667.515,
+  "passed": [
+    "startup",
+    "interaction_distance_guard",
+    "same_stage_death_and_duplicate_guard",
+    "normal_anchor_pickup",
+    "pending_waits_for_death",
+    "guard_waits_for_weapon",
+    "death_applies_next_baseline",
+    "real_weapon_pickup",
+    "guard_moves_on_navigation",
+    "real_weapon_defeats_guard",
+    "normal_access_card_pickup",
+    "normal_monitor_hack",
+    "remote_rotation_clamps_and_body_restore",
+    "normal_playthrough_complete",
+    "completed_restart_restores_new_game",
+    "stage_boundary_and_invalid_target_guards",
+    "gm_disable_guards_all_entries",
+    "normal_permission_and_gm_override",
+    "remote_death_restores_input_and_camera",
+    "gm_enemy_lifecycle_and_no_kill_reward",
+    "monitor_loss_returns_to_body",
+    "ten_reset_cycles_without_state_or_actor_leaks",
+    "default_camera_detection_and_alarm_lock",
+    "camera_orientation_changes_real_detection",
+    "configured_kill_condition_and_wrong_target_rejection",
+    "initialization_failure_recovers_without_losing_progress",
+    "weapon_targets_visible_model_instead_of_plinth",
+    "direct_camera_requires_access_card",
+    "direct_camera_enters_and_pitch_sign_is_consistent",
+    "direct_camera_rejects_looking_away",
+    "direct_camera_rejects_beyond_1500_cm",
+    "direct_camera_wall_blocks_prompt_and_entry",
+    "direct_camera_prompt_recovers_and_legacy_terminal_hidden"
+  ],
+  "events": [
+    {
+      "test": "startup",
+      "detail": "OFFAIR player/controller/session/director initialized",
+      "seconds": 0.14
+    },
+    {
+      "test": "interaction_distance_guard",
+      "detail": "",
+      "seconds": 0.14
+    },
+    {
+      "test": "same_stage_death_and_duplicate_guard",
+      "detail": "",
+      "seconds": 0.97
+    },
+    {
+      "test": "normal_anchor_pickup",
+      "detail": "",
+      "seconds": 1.58
+    },
+    {
+      "test": "pending_waits_for_death",
+      "detail": "",
+      "seconds": 2.28
+    },
+    {
+      "test": "guard_waits_for_weapon",
+      "detail": "",
+      "seconds": 3.78
+    },
+    {
+      "test": "death_applies_next_baseline",
+      "detail": "",
+      "seconds": 3.78
+    },
+    {
+      "test": "real_weapon_pickup",
+      "detail": "BP_ShooterWeapon_Pistol_C",
+      "seconds": 6.11
+    },
+    {
+      "test": "guard_moves_on_navigation",
+      "detail": "12.9 cm after weapon pickup",
+      "seconds": 6.23
+    },
+    {
+      "test": "real_weapon_defeats_guard",
+      "detail": "",
+      "seconds": 7.48
+    },
+    {
+      "test": "normal_access_card_pickup",
+      "detail": "",
+      "seconds": 9.14
+    },
+    {
+      "test": "normal_monitor_hack",
+      "detail": "",
+      "seconds": 9.78
+    },
+    {
+      "test": "remote_rotation_clamps_and_body_restore",
+      "detail": "",
+      "seconds": 9.78
+    },
+    {
+      "test": "normal_playthrough_complete",
+      "detail": "No GM action was used; real movement, pickup, weapon projectiles and direct camera interaction",
+      "seconds": 14.67
+    },
+    {
+      "test": "completed_restart_restores_new_game",
+      "detail": "",
+      "seconds": 15.5
+    },
+    {
+      "test": "stage_boundary_and_invalid_target_guards",
+      "detail": "",
+      "seconds": 15.5
+    },
+    {
+      "test": "gm_disable_guards_all_entries",
+      "detail": "",
+      "seconds": 15.5
+    },
+    {
+      "test": "normal_permission_and_gm_override",
+      "detail": "",
+      "seconds": 16.31
+    },
+    {
+      "test": "remote_death_restores_input_and_camera",
+      "detail": "",
+      "seconds": 17.11
+    },
+    {
+      "test": "gm_enemy_lifecycle_and_no_kill_reward",
+      "detail": "",
+      "seconds": 17.12
+    },
+    {
+      "test": "monitor_loss_returns_to_body",
+      "detail": "",
+      "seconds": 18.12
+    },
+    {
+      "test": "ten_reset_cycles_without_state_or_actor_leaks",
+      "detail": "",
+      "seconds": 26.19
+    },
+    {
+      "test": "default_camera_detection_and_alarm_lock",
+      "detail": "",
+      "seconds": 27.7
+    },
+    {
+      "test": "camera_orientation_changes_real_detection",
+      "detail": "",
+      "seconds": 29.2
+    },
+    {
+      "test": "configured_kill_condition_and_wrong_target_rejection",
+      "detail": "",
+      "seconds": 30.64
+    },
+    {
+      "test": "initialization_failure_recovers_without_losing_progress",
+      "detail": "",
+      "seconds": 32.26
+    },
+    {
+      "test": "weapon_targets_visible_model_instead_of_plinth",
+      "detail": "",
+      "seconds": 33.48
+    },
+    {
+      "test": "direct_camera_requires_access_card",
+      "detail": "",
+      "seconds": 34.09
+    },
+    {
+      "test": "direct_camera_enters_and_pitch_sign_is_consistent",
+      "detail": "",
+      "seconds": 35.31
+    },
+    {
+      "test": "direct_camera_rejects_looking_away",
+      "detail": "",
+      "seconds": 35.92
+    },
+    {
+      "test": "direct_camera_rejects_beyond_1500_cm",
+      "detail": "",
+      "seconds": 36.53
+    },
+    {
+      "test": "direct_camera_wall_blocks_prompt_and_entry",
+      "detail": "",
+      "seconds": 37.14
+    },
+    {
+      "test": "direct_camera_prompt_recovers_and_legacy_terminal_hidden",
+      "detail": "",
+      "seconds": 37.75
+    }
+  ],
+  "status": "passed",
+  "last_shot": 13637.64,
+  "waypoint": 4,
+  "normal_gm_calls": 0,
+  "snapshots": [],
+  "observation": {
+    "stage": 1,
+    "position": [
+      1830.0,
+      -410.0,
+      98.0
+    ],
+    "hp": 500.0,
+    "remote": false,
+    "alarm": false,
+    "live_enemies": 0
+  },
+  "last_observation": 13666.937,
+  "run_before": 2,
+  "guard_start": [
+    1550.0,
+    0.0,
+    98.1499981880188
+  ],
+  "weapon_wait": 13635.671,
+  "body_before_remote": [
+    1762.9760855996497,
+    -2.383606166570631,
+    98.1499981880188
+  ],
+  "regression_gm_calls": 42,
+  "wait_run": 22,
+  "repeat_count": 10,
+  "error": "",
+  "elapsed_seconds": 37.75
+}

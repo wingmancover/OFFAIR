@@ -14,6 +14,43 @@ def retire_camera_terminal():
             actor.set_actor_enable_collision(False)
 
 
+def update_narrative_layout():
+    """Migrate only the authored note/gate/cache objects; preserve the rest of the map."""
+    subsystem = u.get_editor_subsystem(u.EditorActorSubsystem)
+    by_label = {a.get_actor_label(): a for a in subsystem.get_all_level_actors()}
+    for label in ['OF_StageGate', 'OF_AnchorPlinth', 'OF_AnchorLabel', 'OF_RewindLabel']:
+        if label in by_label:
+            subsystem.destroy_actor(by_label[label])
+    note = by_label['OF_Anchor']
+    note.set_actor_location(u.Vector(245, -170, 0.3), False, True)
+    note.set_actor_rotation(u.Rotator(), True)
+    note.set_actor_scale3d(u.Vector(0.55, 0.38, 0.002))
+    note.static_mesh_component.set_material(0, u.load_asset('/Game/OFFAIR/Materials/M_Surveillance'))
+    note.set_actor_enable_collision(False)
+    cache = by_label.get('OF_TrapBox')
+    if not cache:
+        cache = subsystem.spawn_actor_from_class(u.StaticMeshActor, u.Vector(820, 0, 35))
+        cache.set_actor_label('OF_TrapBox')
+        cache.static_mesh_component.set_mobility(u.ComponentMobility.MOVABLE)
+        cache.static_mesh_component.set_static_mesh(u.load_asset('/Engine/BasicShapes/Cube'))
+    cache.set_actor_scale3d(u.Vector(0.7, 0.6, 0.65))
+    cache.static_mesh_component.set_material(0, u.load_asset('/Game/OFFAIR/Materials/M_Access'))
+    cache.set_actor_enable_collision(False)
+    spawn = by_label.get('OF_TrapSpawn')
+    if not spawn:
+        spawn = subsystem.spawn_actor_from_class(u.TargetPoint, u.Vector(1120, 0, 105))
+        spawn.set_actor_label('OF_TrapSpawn')
+        spawn.set_actor_rotation(u.Rotator(0, 180, 0), True)
+    director = by_label['OF_RunDirector']
+    director.set_editor_property('CoreItem', note)
+    director.set_editor_property('TrapBox', cache)
+    director.set_editor_property('TrapSpawn', spawn)
+    if 'OF_WeaponLabel' in by_label:
+        by_label['OF_WeaponLabel'].text_render.set_text('02  /  SUPPLY CACHE')
+    retire_camera_terminal()
+    return {'note': note.get_path_name(), 'trap_box': cache.get_path_name(), 'trap_spawn': spawn.get_path_name()}
+
+
 def build_level(classes, output_dir):
     levels = u.get_editor_subsystem(u.LevelEditorSubsystem)
     actors = u.get_editor_subsystem(u.EditorActorSubsystem)
@@ -98,7 +135,6 @@ def build_level(classes, output_dir):
     box('SouthWall', (1650, -610, 250), (4400, 30, 500))
     box('StartWall', (-550, 0, 250), (30, 1240, 500))
     box('EndWall', (3850, 0, 250), (30, 1240, 500))
-    stage_gate = box('StageGate', (600, 0, 250), (35, 1200, 500), 'cyan', True)
     box('BayDividerNorth', (2150, 410, 250), (35, 380, 500))
     box('BayDividerSouth', (2150, -410, 250), (35, 380, 500))
     box('CorridorNorth', (2800, 235, 250), (1300, 30, 500))
@@ -113,8 +149,7 @@ def build_level(classes, output_dir):
     box('SurveillanceFloor', (2780, 0, 2), (1120, 390, 3), 'red', collision=False)
     box('ExitFloor', (3630, 0, 3), (350, 400, 4), 'green', collision=False)
 
-    core = box('Anchor', (245, -170, 85), (55, 55, 100), 'cyan', True, False)
-    box('AnchorPlinth', (245, -170, 25), (100, 100, 50), 'dark')
+    core = box('Anchor', (245, -170, 0.3), (55, 38, 0.2), 'red', True, False)
     access = box('AccessCard', (0, 0, -500), (12, 48, 32), 'gold', True, False)
     terminal = box('Terminal', (1940, -500, 80), (75, 75, 160), 'dark', True)
     box('TerminalScreen', (1900, -500, 115), (5, 62, 60), 'cyan', collision=False)
@@ -149,9 +184,7 @@ def build_level(classes, output_dir):
     scan_light.attach_to_actor(camera, '', u.AttachmentRule.KEEP_WORLD, u.AttachmentRule.KEEP_WORLD, u.AttachmentRule.KEEP_WORLD, False)
 
     sign('Title', 'OFFAIR  /  RECURSION TEST', (-500, 0, 290), 0, 40)
-    sign('AnchorLabel', '01  /  ANCHOR\nE TO SECURE', (245, -170, 210), 180, 20)
-    sign('RewindLabel', 'RESTART LOOP [R]\nNEXT STAGE AFTER DEATH', (575, 0, 330), 180, 22)
-    sign('WeaponLabel', '02  /  WEAPON PICKUP', (850, 0, 235), 180, 22, (255, 200, 120))
+    sign('WeaponLabel', '02  /  SUPPLY CACHE', (850, 0, 235), 180, 22, (255, 200, 120))
     sign('TerminalLabel', '03  /  CAMERA LINK\nACCESS CARD + E', (1900, -500, 230), 180, 20)
     sign('CorridorWarning', 'SURVEILLANCE ZONE\nTURN CAMERA AWAY', (2165, 0, 340), 180, 22, (255, 130, 120))
     sign('ExitLabel', '04  /  EXIT', (3790, 0, 270), 180, 40, (140, 255, 190))
@@ -191,12 +224,12 @@ def build_level(classes, output_dir):
         recast.set_editor_property('runtime_generation', u.RuntimeGenerationType.DYNAMIC)
 
     director = spawn(classes['director'], 'RunDirector', (-300, -450, 100))
-    refs = {'CoreItem': core, 'AccessItem': access, 'Terminal': terminal, 'StageGate': stage_gate,
+    refs = {'CoreItem': core, 'AccessItem': access, 'Terminal': terminal,
             'ExitGate': exit_gate, 'WeaponPickup': pickup, 'Monitor': camera,
             'EnemySpawn': enemy_spawn, 'GMSpawn': gm_spawn}
     for name, actor in refs.items():
         director.set_editor_property(name, actor)
-    retire_camera_terminal()
+    update_narrative_layout()
     assert levels.save_current_level()
     report = {'map': MAP_PATH, 'director': director.get_path_name(),
               'references': {name: actor.get_path_name() for name, actor in refs.items()},

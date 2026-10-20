@@ -71,6 +71,10 @@ vars_('session', {'CurrentStage': 'int', 'PendingStage': 'int', 'ResetTarget': '
 vars_('director', {
     'WeaponCollected': 'bool', 'WeaponInteractDistance': 'real',
     'CameraInteractDistance': 'real', 'CameraPromptVisible': 'bool',
+    'TrapBox': ACTOR, 'TrapSpawn': ACTOR, 'TrapTriggered': 'bool',
+    'SystemResetActive': 'bool', 'SystemResetRemaining': 'real',
+    'ThoughtText': 'string', 'ThoughtRemaining': 'real',
+    'TrapMaxHP': 'real', 'NormalMaxHP': 'real',
     'Session': PATH['session'], 'Player': SHOOTER, 'Controller': PC,
     'CoreItem': ACTOR, 'AccessItem': ACTOR, 'Terminal': ACTOR,
     'StageGate': ACTOR, 'ExitGate': ACTOR, 'WeaponPickup': ACTOR,
@@ -87,7 +91,7 @@ vars_('director', {
     'ConditionEvent': 'name', 'ConditionTarget': 'name',
 })
 vars_('hud', {'Director': PATH['director'], 'ScreenWidth': 'real', 'ScreenHeight': 'real'})
-for name in ['CoreItem', 'AccessItem', 'Terminal', 'StageGate', 'ExitGate', 'WeaponPickup', 'Monitor', 'EnemySpawn', 'GMSpawn', 'MaxEnemies', 'ConditionEvent', 'ConditionTarget', 'WeaponInteractDistance', 'CameraInteractDistance']:
+for name in ['CoreItem', 'AccessItem', 'Terminal', 'ExitGate', 'WeaponPickup', 'Monitor', 'EnemySpawn', 'GMSpawn', 'TrapBox', 'TrapSpawn', 'TrapMaxHP', 'NormalMaxHP', 'MaxEnemies', 'ConditionEvent', 'ConditionTarget', 'WeaponInteractDistance', 'CameraInteractDistance']:
     LIB.set_blueprint_variable_instance_editable(BP['director'], name, True)
     LIB.set_blueprint_variable_category(BP['director'], name, 'Stage Setup')
 compile_bp(BP['director'])
@@ -104,6 +108,7 @@ FUNCTIONS = {
         ('Interact', {}, {}), ('CanInteract', {'Target': ACTOR}, {'Result': 'bool'}),
         ('InteractionPoint', {'Target': ACTOR}, {'Point': VECTOR}),
         ('CollectWeapon', {}, {}), ('SetEnemyCombat', {'Enemy': NPC, 'Enabled': 'bool'}, {}),
+        ('StartSystemReset', {}, {}), ('TriggerTrap', {}, {}), ('TickNarrative', {'Delta': 'real'}, {}),
         ('MarkCondition', {'EventId': 'name', 'TargetId': 'name'}, {}),
         ('EnterRemote', {'BypassAccess': 'bool'}, {}), ('ExitRemote', {}, {}),
         ('RefreshControls', {}, {}), ('ToggleGM', {}, {}),
@@ -113,6 +118,8 @@ FUNCTIONS = {
         ('UpdateExit', {}, {}), ('CheckFinish', {}, {}), ('GMAction', {'Action': 'int'}, {}),
     ],
     'hud': [('DrawPrototype', {}, {}), ('DrawGM', {}, {}), ('DrawCameraPrompt', {}, {}),
+            ('DrawNarrative', {}, {}),
+            ('CenteredText', {'Text': 'string', 'Y': 'real', 'Size': 'real', 'Color': '/Script/CoreUObject.LinearColor'}, {}),
             ('Label', {'Text': 'string', 'X': 'real', 'Y': 'real', 'Size': 'real'}, {}),
             ('GMButton', {'Label': 'string', 'Y': 'real', 'HitName': 'name'}, {})],
 }
@@ -196,7 +203,7 @@ def build_core():
     g.set('Initialized', False)
     g.set('FailureText', '')
     local(g, 'RefreshControls')
-    essential = ['CoreItem', 'AccessItem', 'StageGate', 'ExitGate', 'WeaponPickup', 'Monitor', 'EnemySpawn', 'GMSpawn']
+    essential = ['CoreItem', 'AccessItem', 'TrapBox', 'TrapSpawn', 'ExitGate', 'WeaponPickup', 'Monitor', 'EnemySpawn', 'GMSpawn']
     for name in essential:
         yes, no = g.branch(g.valid(g.get(name)))
         no.set('FailureText', 'Missing level reference: ' + name)
@@ -217,13 +224,16 @@ def build_core():
     g = g_('RequestReset')
     g.guard(g.and_(g.not_(g.get('Resetting')), g.valid(g.get('Session'))))
     target = g.param('Target')
-    g.guard(g.and_(g.math('GreaterEqual_IntInt', A=target, B=0), g.math('LessEqual_IntInt', A=target, B=1)))
+    g.guard(g.and_(g.math('GreaterEqual_IntInt', A=target, B=0), g.math('LessEqual_IntInt', A=target, B=2)))
     g.set('Resetting', True)
     g.set('AcceptedResets', g.math('Add_IntInt', A=g.get('AcceptedResets'), B=1))
     set_session(g, 'ResetTarget', target)
     set_session(g, 'ResetBusy', True)
     g.set('GMOpen', False)
     g.set('CameraPromptVisible', False)
+    g.set('SystemResetActive', False)
+    g.set('SystemResetRemaining', 0.0)
+    g.set('ThoughtRemaining', 0.0)
     local(g, 'ExitRemote')
     local(g, 'RefreshControls')
     g.set('StatusText', 'REWINDING / rebuilding the stage...')
@@ -246,17 +256,19 @@ def build_core():
 
     g = g_('Restart')
     ready(g, True)
+    g.guard(g.not_(g.get('SystemResetActive')))
     yes, no = g.branch(g.get('Completed'))
     yes.call('RequestReset', Target=0)
     no.call('KillPlayer')
 
     g = g_('GMStage')
     ready(g)
+    g.guard(g.not_(g.get('SystemResetActive')))
     g.guard(session(g, 'GMEnabled'))
     target = g.math('Add_IntInt', A=g.get('Stage'), B=g.param('Delta'))
-    yes, no = g.branch(g.and_(g.math('GreaterEqual_IntInt', A=target, B=0), g.math('LessEqual_IntInt', A=target, B=1)))
+    yes, no = g.branch(g.and_(g.math('GreaterEqual_IntInt', A=target, B=0), g.math('LessEqual_IntInt', A=target, B=2)))
     yes.call('RequestReset', Target=target)
-    no.set('StatusText', 'No adjacent stage. Stage order is 0 -> 1.')
+    no.set('StatusText', 'No adjacent stage. Stage order is 0 -> 1 -> 2.')
 
     g = g_('CommitRun')
     g.guard(g.get('Initialized'))
@@ -265,6 +277,16 @@ def build_core():
     set_session(g, 'ResetBusy', False)
     set_session(g, 'RunNumber', g.math('Add_IntInt', A=session(g, 'RunNumber'), B=1))
     g.set('StatusText', 'Follow the signs. E interacts. R restarts a loop.')
+    g.set('ThoughtText', '')
+    g.set('ThoughtRemaining', 0.0)
+    def thought1(b):
+        b.set('ThoughtText', 'What the hell... What just happened?')
+        b.set('ThoughtRemaining', 3.0)
+    def thought2(b):
+        b.set('ThoughtText', "Didn't I just die? Wait...\nWhy is there a gun where that box was?")
+        b.set('ThoughtRemaining', 3.0)
+    g.when(g.eq(g.get('Stage'), 1), thought1)
+    g.when(g.eq(g.get('Stage'), 2), thought2)
     local(g, 'RefreshControls')
     g.log('OFFAIR_RUN_READY')
 
@@ -322,16 +344,18 @@ def build_interactions():
     g.set('CoreCollected', True)
     set_session(g, 'PendingStage', 1)
     show_actor(g, g.get('CoreItem'), False, False)
-    g.set('StatusText', 'CONDITION SECURED. The next death starts STAGE 1. Press R to rewind.')
+    g.set('StatusText', 'CONDITION SECURED. The next death starts STAGE 1.')
+    g.when(g.math('EqualEqual_NameName', A=g.param('EventId'), B='ItemAcquired'), lambda b: b.call('StartSystemReset'))
     g.log('OFFAIR_CONDITION accepted; PendingStage=1')
 
     g = g_('Interact')
     ready(g)
+    g.guard(g.not_(g.get('SystemResetActive')))
     yes, body = g.branch(g.get('RemoteActive'))
     yes.call('ExitRemote')
     g.tail = body.tail
     g.guard(g.not_(g.get('GMOpen')))
-    weapon = g.and_(g.not_(g.get('WeaponCollected')), g.or_(g.eq(g.get('Stage'), 1),
+    weapon = g.and_(g.not_(g.get('WeaponCollected')), g.or_(g.eq(g.get('Stage'), 2),
         g.math('EqualEqual_NameName', A=g.get('ConditionEvent'), B='EnemyKilled')),
         g.call('CanInteract', 'Result', Target=g.get('WeaponPickup')))
     g.when(weapon, lambda b: b.call('CollectWeapon'))
@@ -339,7 +363,9 @@ def build_interactions():
                   g.math('EqualEqual_NameName', A=g.get('ConditionEvent'), B='ItemAcquired'))
     core = g.and_(core, g.call('CanInteract', 'Result', Target=g.get('CoreItem')))
     g.when(core, lambda b: b.call('MarkCondition', EventId='ItemAcquired', TargetId='Anchor'))
-    access = g.and_(g.eq(g.get('Stage'), 1), g.get('GuardRewarded'), g.not_(g.get('AccessCollected')))
+    trap = g.and_(g.eq(g.get('Stage'), 1), g.not_(g.get('TrapTriggered')), g.call('CanInteract', 'Result', Target=g.get('TrapBox')))
+    g.when(trap, lambda b: b.call('TriggerTrap'))
+    access = g.and_(g.eq(g.get('Stage'), 2), g.get('GuardRewarded'), g.not_(g.get('AccessCollected')))
     access = g.and_(access, g.call('CanInteract', 'Result', Target=g.get('AccessItem')))
     def collect(b):
         b.set('AccessCollected', True)
@@ -347,7 +373,7 @@ def build_interactions():
         b.set('StatusText', 'ACCESS CARD COLLECTED. Look at the camera and press E to hack it.')
         b.log('OFFAIR_ACCESS_COLLECTED')
     g.when(access, collect)
-    monitor = g.and_(g.eq(g.get('Stage'), 1), g.call('CanInteract', 'Result', Target=g.get('Monitor')))
+    monitor = g.and_(g.eq(g.get('Stage'), 2), g.call('CanInteract', 'Result', Target=g.get('Monitor')))
     def connect(b):
         yes, no = b.branch(b.get('AccessCollected'))
         yes.call('EnterRemote', BypassAccess=False)
@@ -357,6 +383,8 @@ def build_interactions():
 
     g = g_('CollectWeapon')
     ready(g)
+    g.guard(g.not_(g.get('SystemResetActive')))
+    g.guard(g.or_(g.eq(g.get('Stage'), 2), g.and_(g.eq(g.get('Stage'), 0), g.math('EqualEqual_NameName', A=g.get('ConditionEvent'), B='EnemyKilled'))))
     g.guard(g.not_(g.get('WeaponCollected')))
     g.guard(g.call('CanInteract', 'Result', Target=g.get('WeaponPickup')))
     pickup = g.cast(g.get('WeaponPickup'), PICKUP)
@@ -391,6 +419,8 @@ def build_interactions():
     gm_position = g.math('Add_VectorVector', A=location(g, g.get('GMSpawn')), B=gm_offset)
     position = g.engine('KismetMathLibrary', 'SelectVector', 'ReturnValue',
         A=location(g, g.get('EnemySpawn')), B=gm_position, bPickA=g.param('KeyGuard'))
+    position = g.engine('KismetMathLibrary', 'SelectVector', 'ReturnValue', A=location(g, g.get('TrapSpawn')), B=position,
+        bPickA=g.and_(g.eq(g.get('Stage'), 1), g.param('KeyGuard')))
     spawned = g.spawn(NPC, g.transform(position, g.rot(0.0, 180.0)))
     good, bad = g.branch(g.valid(spawned))
     def critical_failure(b):
@@ -404,7 +434,7 @@ def build_interactions():
     g.call('/Script/Engine.KismetArrayLibrary.Array_Add', TargetArray=g.get('Enemies'), NewItem=spawned)
     g.when(g.param('KeyGuard'), lambda b: b.set('KeyEnemy', spawned))
     g.set('EnemyCount', g.math('Add_IntInt', A=g.get('EnemyCount'), B=1))
-    g.call('SetEnemyCombat', Enemy=spawned, Enabled=g.get('WeaponCollected'))
+    g.call('SetEnemyCombat', Enemy=spawned, Enabled=g.or_(g.get('WeaponCollected'), g.and_(g.eq(g.get('Stage'), 1), g.get('TrapTriggered'))))
     g.set('StatusText', 'Enemy spawned. R restores the stage baseline.')
 
     editor = EDITOR.get_graph_editor_by_name(BP['director'], 'PollEnemies')
@@ -428,7 +458,7 @@ def build_interactions():
     g.guard(g.math('LessEqual_DoubleDouble', A=g.get('Current HP', guard, NPC), B=0.0))
     g.set('GuardRewarded', True)
     g.call('MarkCondition', EventId='EnemyKilled', TargetId='Guard')
-    g.guard(g.eq(g.get('Stage'), 1))
+    g.guard(g.eq(g.get('Stage'), 2))
     drop = g.math('Add_VectorVector', A=location(g, guard), B=g.vec(0.0, 0.0, 65.0))
     g.engine('Actor', 'K2_SetActorLocation', self=g.get('AccessItem'), NewLocation=drop, bSweep=False, bTeleport=True)
     show_actor(g, g.get('AccessItem'), True, False)
@@ -437,6 +467,7 @@ def build_interactions():
 
     g = g_('GMAdd')
     ready(g)
+    g.guard(g.not_(g.get('SystemResetActive')))
     g.guard(session(g, 'GMEnabled'))
     g.call('AddEnemy', KeyGuard=False)
 
@@ -448,6 +479,7 @@ def build_interactions():
         editor.add_local_variable('Candidate', LIB.get_object_reference_type(u.load_class(None, NPC)), 'None')
     g = g_('GMRemove')
     ready(g)
+    g.guard(g.not_(g.get('SystemResetActive')))
     g.guard(session(g, 'GMEnabled'))
     body, enemy = g.foreach(g.get('Enemies'))
     body.guard(body.valid(enemy))
@@ -471,7 +503,7 @@ def build_remote():
     g = g_('RefreshControls')
     g.guard(g.valid(g.get('Player')))
     g.guard(g.valid(g.get('Controller')))
-    blocked = g.or_(g.get('RemoteActive'), g.get('GMOpen'), g.get('Resetting'), g.get('Completed'), g.not_(g.get('Initialized')))
+    blocked = g.or_(g.get('RemoteActive'), g.get('GMOpen'), g.get('SystemResetActive'), g.get('Resetting'), g.get('Completed'), g.not_(g.get('Initialized')))
     yes, no = g.branch(blocked)
     yes.engine('Actor', 'DisableInput', self=yes.get('Player'), PlayerController=yes.get('Controller'))
     movement = yes.get('CharacterMovement', yes.get('Player'), '/Script/Engine.Character')
@@ -489,6 +521,7 @@ def build_remote():
 
     g = g_('EnterRemote')
     ready(g)
+    g.guard(g.not_(g.get('SystemResetActive')))
     g.guard(g.not_(g.get('RemoteActive')))
     g.guard(g.valid(g.get('Monitor')))
     g.guard(g.or_(g.get('AccessCollected'), g.param('BypassAccess')))
@@ -517,6 +550,7 @@ def build_remote():
 
     g = g_('ToggleGM')
     ready(g)
+    g.guard(g.not_(g.get('SystemResetActive')))
     g.guard(session(g, 'GMEnabled'))
     g.set('GMOpen', g.not_(g.get('GMOpen')))
     g.call('RefreshControls')
@@ -547,7 +581,7 @@ def build_remote():
 
     g = g_('TickSurveillance')
     ready(g)
-    g.guard(g.eq(g.get('Stage'), 1))
+    g.guard(g.eq(g.get('Stage'), 2))
     g.guard(g.not_(g.get('Alarm')))
     g.guard(g.valid(g.get('Monitor')))
     player_pos = location(g, g.get('Player'))
@@ -576,7 +610,7 @@ def build_remote():
 
     g = g_('CheckFinish')
     ready(g)
-    g.guard(g.and_(g.eq(g.get('Stage'), 1), g.get('AccessCollected'), g.get('HackedOnce'), g.not_(g.get('Alarm')), g.not_(g.get('RemoteActive'))))
+    g.guard(g.and_(g.eq(g.get('Stage'), 2), g.get('AccessCollected'), g.get('HackedOnce'), g.not_(g.get('Alarm')), g.not_(g.get('RemoteActive'))))
     xyz = g.engine('KismetMathLibrary', 'BreakVector', InVec=location(g, g.get('Player')))
     g.guard(g.math('Greater_DoubleDouble', A=pin(xyz, 'X', True), B=3500.0))
     g.set('Completed', True)
@@ -587,9 +621,49 @@ def build_remote():
     g.log('OFFAIR_COMPLETE')
 
 
+def build_narrative():
+    g = g_('StartSystemReset')
+    ready(g)
+    g.guard(g.and_(g.eq(g.get('Stage'), 0), g.get('CoreCollected'), g.not_(g.get('SystemResetActive'))))
+    g.set('SystemResetActive', True)
+    g.set('SystemResetRemaining', 3.0)
+    g.set('ThoughtRemaining', 0.0)
+    g.set('GMOpen', False)
+    g.set('PromptText', '')
+    g.call('RefreshControls')
+    g.log('OFFAIR_SYSTEM_RESET_COUNTDOWN')
+
+    g = g_('TriggerTrap')
+    ready(g)
+    g.guard(g.and_(g.eq(g.get('Stage'), 1), g.not_(g.get('TrapTriggered'))))
+    g.guard(g.call('CanInteract', 'Result', Target=g.get('TrapBox')))
+    g.set('TrapTriggered', True)
+    g.call('AddEnemy', KeyGuard=True)
+    g.guard(g.and_(g.get('Initialized'), g.valid(g.get('KeyEnemy'))))
+    set_session(g, 'PendingStage', 2)
+    show_actor(g, g.get('TrapBox'), False, False)
+    body, enemy = g.foreach(g.get('Enemies'))
+    body.call('SetEnemyCombat', Enemy=enemy, Enabled=True)
+    g.set('StatusText', 'AMBUSH!')
+    g.log('OFFAIR_TRAP_TRIGGERED PendingStage=2')
+
+    g = g_('TickNarrative')
+    ready(g)
+    def thought(b):
+        b.set('ThoughtRemaining', b.engine('KismetMathLibrary', 'FMax', 'ReturnValue',
+            A=0.0, B=b.math('Subtract_DoubleDouble', A=b.get('ThoughtRemaining'), B=b.param('Delta'))))
+        b.when(b.math('LessEqual_DoubleDouble', A=b.get('ThoughtRemaining'), B=0.0), lambda c: c.set('ThoughtText', ''))
+    g.when(g.math('Greater_DoubleDouble', A=g.get('ThoughtRemaining'), B=0.0), thought)
+    def countdown(b):
+        b.set('SystemResetRemaining', b.math('Subtract_DoubleDouble', A=b.get('SystemResetRemaining'), B=b.param('Delta')))
+        b.when(b.math('LessEqual_DoubleDouble', A=b.get('SystemResetRemaining'), B=0.0), lambda c: c.call('KillPlayer'))
+    g.when(g.get('SystemResetActive'), countdown)
+
+
 def build_tick():
     g = g_('GMAction')
     ready(g)
+    g.guard(g.not_(g.get('SystemResetActive')))
     g.guard(session(g, 'GMEnabled'))
     actions = [('KillPlayer', {}), ('GMStage', {'Delta': 1}), ('GMStage', {'Delta': -1}),
                ('GMAdd', {}), ('GMRemove', {}), ('EnterRemote', {'BypassAccess': True})]
@@ -601,6 +675,7 @@ def build_tick():
     g.guard(g.valid(g.get('Session')))
     g.guard(g.not_(g.get('Resetting')))
     g.guard(g.get('Initialized'))
+    local(g, 'TickNarrative', Delta=g.param('Delta'))
     def close_disabled_menu(b):
         b.set('GMOpen', False)
         b.call('RefreshControls')
@@ -619,29 +694,35 @@ def build_tick():
     g.set('CameraPromptVisible', False)
     ready(g)
     g.set('PromptText', '')
-    stage0, stage1 = g.branch(g.eq(g.get('Stage'), 0))
-    stage0.set('ObjectiveText', 'LOOP 0 / SECURE THE CYAN ANCHOR')
+    g.guard(g.not_(g.get('SystemResetActive')))
+    stage0, later = g.branch(g.eq(g.get('Stage'), 0))
+    stage1, stage2 = later.branch(later.eq(later.get('Stage'), 1))
+    stage0.set('ObjectiveText', 'LOOP 0 / LOOK FOR THE RED NOTE')
     stage0.when(stage0.math('EqualEqual_NameName', A=stage0.get('ConditionEvent'), B='EnemyKilled'),
                 lambda b: b.set('ObjectiveText', 'LOOP 0 / DEFEAT THE KEY GUARD'))
-    stage0.when(stage0.get('CoreCollected'), lambda b: b.set('ObjectiveText', 'ANCHOR LOCKED / PRESS R TO REWIND'))
     core_near = stage0.and_(stage0.not_(stage0.get('CoreCollected')),
         stage0.math('EqualEqual_NameName', A=stage0.get('ConditionEvent'), B='ItemAcquired'),
         stage0.call('CanInteract', 'Result', Target=stage0.get('CoreItem')))
-    stage0.when(core_near, lambda b: b.set('PromptText', '[E] Secure anchor'))
-    stage1.set('ObjectiveText', 'LOOP 1 / ARM YOURSELF AND DEFEAT THE GUARD')
-    weapon_near = stage1.and_(stage1.not_(stage1.get('WeaponCollected')), stage1.call('CanInteract', 'Result', Target=stage1.get('WeaponPickup')))
-    stage1.when(weapon_near, lambda b: b.set('PromptText', '[E] Pick up pistol'))
+    stage0.when(core_near, lambda b: b.set('PromptText', '[E] Pick up note'))
+    stage1.set('ObjectiveText', 'LOOP 1 / INSPECT THE GOLD BOX')
+    stage1.when(stage1.get('TrapTriggered'), lambda b: b.set('ObjectiveText', 'LOOP 1 / AMBUSH'))
+    box_near = stage1.and_(stage1.not_(stage1.get('TrapTriggered')), stage1.call('CanInteract', 'Result', Target=stage1.get('TrapBox')))
+    stage1.when(box_near, lambda b: b.set('PromptText', '[E] Open box'))
+    stage2.set('ObjectiveText', 'LOOP 2 / ARM YOURSELF AND DEFEAT THE GUARD')
+    weapon_near = stage2.and_(stage2.not_(stage2.get('WeaponCollected')), stage2.call('CanInteract', 'Result', Target=stage2.get('WeaponPickup')))
+    stage2.when(weapon_near, lambda b: b.set('PromptText', '[E] Pick up pistol'))
     stage0_weapon_near = stage0.and_(stage0.not_(stage0.get('WeaponCollected')), stage0.call('CanInteract', 'Result', Target=stage0.get('WeaponPickup')))
     stage0.when(stage0.and_(stage0.math('EqualEqual_NameName', A=stage0.get('ConditionEvent'), B='EnemyKilled'), stage0_weapon_near),
                 lambda b: b.set('PromptText', '[E] Pick up pistol'))
-    stage1.when(stage1.get('GuardRewarded'), lambda b: b.set('ObjectiveText', 'LOOP 1 / COLLECT THE GUARD ACCESS CARD'))
-    stage1.when(stage1.get('AccessCollected'), lambda b: b.set('ObjectiveText', 'LOOP 1 / LOOK AT THE CAMERA / E TO HACK'))
-    access_near = stage1.and_(stage1.get('GuardRewarded'), stage1.not_(stage1.get('AccessCollected')), stage1.call('CanInteract', 'Result', Target=stage1.get('AccessItem')))
-    stage1.when(access_near, lambda b: b.set('PromptText', '[E] Collect access card'))
-    camera_near = stage1.call('CanInteract', 'Result', Target=stage1.get('Monitor'))
-    stage1.set('CameraPromptVisible', stage1.and_(camera_near, stage1.get('AccessCollected'), stage1.not_(stage1.get('RemoteActive')), stage1.not_(stage1.get('GMOpen'))))
-    stage1.when(stage1.get('RemoteActive'), lambda b: b.set('PromptText', 'MOUSE: turn camera     [E / Q] Return to body'))
-    stage1.when(stage1.get('Alarm'), lambda b: b.set('ObjectiveText', 'ALARM / EXIT LOCKED / R TO RETRY'))
+    stage2.when(stage2.get('GuardRewarded'), lambda b: b.set('ObjectiveText', 'LOOP 2 / COLLECT THE GUARD ACCESS CARD'))
+    stage2.when(stage2.get('AccessCollected'), lambda b: b.set('ObjectiveText', 'LOOP 2 / LOOK AT THE CAMERA / E TO HACK'))
+    stage2.when(stage2.get('HackedOnce'), lambda b: b.set('ObjectiveText', 'LOOP 2 / TURN CAMERA AWAY, THEN REACH THE EXIT'))
+    access_near = stage2.and_(stage2.get('GuardRewarded'), stage2.not_(stage2.get('AccessCollected')), stage2.call('CanInteract', 'Result', Target=stage2.get('AccessItem')))
+    stage2.when(access_near, lambda b: b.set('PromptText', '[E] Collect access card'))
+    camera_near = stage2.call('CanInteract', 'Result', Target=stage2.get('Monitor'))
+    stage2.set('CameraPromptVisible', stage2.and_(camera_near, stage2.get('AccessCollected'), stage2.not_(stage2.get('RemoteActive')), stage2.not_(stage2.get('GMOpen'))))
+    stage2.when(stage2.get('RemoteActive'), lambda b: b.set('PromptText', 'MOUSE: turn camera     [E / Q] Return to body'))
+    stage2.when(stage2.get('Alarm'), lambda b: b.set('ObjectiveText', 'ALARM / EXIT LOCKED / R TO RETRY'))
 
 
 def build_events():
@@ -658,12 +739,15 @@ def finish_events():
     g.tail = nodes['FinalizeRun'].find_then_pin()
     item_condition = g.math('EqualEqual_NameName', A=g.get('ConditionEvent'), B='ItemAcquired')
     combat_condition = g.math('EqualEqual_NameName', A=g.get('ConditionEvent'), B='EnemyKilled')
-    combat_stage = g.or_(g.eq(g.get('Stage'), 1), combat_condition)
+    combat_stage = g.or_(g.eq(g.get('Stage'), 2), g.and_(g.eq(g.get('Stage'), 0), combat_condition))
     show_actor(g, g.get('CoreItem'), g.and_(g.eq(g.get('Stage'), 0), item_condition), False)
     show_actor(g, g.get('AccessItem'), False, False)
     g.set('WeaponCollected', False)
+    g.set('TrapTriggered', False)
+    g.set('SystemResetActive', False)
+    g.set('SystemResetRemaining', 0.0)
+    show_actor(g, g.get('TrapBox'), g.eq(g.get('Stage'), 1), False)
     show_actor(g, g.get('WeaponPickup'), combat_stage, False)
-    show_actor(g, g.get('StageGate'), g.and_(g.eq(g.get('Stage'), 0), item_condition))
     show_actor(g, g.get('ExitGate'), True)
     g.set('RemoteYaw', 180.0)
     g.set('RemotePitch', -18.0)
@@ -671,6 +755,9 @@ def finish_events():
     set_session(g, 'ResetTarget', g.get('Stage'))
     set_session(g, 'ResetBusy', True)
     g.set('Initialized', True)
+    max_hp = g.engine('KismetMathLibrary', 'SelectFloat', 'ReturnValue', A=g.get('TrapMaxHP'), B=g.get('NormalMaxHP'), bPickA=g.eq(g.get('Stage'), 1))
+    g.set('Max HP', max_hp, g.get('Player'), SHOOTER)
+    g.set('Current HP', max_hp, g.get('Player'), SHOOTER)
     g.when(combat_stage, lambda b: b.call('AddEnemy', KeyGuard=True))
     g.call('CommitRun')
 
@@ -747,6 +834,8 @@ def set_defaults():
     d.set_editor_property('MaxEnemies', 8)
     d.set_editor_property('WeaponInteractDistance', 300.0)
     d.set_editor_property('CameraInteractDistance', 1500.0)
+    d.set_editor_property('TrapMaxHP', 100.0)
+    d.set_editor_property('NormalMaxHP', 500.0)
     d.set_editor_property('ConditionEvent', 'ItemAcquired')
     d.set_editor_property('ConditionTarget', 'Anchor')
     tick = d.get_editor_property('primary_actor_tick')
@@ -766,6 +855,7 @@ build_events()
 build_core()
 build_interactions()
 build_remote()
+build_narrative()
 build_tick()
 finish_events()
 if not DIRECTOR_ONLY:

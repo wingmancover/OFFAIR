@@ -1,5 +1,7 @@
 # OFFAIR 原型实现验证
 
+最新三阶段纸条、盒子陷阱与叙事对白实现见[三阶段验证记录](narrative-prototype-validation.md)，下文两阶段流程为历史记录。
+
 最新的直接黑入、俯仰与模型瞄准点调整见[2026-10-19 验证记录](direct-camera-validation.md)；旧终端路线仅保留为下文历史结果。
 
 2026-10-19 枪械 E 拾取与守卫待机调整另见[本轮验证记录](weapon-interaction-validation.md)。下文保留 2026-10-18 的历史结果，不能将旧的自动拾枪步骤视为当前操作。

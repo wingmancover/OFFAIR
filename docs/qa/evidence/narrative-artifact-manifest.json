@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-19",
+  "baseline": "b1ee8e1",
+  "scope": "Three-stage narrative prototype",
+  "assets_saved": true,
+  "git_operations": "No staging, commit or push; user will review and handle Git.",
+  "files": [
+    {
+      "path": "Content/OFFAIR/Core/BP_RunDirector.uasset",
+      "sha256": "AA9C18EF6D26A343A67809212A0D6C62FF3CFFC481728C2A7B5FD883B30B3580",
+      "bytes": 2989649
+    },
+    {
+      "path": "Content/OFFAIR/UI/BP_PrototypeHUD.uasset",
+      "sha256": "2469D347AE11BF95AC0928950C9FE4C3756FDAD756B767CF9FB476B6ADF3546F",
+      "bytes": 578557
+    },
+    {
+      "path": "Content/OFFAIR/Levels/Lvl_Prototype.umap",
+      "sha256": "EAE190FFD3FB601832ECB2BE60CA538C16B7CDA479D6B97877295CA799F8F419",
+      "bytes": 111163
+    },
+    {
+      "path": "Tools/unreal/build_prototype.py",
+      "sha256": "DF63920A6300BE89BA422A42948F612DBA233EA7E390AA09DC046827006F8E39",
+      "bytes": 47553
+    },
+    {
+      "path": "Tools/unreal/prototype_hud.py",
+      "sha256": "FDB43D484FC82EA47670DAD2309B503BC84DA4C2AD45AB48B71BF1935FFC5AEC",
+      "bytes": 8440
+    },
+    {
+      "path": "Tools/unreal/prototype_level.py",
+      "sha256": "0CB18BEE3CFA8A0A44117C46D4309C934C5D4BDB2821F39ECDAE4FD3435110B9",
+      "bytes": 14119
+    },
+    {
+      "path": "Tools/unreal/validate_prototype.py",
+      "sha256": "B632AD8E6F60DD744560EC09BD1467F1AEAEA0548847D79DE38947F0B79DC710",
+      "bytes": 18480
+    },
+    {
+      "path": "Tools/unreal/runtime_regressions.py",
+      "sha256": "EDD1A26D71B7DA3844A80FEA1C3E81853887D41F4C6D3D651E31D2EEE14AFAE8",
+      "bytes": 20102
+    }
+  ]
+}

@@ -21,7 +21,7 @@ Epic 将蓝图的快速原型迭代列为优势，并指出 C++ 的性能收益�
 | GM 界面 | `BP_PrototypeHUD` | Canvas 绘制六个按钮与命中区域；派发 `GMAction`，不直接改世界状态 |
 | 输入与 GM 调度 | `BP_OFFAIRController` 与 `BP_RunDirector` | 原生键盘事件与统一操作入口，正常流程不依赖 GM |
 | 会话与阶段 | `BP_OFFAIRSession` 与 `BP_RunDirector` | 当前／待生效／目标阶段分开，重建验证成功后提交进度 |
-| 阶段配置 | Director 的 `Stage Setup` 与两阶段基线函数 | 配置场景引用与关键条件，当前明确限定为 0、1 两阶段 |
+| 阶段配置 | Director 的 `Stage Setup` 与三阶段基线函数 | 配置场景引用与关键条件，当前明确限定为 0、1、2 三阶段 |
 | FPS 与敌人 | 模板派生玩家／控制器／GameMode，原模板 NPC 与武器 | 保留战斗，替换自动复活职责；登记真实 AI，移除不发击杀奖励 |
 | 监控 | 地图中的 CameraActor 与 Director | 真实设备朝向、视角、输入、侦测及统一退出清理 |
 

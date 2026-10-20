@@ -30,6 +30,12 @@ def build_hud(blueprints, paths):
              ScreenX=g.param('X'), ScreenY=g.param('Y'),
              Scale=g.math('Multiply_DoubleDouble', A=g.param('Size'), B=2.0), bScalePosition=False)
 
+    g = graph('CenteredText')
+    scale = g.math('Multiply_DoubleDouble', A=g.param('Size'), B=2.0)
+    text_width = g.engine('HUD', 'GetTextSize', 'OutWidth', Text=g.param('Text'), Scale=scale)
+    x = g.math('Multiply_DoubleDouble', A=g.math('Subtract_DoubleDouble', A=g.get('ScreenWidth'), B=text_width), B=0.5)
+    g.engine('HUD', 'DrawText', Text=g.param('Text'), TextColor=g.param('Color'), ScreenX=x, ScreenY=g.param('Y'), Scale=scale, bScalePosition=False)
+
     g = graph('GMButton')
     rect(g, 34.0, g.param('Y'), 600.0, 40.0, '(R=0.06,G=0.15,B=0.22,A=1.0)')
     label(g, g.param('Label'), 45.0, g.math('Add_DoubleDouble', A=g.param('Y'), B=10.0), 1.1)
@@ -81,8 +87,31 @@ def build_hud(blueprints, paths):
         label(b, 'Prototype complete. You escaped through the surveillance blind spot.', 65.0, 285.0, 1.2)
         label(b, 'R  /  START AGAIN', 65.0, 345.0, 1.4)
     g.when(state(g, 'Completed'), completed)
+    g.call('DrawNarrative')
     length = g.engine('KismetStringLibrary', 'Len', 'ReturnValue', S=state(g, 'FailureText'))
     g.when(g.math('Greater_IntInt', A=length, B=0), lambda b: label(b, state(b, 'FailureText'), 40.0, 180.0, 1.3))
+
+    g = graph('DrawNarrative')
+    g.guard(g.valid(g.get('Director')))
+    g.guard(g.not_(state(g, 'Resetting')))
+    g.guard(g.not_(state(g, 'Completed')))
+    width = g.engine('KismetMathLibrary', 'FMin', 'ReturnValue', A=960.0,
+                     B=g.math('Subtract_DoubleDouble', A=g.get('ScreenWidth'), B=80.0))
+    x = g.math('Multiply_DoubleDouble', A=g.math('Subtract_DoubleDouble', A=g.get('ScreenWidth'), B=width), B=0.5)
+    def thought(b):
+        y = b.math('Subtract_DoubleDouble', A=b.get('ScreenHeight'), B=170.0)
+        rect(b, x, y, width, 88.0, '(R=0.005,G=0.015,B=0.025,A=0.94)')
+        b.call('CenteredText', Text=state(b, 'ThoughtText'), Y=b.math('Add_DoubleDouble', A=y, B=18.0),
+               Size=1.0, Color='(R=0.35,G=0.85,B=1.0,A=1.0)')
+    g.when(g.math('Greater_DoubleDouble', A=state(g, 'ThoughtRemaining'), B=0.0), thought)
+    def system_error(b):
+        cy = b.math('Multiply_DoubleDouble', A=b.get('ScreenHeight'), B=0.5)
+        y = b.math('Subtract_DoubleDouble', A=cy, B=95.0)
+        rect(b, x, y, width, 190.0, '(R=0.02,G=0.005,B=0.008,A=0.97)')
+        b.call('CenteredText', Text='SYSTEM ERROR', Y=b.math('Add_DoubleDouble', A=y, B=32.0), Size=1.7, Color='(R=1,G=1,B=1,A=1)')
+        b.call('CenteredText', Text='Death is required to reset the subject.',
+               Y=b.math('Add_DoubleDouble', A=y, B=100.0), Size=1.1, Color='(R=1,G=0.25,B=0.25,A=1)')
+    g.when(state(g, 'SystemResetActive'), system_error)
 
     g = graph('DrawCameraPrompt')
     g.guard(g.valid(g.get('Director')))

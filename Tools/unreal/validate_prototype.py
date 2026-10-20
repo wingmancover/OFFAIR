@@ -129,6 +129,14 @@ def tick(delta):
             invoke(director, 'Interact')
             require(not prop(director, 'CoreCollected'), 'Remote-distance pickup was accepted')
             record('interaction_distance_guard')
+            require(not prop(director, 'TrapTriggered') and int(prop(director, 'EnemyCount')) == 0, 'Stage 0 has trap/enemy state')
+            phase('explore_open_space')
+        elif mode == 'explore_open_space':
+            aim(world, pc, u.Vector(1000, 0, 150))
+            if not move_to(pawn, (850, 0), 25):
+                return
+            require(current == 0 and prop(pawn, 'Current Weapon') is None and not prop(director, 'Completed'), 'Stage 0 exploration gained combat/progress')
+            record('stage0_can_cross_removed_gate_without_progress')
             state['run_before'] = int(prop(session, 'RunNumber'))
             invoke(director, 'Restart')
             invoke(director, 'Restart')
@@ -148,20 +156,64 @@ def tick(delta):
                 require(prop(director, 'CoreCollected'), 'Normal anchor interaction failed')
                 require(int(prop(session, 'PendingStage')) == 1, 'Anchor did not latch stage 1')
                 require(int(prop(director, 'Stage')) == 0, 'Anchor advanced immediately')
-                record('normal_anchor_pickup')
+                require(prop(director, 'SystemResetActive'), 'Note did not start system error countdown')
+                state['note_position'] = [pawn.get_actor_location().x, pawn.get_actor_location().y]
+                record('normal_note_pickup_and_system_error')
                 phase('pending')
         elif mode == 'pending':
-            require(current == 0, 'Pending stage applied while alive')
-            if now - state['entered'] > 0.7:
-                state['run_before'] = int(prop(session, 'RunNumber'))
+            if current == 0:
+                require(prop(director, 'SystemResetActive'), 'System countdown vanished before death')
+                invoke(director, 'Interact')
                 invoke(director, 'Restart')
-                record('pending_waits_for_death')
-                phase('stage1')
-        elif mode == 'stage1':
-            if current != 1:
+                invoke(director, 'GMAction', 1)
+                require(not prop(director, 'Resetting'), 'R or GM bypassed the locked three-second countdown')
+                require(int(prop(session, 'PendingStage')) == 1, 'Duplicate interaction changed pending stage')
+                return
+            require(current == 1 and now-state['entered'] >= 2.8, 'Note advanced without waiting for its death countdown')
+            record('three_second_system_death_advances_once')
+            phase('trap_baseline')
+        elif mode == 'trap_baseline':
+            require(current == 1 and int(prop(director, 'EnemyCount')) == 0, 'Trap stage spawned an enemy before box interaction')
+            require(float(prop(pawn, 'Current HP')) == 100.0 and float(prop(pawn, 'Max HP')) == 100.0, 'Wrong trap-stage health')
+            require(prop(pawn, 'Current Weapon') is None and not prop(director, 'WeaponCollected'), 'Trap stage granted a gun')
+            require('What the hell' in prop(director, 'ThoughtText'), 'First respawn thought missing')
+            record('trap_stage_baseline_and_first_thought')
+            phase('trap_box')
+        elif mode == 'trap_box':
+            target = prop(director, 'TrapBox').get_actor_location()
+            aim(world, pc, target)
+            if not move_to(pawn, (target.x-150, target.y), 25):
+                return
+            if now-state['entered'] < 0.3:
+                return
+            invoke(director, 'Interact')
+            require(prop(director, 'TrapTriggered') and int(prop(director, 'EnemyCount')) == 1, 'Box did not spawn trap enemy')
+            require(int(prop(session, 'PendingStage')) == 2 and current == 1, 'Trap failed to latch stage 2 while alive')
+            invoke(director, 'Interact')
+            require(int(prop(director, 'EnemyCount')) == 1, 'Repeated box interaction spawned duplicates')
+            state['trap_health_samples'] = [100.0]
+            state['trap_started'] = now
+            record('normal_box_interaction_spawns_one_active_enemy')
+            phase('trap_combat')
+        elif mode == 'trap_combat':
+            if current == 1:
+                hp = float(prop(pawn, 'Current HP'))
+                if hp != state['trap_health_samples'][-1]:
+                    state['trap_health_samples'].append(hp)
+                require(prop(pawn, 'Current Weapon') is None, 'Trap unexpectedly armed player')
+                require(now-state['trap_started'] < 35, 'Trap enemy did not kill player through real shooting')
+                return
+            require(current == 2, 'Trap death did not advance to final stage')
+            require(min(state['trap_health_samples']) <= 75.0, 'No real trap enemy damage was observed')
+            record('real_trap_projectiles_kill_and_advance', str(state['trap_health_samples']))
+            require('gun where that box was' in prop(director, 'ThoughtText'), 'Second respawn thought missing')
+            record('second_respawn_thought')
+            phase('stage2')
+        elif mode == 'stage2':
+            if current != 2:
                 return
             require(int(prop(session, 'PendingStage')) == -1, 'Pending stage not cleared')
-            require(prop(director, 'KeyEnemy') is not None, 'Stage 1 guard missing')
+            require(prop(director, 'KeyEnemy') is not None, 'Stage 2 guard missing')
             require(not prop(director, 'AccessCollected'), 'Access leaked across reset')
             enemy_pos = prop(director, 'KeyEnemy').get_actor_location()
             nav = u.GameplayStatics.get_all_actors_of_class(world, u.RecastNavMesh)
@@ -230,7 +282,7 @@ def tick(delta):
                 invoke(pawn, 'Touch Shoot End')
                 invoke(pawn, 'Touch Shoot Start')
                 state['last_shot'] = now
-            require(current == 1, 'Combat unexpectedly reset stage')
+            require(current == 2, 'Combat unexpectedly reset stage')
         elif mode == 'access':
             target = prop(director, 'AccessItem').get_actor_location()
             aim(world, pc, target)

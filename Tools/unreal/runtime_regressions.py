@@ -23,7 +23,9 @@ def run_case(state, world, director, pawn, session, now, require, invoke, record
         require(not p('RemoteActive') and not p('GMOpen'), 'Input/control mode leaked across reset')
         require(not p('AccessCollected') and not p('HackedOnce') and not p('Alarm'), 'Run progress leaked across reset')
         require(abs(float(p('RemoteYaw')) - 180) < 0.01, 'Camera direction was not reset')
-        require(int(p('EnemyCount')) == (1 if current == 1 else 0), 'Wrong baseline enemy count')
+        require(not p('TrapTriggered') and not p('SystemResetActive'), 'Narrative trigger state leaked across reset')
+        require(int(p('EnemyCount')) == (1 if current == 2 else 0), 'Wrong baseline enemy count')
+        require(float(pawn.get_editor_property('Current HP')) == (100 if current == 1 else 500), 'Stage health leaked across reset')
         require(len(p('Enemies')) == int(p('EnemyCount')), 'Enemy registry contains stale entries')
         require(len(u.GameplayStatics.get_all_actors_of_class(world, u.PlayerController)) == 1, 'Duplicate player controllers')
         require(len(u.GameplayStatics.get_all_actors_of_class(world, u.AIController)) == int(p('EnemyCount')), 'Orphan AI controllers')
@@ -45,6 +47,11 @@ def run_case(state, world, director, pawn, session, now, require, invoke, record
         require(current == 0, 'New game did not restore stage 0')
         baseline()
         record('completed_restart_restores_new_game')
+        place_and_look((3600, 0, 100), u.Vector(3800, 0, 100))
+        invoke(director, 'CheckFinish')
+        require(not p('Completed'), 'Stage 0 could finish before narrative progression')
+        place_and_look((-160, 0, 98), u.Vector(245, -170, 1.5))
+        record('stage0_cannot_complete_early')
         invoke(director, 'GMStage', -1)
         invoke(director, 'RequestReset', 99)
         require(not p('Resetting') and current == int(p('Stage')), 'Invalid target changed stage')
@@ -64,6 +71,69 @@ def run_case(state, world, director, pawn, session, now, require, invoke, record
         if run <= state['wait_run']:
             return False
         require(current == 1, 'GM next stage failed')
+        baseline()
+        record('gm_trap_stage_baseline')
+        state['wait_run'] = run
+        invoke(director, 'Restart')
+        phase('reg_trap_retry')
+    elif mode == 'reg_trap_retry':
+        if run <= state['wait_run']:
+            return False
+        baseline()
+        require(current == 1, 'Death before box interaction advanced the trap stage')
+        record('trap_death_before_box_retries_same_stage')
+        phase('reg_trap_thought_expiry')
+    elif mode == 'reg_trap_thought_expiry':
+        if float(p('ThoughtRemaining')) > 0:
+            require(now-state['entered'] < 6, 'First thought did not expire')
+            return False
+        require(p('ThoughtText') == '', 'Expired thought text was retained')
+        record('first_thought_expires_after_three_seconds')
+        place_and_look((670, 0, 98), p('TrapBox').get_actor_location())
+        phase('reg_trap_interrupt')
+    elif mode == 'reg_trap_interrupt':
+        if now-state['entered'] < 0.6:
+            return False
+        invoke(director, 'Interact')
+        require(p('TrapTriggered') and int(session.get_editor_property('PendingStage')) == 2, 'Trap fixture failed')
+        state['wait_run'] = run
+        gm(2)
+        phase('reg_note_interrupt_setup')
+    elif mode == 'reg_note_interrupt_setup':
+        if run <= state['wait_run']:
+            return False
+        baseline()
+        require(current == 0 and int(session.get_editor_property('PendingStage')) == -1, 'GM jump retained trap pending progress')
+        record('gm_interrupt_clears_trap_enemy_and_pending_stage')
+        place_and_look((125, -170, 98), p('CoreItem').get_actor_location())
+        phase('reg_note_interrupt')
+    elif mode == 'reg_note_interrupt':
+        if now-state['entered'] < 0.6:
+            return False
+        invoke(director, 'Interact')
+        require(p('SystemResetActive'), 'Note interruption fixture failed')
+        state['wait_run'] = run
+        # Internal failure/isolation fixture, not a user-facing bypass of the lock.
+        invoke(director, 'RequestReset', 2)
+        phase('reg_old_countdown')
+    elif mode == 'reg_old_countdown':
+        if run <= state['wait_run']:
+            return False
+        baseline()
+        require(current == 2, 'Countdown isolation fixture reached wrong stage')
+        state['isolated_run'] = run
+        phase('reg_old_countdown_wait')
+    elif mode == 'reg_old_countdown_wait':
+        require(run == state['isolated_run'], 'Old note countdown killed a new attempt')
+        if now-state['entered'] < 3.5:
+            return False
+        require(p('ThoughtText') == '' and float(p('ThoughtRemaining')) == 0, 'Second thought did not expire')
+        record('old_countdown_isolated_and_second_thought_expires')
+        phase('reg_stage2')
+    elif mode == 'reg_stage2':
+        if run <= state['wait_run']:
+            return False
+        require(current == 2, 'GM next stage did not reach combat stage')
         baseline()
         gm(1)
         require(not p('Resetting'), 'Last stage advanced past its boundary')
@@ -119,7 +189,7 @@ def run_case(state, world, director, pawn, session, now, require, invoke, record
         state['repeat_count'] += 1
         if state['repeat_count'] >= 10:
             record('ten_reset_cycles_without_state_or_actor_leaks')
-            if current == 0:
+            if current != 2:
                 state['wait_run'] = run
                 gm(1)
             phase('reg_alarm')
@@ -128,11 +198,11 @@ def run_case(state, world, director, pawn, session, now, require, invoke, record
         invoke(director, 'PanRemote', 800.0, 0.0)
         state['wait_run'] = run
         if state['repeat_count'] % 2:
-            gm(2 if current == 1 else 1)
+            gm(2 if current == 2 else 1)
         else:
             gm(0)
     elif mode == 'reg_alarm':
-        if current != 1:
+        if current != 2:
             return False
         baseline()
         pawn.set_actor_location(u.Vector(2450, 0, 100), False, True)
@@ -166,6 +236,10 @@ def run_case(state, world, director, pawn, session, now, require, invoke, record
         phase('reg_kill_condition_setup')
     elif mode == 'reg_kill_condition_setup':
         if run <= state['wait_run']:
+            return False
+        if current == 1:
+            state['wait_run'] = run
+            gm(2)
             return False
         require(current == 0, 'Kill-condition fixture did not return to stage 0')
         director.set_editor_property('ConditionEvent', 'EnemyKilled')
@@ -213,6 +287,14 @@ def run_case(state, world, director, pawn, session, now, require, invoke, record
         baseline()
         require(current == 1 and not p('FailureText'), 'Recovery failed to restore valid stage configuration')
         record('initialization_failure_recovers_without_losing_progress')
+        state['wait_run'] = run
+        gm(1)
+        phase('reg_combat_recovered')
+    elif mode == 'reg_combat_recovered':
+        if run <= state['wait_run']:
+            return False
+        require(current == 2, 'Recovery fixture did not reach combat stage')
+        baseline()
         place_and_look((655, 0, 98), invoke(director, 'InteractionPoint', p('WeaponPickup')))
         phase('reg_weapon_model')
     elif mode == 'reg_weapon_model':

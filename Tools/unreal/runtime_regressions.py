@@ -105,7 +105,8 @@ def run_case(state, world, director, pawn, session, now, require, invoke, record
         baseline()
         require(current == 0 and int(session.get_editor_property('PendingStage')) == -1, 'GM jump retained trap pending progress')
         record('gm_interrupt_clears_trap_enemy_and_pending_stage')
-        place_and_look((125, -170, 98), p('CoreItem').get_actor_location())
+        note = p('CoreItem').get_actor_location()
+        place_and_look((note.x - 120, note.y, 98), note)
         phase('reg_note_interrupt')
     elif mode == 'reg_note_interrupt':
         if now-state['entered'] < 0.6:

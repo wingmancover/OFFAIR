@@ -266,6 +266,8 @@ def build_level(classes, output_dir):
         director.set_editor_property(name, actor)
     update_narrative_layout()
     update_readability_layout()
+    import prototype_vault
+    prototype_vault.update_vault_layout()
     assert levels.save_current_level()
     report = {'map': MAP_PATH, 'director': director.get_path_name(),
               'references': {name: actor.get_path_name() for name, actor in refs.items()},

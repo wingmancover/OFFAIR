@@ -25,6 +25,7 @@ WEAPON = '/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterWeaponBase.BP_Shoot
 PICKUP = '/Game/Variant_Shooter/Blueprints/Pickups/BP_ShooterPickup.BP_ShooterPickup_C'
 DIRECTOR_ONLY = '-OFFAIRDirectorOnly' in u.SystemLibrary.get_command_line() or '--director-only' in sys.argv
 INCLUDE_HUD = '--include-hud' in sys.argv
+INCLUDE_CONTROLLER = '--include-controller' in sys.argv
 DEFER_SAVE = '--defer-save' in sys.argv
 if DEFER_SAVE and not DIRECTOR_ONLY:
     raise ValueError('--defer-save requires --director-only; full builds also save the map')
@@ -43,6 +44,8 @@ BP = {
 }
 PATH = {k: class_path(v) for k, v in BP.items()}
 EDIT_KEYS = ({'director', 'hud'} if INCLUDE_HUD else {'director'}) if DIRECTOR_ONLY else set(BP)
+if INCLUDE_CONTROLLER:
+    EDIT_KEYS.add('controller')
 
 # Preserve function identities during regeneration. Clear all generated bodies
 # before compiling any dependent Blueprint; deleting function graphs would
@@ -91,6 +94,8 @@ vars_('director', {
     'ConditionEvent': 'name', 'ConditionTarget': 'name',
 })
 vars_('hud', {'Director': PATH['director'], 'ScreenWidth': 'real', 'ScreenHeight': 'real'})
+import prototype_vault
+prototype_vault.declare_vault(BP['director'])
 for name in ['CoreItem', 'AccessItem', 'Terminal', 'ExitGate', 'WeaponPickup', 'Monitor', 'EnemySpawn', 'GMSpawn', 'TrapBox', 'TrapSpawn', 'TrapMaxHP', 'NormalMaxHP', 'MaxEnemies', 'ConditionEvent', 'ConditionTarget', 'WeaponInteractDistance', 'CameraInteractDistance']:
     LIB.set_blueprint_variable_instance_editable(BP['director'], name, True)
     LIB.set_blueprint_variable_category(BP['director'], name, 'Stage Setup')
@@ -226,6 +231,7 @@ def build_core():
     target = g.param('Target')
     g.guard(g.and_(g.math('GreaterEqual_IntInt', A=target, B=0), g.math('LessEqual_IntInt', A=target, B=2)))
     g.set('Resetting', True)
+    local(g, 'CancelVault')
     g.set('AcceptedResets', g.math('Add_IntInt', A=g.get('AcceptedResets'), B=1))
     set_session(g, 'ResetTarget', target)
     set_session(g, 'ResetBusy', True)
@@ -350,6 +356,7 @@ def build_interactions():
 
     g = g_('Interact')
     ready(g)
+    g.guard(g.not_(g.get('VaultActive')))
     g.guard(g.not_(g.get('SystemResetActive')))
     yes, body = g.branch(g.get('RemoteActive'))
     yes.call('ExitRemote')
@@ -503,7 +510,7 @@ def build_remote():
     g = g_('RefreshControls')
     g.guard(g.valid(g.get('Player')))
     g.guard(g.valid(g.get('Controller')))
-    blocked = g.or_(g.get('RemoteActive'), g.get('GMOpen'), g.get('SystemResetActive'), g.get('Resetting'), g.get('Completed'), g.not_(g.get('Initialized')))
+    blocked = g.or_(g.get('VaultActive'), g.get('RemoteActive'), g.get('GMOpen'), g.get('SystemResetActive'), g.get('Resetting'), g.get('Completed'), g.not_(g.get('Initialized')))
     yes, no = g.branch(blocked)
     yes.engine('Actor', 'DisableInput', self=yes.get('Player'), PlayerController=yes.get('Controller'))
     movement = yes.get('CharacterMovement', yes.get('Player'), '/Script/Engine.Character')
@@ -521,6 +528,7 @@ def build_remote():
 
     g = g_('EnterRemote')
     ready(g)
+    g.guard(g.not_(g.get('VaultActive')))
     g.guard(g.not_(g.get('SystemResetActive')))
     g.guard(g.not_(g.get('RemoteActive')))
     g.guard(g.valid(g.get('Monitor')))
@@ -550,6 +558,7 @@ def build_remote():
 
     g = g_('ToggleGM')
     ready(g)
+    g.guard(g.not_(g.get('VaultActive')))
     g.guard(g.not_(g.get('SystemResetActive')))
     g.guard(session(g, 'GMEnabled'))
     g.set('GMOpen', g.not_(g.get('GMOpen')))
@@ -676,6 +685,7 @@ def build_tick():
     g.guard(g.not_(g.get('Resetting')))
     g.guard(g.get('Initialized'))
     local(g, 'TickNarrative', Delta=g.param('Delta'))
+    local(g, 'TickVault', Delta=g.param('Delta'))
     def close_disabled_menu(b):
         b.set('GMOpen', False)
         b.call('RefreshControls')
@@ -723,6 +733,9 @@ def build_tick():
     stage2.set('CameraPromptVisible', stage2.and_(camera_near, stage2.get('AccessCollected'), stage2.not_(stage2.get('RemoteActive')), stage2.not_(stage2.get('GMOpen'))))
     stage2.when(stage2.get('RemoteActive'), lambda b: b.set('PromptText', 'MOUSE: turn camera     [E / Q] Return to body'))
     stage2.when(stage2.get('Alarm'), lambda b: b.set('ObjectiveText', 'ALARM / EXIT LOCKED / R TO RETRY'))
+    g.tail = [p for branch in [stage0, stage1, stage2] for p in (branch.tail if isinstance(branch.tail, list) else [branch.tail]) if p is not None]
+    empty = g.math('EqualEqual_IntInt', A=g.engine('KismetStringLibrary', 'Len', 'ReturnValue', S=g.get('PromptText')), B=0)
+    g.when(g.and_(empty, g.call('CanVault', 'Result')), lambda b: b.set('PromptText', '[V] Vault obstacle'))
 
 
 def build_events():
@@ -774,13 +787,15 @@ def finish_events():
     event = g.event('ReceiveTick')
     local(g, 'TickInput', Delta=pin(event, 'DeltaSeconds', True))
 
-    if DIRECTOR_ONLY:
+    if DIRECTOR_ONLY and not INCLUDE_CONTROLLER:
         return
 
     # Override only the template's automatic respawn; inherited FPS input/HUD remain.
     g = Graph(BP['controller'], 'EventGraph')
     g.event('OnDestroyed_Event')
     g.log('OFFAIR_TEMPLATE_RESPAWN_SUPPRESSED')
+    if DIRECTOR_ONLY:
+        return
     g = Graph(BP['mode'], 'EventGraph')
     g.event('ReceiveBeginPlay')
     g.log('OFFAIR_MODE_READY')  # suppress the arena scoreboard/local-player creation
@@ -796,7 +811,7 @@ def build_controller_input():
     bp = BP['controller']
     editor = EDITOR.get_graph_editor_by_name(bp, 'EventGraph')
     available = [str(a) for a in editor.list_available_nodes([])]
-    bindings = {'E': 'Interact', 'Q': 'ExitRemote', 'F1': 'ToggleGM', 'R': 'Restart'}
+    bindings = {'E': 'Interact', 'V': 'TryVault', 'Q': 'ExitRemote', 'F1': 'ToggleGM', 'R': 'Restart'}
     bindings.update({str(i + 1): 'GMAction' for i in range(6)})
     for display, function in bindings.items():
         choices = [a for a in available if 'Keyboard' in a and a.rsplit('|', 1)[-1] == display]
@@ -856,9 +871,10 @@ build_core()
 build_interactions()
 build_remote()
 build_narrative()
+prototype_vault.build_vault(BP['director'])
 build_tick()
 finish_events()
-if not DIRECTOR_ONLY:
+if not DIRECTOR_ONLY or INCLUDE_CONTROLLER:
     build_controller_input()
 if not DIRECTOR_ONLY or INCLUDE_HUD:
     import importlib

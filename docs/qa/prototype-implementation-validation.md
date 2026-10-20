@@ -1,5 +1,7 @@
 # OFFAIR 原型实现验证
 
+后续低障碍翻越、V 键与配置目录整理见[本轮验证](vault-validation.md)，包含 12 项翻越检查及 44 项完整阶段回归。
+
 后续灯光、曝光和提示对比度调整见[可读性验证记录](readability-validation.md)。
 
 最新三阶段纸条、盒子陷阱与叙事对白实现见[三阶段验证记录](narrative-prototype-validation.md)，下文两阶段流程为历史记录。

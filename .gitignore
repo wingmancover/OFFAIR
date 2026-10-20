@@ -76,3 +76,9 @@ DerivedDataCache/*
 # Python editor-authoring tools
 __pycache__/
 *.pyc
+
+# Optional local editor connections; shared templates live in Tools/EditorSetup.
+/.cursor/
+/.gemini/
+/.vscode/
+/.mcp.json

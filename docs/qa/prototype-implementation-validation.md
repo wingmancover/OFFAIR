@@ -1,5 +1,7 @@
 # OFFAIR 原型实现验证
 
+最新键盘操作为空格优先翻越、其余情况跳跃，见[空格统一验证](space-vault-validation.md)。
+
 后续低障碍翻越、V 键与配置目录整理见[本轮验证](vault-validation.md)，包含 12 项翻越检查及 44 项完整阶段回归。
 
 后续灯光、曝光和提示对比度调整见[可读性验证记录](readability-validation.md)。

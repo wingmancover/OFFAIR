@@ -16,7 +16,7 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 - 当前仓库以蓝图资产为主，未发现 `Source/` 或项目 C++ 模块声明。
 - 默认启动地图：`/Game/OFFAIR/Levels/Lvl_Prototype`。
 - 项目专用玩家、控制器和 GameMode 继承射击模板；敌人、武器与投射物继续复用模板。
-- 出生点左前方有低障碍翻越测试，面向并靠近后按 V，普通跳跃仍用空格；编辑器连接样例集中在 [Tools/EditorSetup](Tools/EditorSetup/README.md)，当前 Codex 项目配置保留在根目录。
+- 出生点左前方有低障碍翻越测试，面向并靠近后按空格优先翻越，其余情况下空格跳跃；编辑器连接样例集中在 [Tools/EditorSetup](Tools/EditorSetup/README.md)，当前 Codex 项目配置保留在根目录。
 - 最新三阶段流程已生成并保存，验证范围见[本轮记录](docs/qa/narrative-prototype-validation.md)；当前为灰盒原型，未包含完整剧情、美术制作或跨进程存档。
 
 ## 文档导航

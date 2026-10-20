@@ -1,0 +1,26 @@
+{
+  "phase": "done",
+  "status": "passed",
+  "passed": [
+    "wrong_facing_rejected",
+    "distance_rejected",
+    "physical_SPACE_started_vault",
+    "swept_vault_crossed_obstacle_and_duplicate_rejected",
+    "walking_restored",
+    "held_SPACE_does_not_repeat",
+    "physical_SPACE_still_jumps",
+    "blocked_landing_rejected",
+    "blocked_headroom_rejected",
+    "too_tall_rejected",
+    "death_mid_vault_restores_spawn_and_input",
+    "gm_reset_clears_vault",
+    "remote_mode_rejects_vault"
+  ],
+  "started": 29040.921,
+  "max_height": 224.0,
+  "entered": 29079.187,
+  "stage": 2,
+  "active": false,
+  "seconds": 38.27,
+  "jump_base": 98.14999585149104
+}

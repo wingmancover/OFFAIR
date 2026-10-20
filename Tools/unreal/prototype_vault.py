@@ -3,6 +3,25 @@ import unreal as u
 from graph_builder import Graph, member, declare, pin, pin_type
 
 
+def create_traversal_input():
+    assets=u.get_editor_subsystem(u.EditorAssetSubsystem)
+    tools=u.AssetToolsHelpers.get_asset_tools()
+    action=u.load_asset('/Game/OFFAIR/Input/IA_ContextJump')
+    if not action:
+        action=tools.create_asset('IA_ContextJump','/Game/OFFAIR/Input',u.InputAction,u.InputAction_Factory())
+    action.set_editor_property('consume_input',True)
+    action.set_editor_property('value_type',u.InputActionValueType.BOOLEAN)
+    context=u.load_asset('/Game/OFFAIR/Input/IMC_Traversal')
+    if not context:
+        context=tools.create_asset('IMC_Traversal','/Game/OFFAIR/Input',u.InputMappingContext,u.InputMappingContext_Factory())
+    context.unmap_all()
+    space=u.Key()
+    space.set_editor_property('key_name','SpaceBar')
+    context.map_key(action,space)
+    assets.save_loaded_asset(action,False)
+    assets.save_loaded_asset(context,False)
+
+
 def declare_vault(bp):
     for name, kind in {'VaultObstacle':'/Script/Engine.Actor', 'VaultActive':'bool',
                        'VaultElapsed':'real', 'VaultStart':'/Script/CoreUObject.Vector',
@@ -15,6 +34,8 @@ def declare_vault(bp):
     declare(bp,'TryVault')
     declare(bp,'CancelVault')
     declare(bp,'TickVault',{'Delta':'real'})
+    declare(bp,'JumpOrVault')
+    declare(bp,'SetupTraversalInput')
 
 
 def build_vault(bp):
@@ -43,6 +64,22 @@ def build_vault(bp):
         return g.engine('KismetSystemLibrary','CapsuleTraceSingle','ReturnValue',Start=start,End=end,
                         Radius=radius,HalfHeight=half,TraceChannel='TraceTypeQuery1',bTraceComplex=False,
                         ActorsToIgnore=a,DrawDebugType='None',bIgnoreSelf=True)
+
+    g=graph('SetupTraversalInput')
+    subsystem=g.call('/Script/Engine.SubsystemBlueprintLibrary.GetLocalPlayerSubSystemFromPlayerController','ReturnValue',
+                     PlayerController=g.get('Controller'),Class='/Script/EnhancedInput.EnhancedInputLocalPlayerSubsystem')
+    subsystem=g.cast(subsystem,'/Script/EnhancedInput.EnhancedInputLocalPlayerSubsystem')
+    g.guard(g.valid(subsystem))
+    g.call('/Script/EnhancedInput.EnhancedInputSubsystemInterface.AddMappingContext',self=subsystem,
+           MappingContext='/Game/OFFAIR/Input/IMC_Traversal.IMC_Traversal',Priority=100)
+
+    g=graph('JumpOrVault')
+    g.guard(g.and_(g.get('Initialized'),g.not_(g.get('Resetting')),g.not_(g.get('Completed'))))
+    for name in ['VaultActive','RemoteActive','GMOpen','SystemResetActive']:
+        g.guard(g.not_(g.get(name)))
+    g.guard(g.valid(g.get('Player')))
+    g.call('TryVault')
+    g.when(g.not_(g.get('VaultActive')),lambda b:b.engine('Character','Jump',self=b.get('Player')))
 
     g=graph('CanVault')
     reject=lambda b:b.ret(Result=False)
@@ -134,10 +171,11 @@ def update_vault_layout():
     if not sign:
         sign=actors.spawn_actor_from_class(u.TextRenderActor,u.Vector(298,-330,160),u.Rotator(pitch=0,yaw=180,roll=0))
         sign.set_actor_label('OF_VaultSign')
-        sign.text_render.set_text('VAULT TEST\n[V] VAULT')
+        sign.text_render.set_text('VAULT TEST\n[SPACE] VAULT')
         sign.text_render.set_world_size(20)
         sign.text_render.set_horizontal_alignment(u.HorizTextAligment.EHTA_CENTER)
     sign.set_actor_rotation(u.Rotator(pitch=0,yaw=180,roll=0),True)
+    sign.text_render.set_text('VAULT TEST\n[SPACE] VAULT')
     sign.set_actor_location(u.Vector(298,-330,85),False,True)
     sign.text_render.set_world_size(7)
     sign.text_render.set_text_render_color(u.Color(10,20,30,255))

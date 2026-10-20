@@ -1,4 +1,4 @@
-"""Interactive PIE vault checks: a fixture positions the player; press V, then Space when requested by the result phase. Test-only cover changes stay in PIE."""
+"""Interactive PIE vault checks: press Space near the obstacle, then again on open ground. Test-only cover changes stay in PIE."""
 import unreal as u,json,time,traceback
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
@@ -39,14 +39,15 @@ def tick(dt):
             d.call_method('TryVault',());check(not d.get_editor_property('VaultActive'),'Distant vault accepted');record('distance_rejected')
             fixture(pawn,pc);phase('ready_wait')
         elif p=='ready_wait' and now-s['entered']>0.3:
-            check('[V]' in d.get_editor_property('PromptText'),'Missing V prompt')
+            check('[SPACE]' in d.get_editor_property('PromptText'),'Missing Space prompt')
             u.SystemLibrary.execute_console_command(w,'HighResShot 1280x720 filename="'+(out.parent/'vault-prompt.png').as_posix()+'"')
             phase('key_ready')
         elif p=='key_ready' and active:
-            record('physical_V_started_vault');phase('moving')
+            record('physical_SPACE_started_vault');phase('moving')
         elif p=='moving':
             s['max_height']=max(s['max_height'],pawn.get_actor_location().z)
             if active:
+                check(not pawn.get_editor_property('pressed_jump'),'Template jump also fired during vault')
                 before=d.get_editor_property('VaultElapsed');d.call_method('TryVault',())
                 check(d.get_editor_property('VaultElapsed')==before,'Duplicate event restarted movement')
             else:
@@ -55,7 +56,11 @@ def tick(dt):
                 record('swept_vault_crossed_obstacle_and_duplicate_rejected');phase('landed')
         elif p=='landed' and now-s['entered']>0.5:
             check(pawn.character_movement.is_moving_on_ground(),'Did not restore ground movement')
-            record('walking_restored');s['jump_base']=pawn.get_actor_location().z;phase('jump_ready')
+            record('walking_restored');s['jump_base']=pawn.get_actor_location().z;phase('hold_wait')
+        elif p=='hold_wait':
+            check(abs(pawn.get_actor_location().z-s['jump_base'])<5,'Holding Space retriggered jump after vault')
+            if now-s['entered']>1.2:
+                record('held_SPACE_does_not_repeat');phase('jump_ready')
         elif p=='jump_ready' and pawn.get_actor_location().z>s['jump_base']+15:
             record('physical_SPACE_still_jumps');phase('jump_wait')
         elif p=='jump_wait' and pawn.character_movement.is_moving_on_ground():

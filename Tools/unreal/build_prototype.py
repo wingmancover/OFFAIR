@@ -95,6 +95,9 @@ vars_('director', {
 })
 vars_('hud', {'Director': PATH['director'], 'ScreenWidth': 'real', 'ScreenHeight': 'real'})
 import prototype_vault
+import importlib
+prototype_vault = importlib.reload(prototype_vault)
+prototype_vault.create_traversal_input()
 prototype_vault.declare_vault(BP['director'])
 for name in ['CoreItem', 'AccessItem', 'Terminal', 'ExitGate', 'WeaponPickup', 'Monitor', 'EnemySpawn', 'GMSpawn', 'TrapBox', 'TrapSpawn', 'TrapMaxHP', 'NormalMaxHP', 'MaxEnemies', 'ConditionEvent', 'ConditionTarget', 'WeaponInteractDistance', 'CameraInteractDistance']:
     LIB.set_blueprint_variable_instance_editable(BP['director'], name, True)
@@ -293,6 +296,7 @@ def build_core():
         b.set('ThoughtRemaining', 5.0)
     g.when(g.eq(g.get('Stage'), 1), thought1)
     g.when(g.eq(g.get('Stage'), 2), thought2)
+    local(g, 'SetupTraversalInput')
     local(g, 'RefreshControls')
     g.log('OFFAIR_RUN_READY')
 
@@ -735,7 +739,7 @@ def build_tick():
     stage2.when(stage2.get('Alarm'), lambda b: b.set('ObjectiveText', 'ALARM / EXIT LOCKED / R TO RETRY'))
     g.tail = [p for branch in [stage0, stage1, stage2] for p in (branch.tail if isinstance(branch.tail, list) else [branch.tail]) if p is not None]
     empty = g.math('EqualEqual_IntInt', A=g.engine('KismetStringLibrary', 'Len', 'ReturnValue', S=g.get('PromptText')), B=0)
-    g.when(g.and_(empty, g.call('CanVault', 'Result')), lambda b: b.set('PromptText', '[V] Vault obstacle'))
+    g.when(g.and_(empty, g.call('CanVault', 'Result')), lambda b: b.set('PromptText', '[SPACE] Vault obstacle'))
 
 
 def build_events():
@@ -811,7 +815,7 @@ def build_controller_input():
     bp = BP['controller']
     editor = EDITOR.get_graph_editor_by_name(bp, 'EventGraph')
     available = [str(a) for a in editor.list_available_nodes([])]
-    bindings = {'E': 'Interact', 'V': 'TryVault', 'Q': 'ExitRemote', 'F1': 'ToggleGM', 'R': 'Restart'}
+    bindings = {'E': 'Interact', 'Q': 'ExitRemote', 'F1': 'ToggleGM', 'R': 'Restart'}
     bindings.update({str(i + 1): 'GMAction' for i in range(6)})
     for display, function in bindings.items():
         choices = [a for a in available if 'Keyboard' in a and a.rsplit('|', 1)[-1] == display]
@@ -837,6 +841,22 @@ def build_controller_input():
             failed.call(PATH['director'] + ':RequestReset', self=d, Target=target)
         else:
             g.call(PATH['director'] + ':' + function, self=d)
+
+    choices=[a for a in available if a.rsplit('|',1)[-1]=='IA_ContextJump' and 'EnhancedActionEvents' in a]
+    if len(choices)!=1:
+        raise RuntimeError('Context jump input event not found: '+str(choices))
+    g=Graph(bp,'EventGraph')
+    event=g.own(editor.create_node_from_name(choices[0],u.Vector2D(0,0),[],None))
+    g.tail=pin(event,'Started',True)
+    d=g.engine('GameplayStatics','GetActorOfClass','ReturnValue',ActorClass=PATH['director'])
+    d=g.cast(d,PATH['director'])
+    g.guard(g.valid(d))
+    g.call(PATH['director']+':JumpOrVault',self=d)
+    for output in ['Completed','Canceled']:
+        g=Graph(bp,'EventGraph',pin(event,output,True))
+        pawn=g.engine('GameplayStatics','GetPlayerPawn','ReturnValue',PlayerIndex=0)
+        pawn=g.cast(pawn,SHOOTER)
+        g.engine('Character','StopJumping',self=pawn)
 
 
 def set_defaults():

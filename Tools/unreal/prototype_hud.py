@@ -63,7 +63,7 @@ def build_hud(blueprints, paths):
     label(g, info, 34.0, 146.0, 0.95)
     footer_y = g.math('Subtract_DoubleDouble', A=g.get('ScreenHeight'), B=62.0)
     rect(g, 20.0, footer_y, width, 44.0)
-    label(g, 'WASD move | LMB fire | SHIFT swap | SPACE jump | E interact | Q return | R rewind | F1 GM',
+    label(g, 'WASD move | LMB fire | SHIFT swap | SPACE jump/vault | E use | Q exit | R retry | F1 GM',
           34.0, g.math('Add_DoubleDouble', A=footer_y, B=13.0), 0.9)
     prompt_y = g.math('Multiply_DoubleDouble', A=g.get('ScreenHeight'), B=0.73)
     def prompt(b):

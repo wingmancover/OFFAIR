@@ -43,7 +43,7 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 
 ## 打开与验证
 
-首次克隆后先执行 `python Tools/unrealsharp.py setup`，再按 [UnrealSharp 接入说明](docs/engineering/unrealsharp.md)编译原生插件与 C#。使用 `python Tools/unrealsharp.py editor` 启动带项目本地 .NET 环境的 UE 5.8，默认进入原型地图；点击 Play 后点击游戏视口取得输入焦点。
+首次克隆后先执行 `python Tools/unrealsharp.py setup`，再按 [UnrealSharp 接入说明](docs/engineering/unrealsharp.md)编译原生插件与 C#。Windows 完成首次编译后可直接双击 `OFFAIR.uproject`，工程模块会在 UnrealSharp 加载前配置当前编辑器进程的 .NET 环境；也可继续使用 `python Tools/unrealsharp.py editor`。默认进入原型地图，点击 Play 后点击游戏视口取得输入焦点。
 
 在工程根目录运行 `Tools/Run-Unreal.ps1 -Mode Build` 可重新生成脚本管理的原型资产，运行 `Tools/Run-Unreal.ps1 -Mode Test` 可执行 PIE 集成验证。接入 C# 后，普通源码编译使用 `python Tools/unrealsharp.py build`；原型回归使用 `python Tools/unrealsharp.py test`。原型资产重新生成会覆盖受管理的蓝图函数和关卡对象，详见游玩与开发说明。
 

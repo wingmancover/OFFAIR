@@ -10,7 +10,7 @@
 - 目标为 Windows x64 与 macOS arm64。Mac 需要实际 Apple Silicon 机器、匹配 UE 5.8 的 Xcode 和系统；本机不能完成 Mac 构建或运行验收。
 - 工具入口要求 Python 3.12+。Windows 还需要 UE C++ 工具链；本机使用 VS 2022 的 MSVC 14.44 与 Windows SDK 10.0.22621.0。VS 2022 不支持 .NET 10 C# 项目；命令行构建与编辑器脚本迭代不依赖其 C# IDE 支持。
 
-现有角色、武器、敌人、阶段状态、监控与 GM 继续使用原蓝图。`Source/OFFAIR` 注册项目原生模块，并提供限定在 PIE 世界中生效的测试 Actor 生成入口；`Script/OFFAIR/Offair.Managed.csproj` 是项目 C# 工程。`AOffairScriptProbe` 是独立互调样例，没有正式玩法职责。
+现有角色、武器、敌人、阶段状态、监控与 GM 继续使用原蓝图。`Source/OFFAIR` 注册项目原生模块，在 Windows 编辑器启动时准备进程内 SDK 环境，并提供限定在 PIE 世界中生效的测试 Actor 生成入口；`Script/OFFAIR/Offair.Managed.csproj` 是项目 C# 工程。`AOffairScriptProbe` 是独立互调样例，没有正式玩法职责。
 
 探针只有实例内 `CallCount`，初始为 0，随 Actor／世界销毁，不跨死亡或 PIE 保留；没有计时器、输入绑定、静态 Actor 引用和跨循环状态。验证蓝图位于 `/Game/OFFAIR/Tests/BP_UnrealSharpProbe`，不会自动放进正式地图。
 
@@ -26,6 +26,8 @@ python Tools/unrealsharp.py editor
 
 `setup` 初始化缺少的子模块并校验 SDK 下载。已有子模块若不是固定版本会报错，不自动覆盖本地修改。引擎目录可通过 `--engine-root` 或 `UE_ENGINE_ROOT` 指定；工具拒绝非 UE 5.8 引擎。
 
+Windows 完成首次 setup/build 后，也可直接双击 `OFFAIR.uproject`。OFFAIR 模块在 `PreDefault` 加载阶段配置当前编辑器进程，早于 UnrealSharp 的 SDK 查找与 UAT 调用。它选择项目本地 SDK，保留有效 PATH 目录的顺序并去重，剔除已不存在的目录；不会修改注册表、用户或系统环境变量。删除 `Saved/Toolchains` 或首次克隆后仍需先运行 setup/build，未编译的原生模块无法在启动前替代构建工具链准备。
+
 本机 Launcher 引擎的 Fab 插件声明 `FabToolset`，但已安装的 UE5Rules 中缺少对应构建规则，需要对原生编辑器构建显式排除：
 
 ```sh
@@ -35,7 +37,7 @@ python Tools/unrealsharp.py package --disable-plugin Fab
 
 此参数只影响该次原生编译，不改写 `.uproject` 中的 Fab 配置，不改变引擎安装。其他机器没有这个问题时无需添加。`build` 会生成 IDE／版本文件，编译原生插件与项目模块，再构建项目 C# 和程序集加载清单，不重新生成现有玩法蓝图。
 
-固定上游在 Windows 从 PATH 中查找包含 `Program Files\dotnet\` 的目录，因此项目 SDK 使用 `Saved/Toolchains/Program Files/dotnet/` 后缀并由工具临时加入子进程 PATH。macOS 使用 `Saved/Toolchains/dotnet/`；若机器已经存在 `/usr/local/share/dotnet`，上游编辑器会优先使用它，工具检查其 .NET 10.0.5+ 运行时，版本不满足时明确报错。启动编辑器使用上述 `editor` 命令，以带入依赖环境。
+固定上游在 Windows 从 PATH 中查找包含 `Program Files\dotnet\` 的目录，因此项目 SDK 使用 `Saved/Toolchains/Program Files/dotnet/` 后缀，由命令行入口和 Windows 编辑器模块配置进程 PATH。macOS 使用 `Saved/Toolchains/dotnet/`；若机器已经存在 `/usr/local/share/dotnet`，上游编辑器会优先使用它，工具检查其 .NET 10.0.5+ 运行时，版本不满足时明确报错。Mac 继续使用上述 `editor` 命令，以带入依赖环境，普通启动路径未在 Mac 实测。
 
 固定上游还使用 `UE5Rules.csproj` 推断 Automation/UHT 的 .NET 目标。部分 Launcher 安装没有这个文件；工具在验证引擎版本后，为子进程补充 `UE_5_8_OR_LATER` 版本常量，并通过 `UE_USE_SYSTEM_DOTNET=1` 保持编辑器内部启动 UAT 时使用同一份本地 SDK。没有修改插件源代码。
 
@@ -48,12 +50,14 @@ python Tools/unrealsharp.py smoke
 python Tools/unrealsharp.py test
 python Tools/unrealsharp.py package
 python Tools/unrealsharp.py package-smoke
+python Tools/unrealsharp.py editor-rebuild-test
 ```
 
 - `smoke`：通过 UE 图表 API 生成／编译独立蓝图子类，调用 C# 并读取反射属性，测试死亡重载后的新实例及第二次 PIE。只保存专用测试资产。
 - `test`：运行原有 `validate_prototype.py`，覆盖正常通关、阶段推进、监控与 GM 回归。
 - `package`：在当前平台构建 Development 包，然后运行 UnrealSharp 的托管打包步骤，输出到 `Saved/Packages/`。Windows 为 x64，Mac 为 arm64。此命令不发布或上传产物。
 - `package-smoke`：清除子进程中的项目 SDK 环境，在编辑器外以 NullRHI 启动 Development 包，检查自包含运行时、作者程序集加载和原型初始化。它不验证画面、性能或完整键鼠通关。
+- `editor-rebuild-test`：Windows 专用，故意不注入启动器 SDK 环境，启动普通编辑器并在其中实际执行 RunUAT 重建、加载 C# 类和内存编译 7 个项目蓝图，防止“命令行通过但普通编辑器打不开／重建失败”的回归。详情见[普通编辑器重建修复](../qa/editor-rebuild-validation.md)。
 
 本机 Windows 包位于 `Saved/Packages/Win64/OFFAIR.exe`；应保留整个 `Win64` 目录，不能只复制单个 exe。托管程序集和 .NET 运行时位于其中的 `OFFAIR/Binaries/Managed/net10.0/`。
 

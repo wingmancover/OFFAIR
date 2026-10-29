@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "checks": [
+    "ordinary_editor_configures_toolchain",
+    "editor_run_uat_rebuild_succeeds",
+    "managed_class_loaded",
+    "project_blueprints_compile"
+  ],
+  "blueprints": [
+    "/Game/OFFAIR/Core/BP_OFFAIRController",
+    "/Game/OFFAIR/Core/BP_OFFAIRGameMode",
+    "/Game/OFFAIR/Core/BP_OFFAIRPlayer",
+    "/Game/OFFAIR/Core/BP_OFFAIRSession",
+    "/Game/OFFAIR/Core/BP_RunDirector",
+    "/Game/OFFAIR/Tests/BP_UnrealSharpProbe",
+    "/Game/OFFAIR/UI/BP_PrototypeHUD"
+  ],
+  "path_length": 2548
+}

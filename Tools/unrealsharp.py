@@ -94,7 +94,19 @@ def environment():
         raise RuntimeError("Pinned .NET SDK is missing. Run python Tools/unrealsharp.py setup.")
     env = os.environ.copy()
     env["DOTNET_ROOT"] = str(sdk)
-    env["PATH"] = str(sdk) + os.sep + os.pathsep + env.get("PATH", "")
+    entries = [str(sdk) + os.sep, *env.get("PATH", "").split(os.pathsep)]
+    if WINDOWS:
+        # Keep RunUAT.bat below cmd.exe's environment-variable length limit.
+        seen = set()
+        valid_entries = []
+        for entry in entries:
+            entry = entry.strip()
+            key = os.path.normcase(os.path.normpath(entry))
+            if entry and Path(entry).is_dir() and key not in seen:
+                seen.add(key)
+                valid_entries.append(entry)
+        entries = valid_entries
+    env["PATH"] = os.pathsep.join(entries)
     env["DOTNET_CLI_TELEMETRY_OPTOUT"] = "1"
     env["DOTNET_NOLOGO"] = "1"
     # Editor-triggered RunUAT must retain the same pinned SDK as this launcher.
@@ -152,10 +164,15 @@ def editor(engine, env, mode):
                            "Binaries/Mac/UnrealEditor.app/Contents/MacOS/UnrealEditor")
     args = [executable, PROJECT]
     if mode != "editor":
-        folder = ROOT / "Saved" / ("UnrealSharpTests" if mode == "smoke" else "PrototypeTests")
+        tasks = {
+            "smoke": ("UnrealSharpTests", "validate_unrealsharp.py", "result.json"),
+            "test": ("PrototypeTests", "validate_prototype.py", "runtime-result.json"),
+            "editor-rebuild-test": ("EditorRebuild", "validate_editor_rebuild.py", "result.json"),
+        }
+        folder_name, script, result_name = tasks[mode]
+        folder = ROOT / "Saved" / folder_name
         folder.mkdir(parents=True, exist_ok=True)
-        script = "validate_unrealsharp.py" if mode == "smoke" else "validate_prototype.py"
-        result = folder / ("result.json" if mode == "smoke" else "runtime-result.json")
+        result = folder / result_name
         # Remove only the known previous report, so a crashed run cannot pass on stale evidence.
         result.unlink(missing_ok=True)
         args.extend(["-EnablePlugins=PythonScriptPlugin", "-unattended", "-nop4", "-nosound",
@@ -257,7 +274,7 @@ def package_smoke():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=["setup", "build", "editor", "test", "smoke", "package", "package-smoke", "prototype-build"])
+    parser.add_argument("mode", choices=["setup", "build", "editor", "test", "smoke", "package", "package-smoke", "prototype-build", "editor-rebuild-test"])
     parser.add_argument("--engine-root")
     parser.add_argument("--disable-plugin", action="append", default=[],
                         help="Exclude a plugin from the editor build (also before packaging); repeatable.")
@@ -270,6 +287,12 @@ def main():
         return
     if args.mode == "package-smoke":
         package_smoke()
+        return
+    if args.mode == "editor-rebuild-test":
+        if not WINDOWS:
+            parser.error("editor-rebuild-test currently validates Windows RunUAT only")
+        # Deliberately inherit the ordinary OS environment, not environment().
+        editor(engine_root(args.engine_root), None, args.mode)
         return
     env, dotnet = environment()
     engine = engine_root(args.engine_root)

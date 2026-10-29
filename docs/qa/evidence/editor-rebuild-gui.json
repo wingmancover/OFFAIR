@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-28",
+  "baseline": "33abfbc",
+  "ordinary_visible_editor": true,
+  "hot_reload_completions": 2,
+  "pie_initialized": true,
+  "source_restored": true,
+  "runtime_errors": false,
+  "events": [
+    "[2026.10.29-03.15.33:994][  0]LogOffairEditorToolchain: Display: Project SDK ready: C:\\recent_project\\OFFAIR\\Saved\\Toolchains\\Program Files\\dotnet\\; PATH length: 2548",
+    "[2026.10.29-03.19.11:836][762]LogUnrealSharpEditor: Display: C# Hot Reload completed in 0.82 seconds.",
+    "[2026.10.29-03.19.32:222][944]LogUnrealSharpEditor: Display: C# Hot Reload completed in 0.26 seconds.",
+    "[2026.10.29-03.19.56:506][313]LogBlueprintUserMessages: [BP_RunDirector_C_0] OFFAIR_RUN_READY"
+  ]
+}

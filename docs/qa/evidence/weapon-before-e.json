@@ -1,0 +1,14 @@
+{
+  "phase": "ready",
+  "started": 10798.937,
+  "weapon": false,
+  "weapon_count": 0,
+  "hp": 500.0,
+  "enemy_position": [
+    1550.0,
+    0.0,
+    98.1499981880188
+  ],
+  "prompt": "[E] Pick up pistol",
+  "seconds": 15.31
+}

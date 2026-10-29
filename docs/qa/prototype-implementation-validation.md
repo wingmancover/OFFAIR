@@ -1,5 +1,17 @@
 # OFFAIR 原型实现验证
 
+最新键盘操作为空格优先翻越、其余情况跳跃，见[空格统一验证](space-vault-validation.md)。
+
+后续低障碍翻越、V 键与配置目录整理见[本轮验证](vault-validation.md)，包含 12 项翻越检查及 44 项完整阶段回归。
+
+后续灯光、曝光和提示对比度调整见[可读性验证记录](readability-validation.md)。
+
+最新三阶段纸条、盒子陷阱与叙事对白实现见[三阶段验证记录](narrative-prototype-validation.md)，下文两阶段流程为历史记录。
+
+最新的直接黑入、俯仰与模型瞄准点调整见[2026-10-19 验证记录](direct-camera-validation.md)；旧终端路线仅保留为下文历史结果。
+
+2026-10-19 枪械 E 拾取与守卫待机调整另见[本轮验证记录](weapon-interaction-validation.md)。下文保留 2026-10-18 的历史结果，不能将旧的自动拾枪步骤视为当前操作。
+
 验证日期：2026-10-18。环境为本机 Unreal Engine 5.8.3，Windows，单人 PIE。运行时为纯蓝图；本记录区分编辑器构建、自动化运行和真实界面操作。此次迭代以 `39751c5` 为基线，经过验证的配置、作者脚本和资产哈希见[产物清单](evidence/prototype-artifact-manifest.json)。
 
 ## 构建

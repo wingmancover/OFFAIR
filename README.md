@@ -8,7 +8,7 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 
 当前目标是完整可玩的原型：正常游戏交互与 GM 配套实现。玩家应能通过实际拾取、短战斗、阶段循环和监控黑入走通关卡；GM 提供点击死亡、前后阶段切换、增减敌人和一键接入监控，帮助调试同一套系统。此前“只做 GM、暂缓实际交互”的范围已取消。
 
-当前已接入两阶段可玩灰盒、关键物品、模板 FPS 战斗、权限卡、监控黑入、告警与终点，以及配套 GM。现有玩法仍由蓝图实现，另接入 UnrealSharp C# 开发环境与独立验证 Actor，原模板资产保持不变。详细控制与正常通关路线见[游玩说明](docs/prototype-play-guide.md)，原型验证结果见[测试记录](docs/qa/prototype-implementation-validation.md)。
+当前已接入三阶段叙事灰盒（纸条重置、盒子陷阱、战斗与监控）、关键物品、模板 FPS 战斗、权限卡、监控黑入、告警与终点，以及配套 GM。现有玩法仍由蓝图实现，另接入 UnrealSharp C# 开发环境与独立验证 Actor，原模板资产保持不变。详细控制与正常通关路线见[游玩说明](docs/prototype-play-guide.md)，原型验证结果见[测试记录](docs/qa/prototype-implementation-validation.md)。
 
 ## 当前工程
 
@@ -17,7 +17,8 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 - 目标平台为 Windows x64 与 macOS Apple Silicon arm64；各平台实际验证范围见 [UnrealSharp 接入记录](docs/engineering/unrealsharp.md)。
 - 默认启动地图：`/Game/OFFAIR/Levels/Lvl_Prototype`。
 - 项目专用玩家、控制器和 GameMode 继承射击模板；敌人、武器与投射物继续复用模板。
-- 已验证不开 GM 的正常流程及 25 项运行检查；当前为灰盒原型，未包含完整剧情、美术制作或跨进程存档。
+- 出生点左前方有低障碍翻越测试，面向并靠近后按空格优先翻越，其余情况下空格跳跃；编辑器连接样例集中在 [Tools/EditorSetup](Tools/EditorSetup/README.md)，当前 Codex 项目配置保留在根目录。
+- 最新三阶段流程已生成并保存，验证范围见[本轮记录](docs/qa/narrative-prototype-validation.md)；当前为灰盒原型，未包含完整剧情、美术制作或跨进程存档。
 
 ## 文档导航
 

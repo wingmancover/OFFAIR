@@ -89,3 +89,9 @@ Script/global.json
 *.slnx
 *.sln.projects.json
 Script/OFFAIR.RuntimeGlue/
+
+# Optional local editor connections; shared templates live in Tools/EditorSetup.
+/.cursor/
+/.gemini/
+/.vscode/
+/.mcp.json

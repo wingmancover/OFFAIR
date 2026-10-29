@@ -1,0 +1,12 @@
+{
+  "phase": "done",
+  "status": "passed",
+  "passed": [
+    "physical_SPACE_blocked_vault_falls_back_to_jump",
+    "physical_SPACE_vault_after_respawn"
+  ],
+  "started": 29189.875,
+  "entered": 29220.531,
+  "seconds": 30.66,
+  "base_z": 98.15
+}

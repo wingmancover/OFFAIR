@@ -1,0 +1,21 @@
+{
+  "phase": "thought1",
+  "status": "passed",
+  "started": 22757.718,
+  "events": [
+    "real_E_picked_up_note",
+    "automatic_death_then_first_thought"
+  ],
+  "max_locked_movement": 0.0,
+  "stage": 1,
+  "SystemResetActive": false,
+  "SystemResetRemaining": 0.0,
+  "ThoughtRemaining": 3.0,
+  "hp": 100.0,
+  "enemy_count": 0,
+  "seconds": 19.19,
+  "lock_position": [
+    125.0,
+    -170.0
+  ]
+}

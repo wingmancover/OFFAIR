@@ -12,7 +12,9 @@ import unreal as u
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).parent))
-from runtime_regressions import run_case
+import importlib
+import runtime_regressions
+run_case = importlib.reload(runtime_regressions).run_case
 OUT = ROOT / 'Saved' / 'PrototypeTests'
 OUT.mkdir(parents=True, exist_ok=True)
 RESULT = OUT / 'runtime-result.json'
@@ -127,6 +129,14 @@ def tick(delta):
             invoke(director, 'Interact')
             require(not prop(director, 'CoreCollected'), 'Remote-distance pickup was accepted')
             record('interaction_distance_guard')
+            require(not prop(director, 'TrapTriggered') and int(prop(director, 'EnemyCount')) == 0, 'Stage 0 has trap/enemy state')
+            phase('explore_open_space')
+        elif mode == 'explore_open_space':
+            aim(world, pc, u.Vector(1000, 0, 150))
+            if not move_to(pawn, (850, 0), 25):
+                return
+            require(current == 0 and prop(pawn, 'Current Weapon') is None and not prop(director, 'Completed'), 'Stage 0 exploration gained combat/progress')
+            record('stage0_can_cross_removed_gate_without_progress')
             state['run_before'] = int(prop(session, 'RunNumber'))
             invoke(director, 'Restart')
             invoke(director, 'Restart')
@@ -146,20 +156,64 @@ def tick(delta):
                 require(prop(director, 'CoreCollected'), 'Normal anchor interaction failed')
                 require(int(prop(session, 'PendingStage')) == 1, 'Anchor did not latch stage 1')
                 require(int(prop(director, 'Stage')) == 0, 'Anchor advanced immediately')
-                record('normal_anchor_pickup')
+                require(prop(director, 'SystemResetActive'), 'Note did not start system error countdown')
+                state['note_position'] = [pawn.get_actor_location().x, pawn.get_actor_location().y]
+                record('normal_note_pickup_and_system_error')
                 phase('pending')
         elif mode == 'pending':
-            require(current == 0, 'Pending stage applied while alive')
-            if now - state['entered'] > 0.7:
-                state['run_before'] = int(prop(session, 'RunNumber'))
+            if current == 0:
+                require(prop(director, 'SystemResetActive'), 'System countdown vanished before death')
+                invoke(director, 'Interact')
                 invoke(director, 'Restart')
-                record('pending_waits_for_death')
-                phase('stage1')
-        elif mode == 'stage1':
-            if current != 1:
+                invoke(director, 'GMAction', 1)
+                require(not prop(director, 'Resetting'), 'R or GM bypassed the locked three-second countdown')
+                require(int(prop(session, 'PendingStage')) == 1, 'Duplicate interaction changed pending stage')
+                return
+            require(current == 1 and now-state['entered'] >= 2.8, 'Note advanced without waiting for its death countdown')
+            record('three_second_system_death_advances_once')
+            phase('trap_baseline')
+        elif mode == 'trap_baseline':
+            require(current == 1 and int(prop(director, 'EnemyCount')) == 0, 'Trap stage spawned an enemy before box interaction')
+            require(float(prop(pawn, 'Current HP')) == 100.0 and float(prop(pawn, 'Max HP')) == 100.0, 'Wrong trap-stage health')
+            require(prop(pawn, 'Current Weapon') is None and not prop(director, 'WeaponCollected'), 'Trap stage granted a gun')
+            require('What the hell' in prop(director, 'ThoughtText'), 'First respawn thought missing')
+            record('trap_stage_baseline_and_first_thought')
+            phase('trap_box')
+        elif mode == 'trap_box':
+            target = prop(director, 'TrapBox').get_actor_location()
+            aim(world, pc, target)
+            if not move_to(pawn, (target.x-150, target.y), 25):
+                return
+            if now-state['entered'] < 0.3:
+                return
+            invoke(director, 'Interact')
+            require(prop(director, 'TrapTriggered') and int(prop(director, 'EnemyCount')) == 1, 'Box did not spawn trap enemy')
+            require(int(prop(session, 'PendingStage')) == 2 and current == 1, 'Trap failed to latch stage 2 while alive')
+            invoke(director, 'Interact')
+            require(int(prop(director, 'EnemyCount')) == 1, 'Repeated box interaction spawned duplicates')
+            state['trap_health_samples'] = [100.0]
+            state['trap_started'] = now
+            record('normal_box_interaction_spawns_one_active_enemy')
+            phase('trap_combat')
+        elif mode == 'trap_combat':
+            if current == 1:
+                hp = float(prop(pawn, 'Current HP'))
+                if hp != state['trap_health_samples'][-1]:
+                    state['trap_health_samples'].append(hp)
+                require(prop(pawn, 'Current Weapon') is None, 'Trap unexpectedly armed player')
+                require(now-state['trap_started'] < 35, 'Trap enemy did not kill player through real shooting')
+                return
+            require(current == 2, 'Trap death did not advance to final stage')
+            require(min(state['trap_health_samples']) <= 75.0, 'No real trap enemy damage was observed')
+            record('real_trap_projectiles_kill_and_advance', str(state['trap_health_samples']))
+            require('gun where that box was' in prop(director, 'ThoughtText'), 'Second respawn thought missing')
+            record('second_respawn_thought')
+            phase('stage2')
+        elif mode == 'stage2':
+            if current != 2:
                 return
             require(int(prop(session, 'PendingStage')) == -1, 'Pending stage not cleared')
-            require(prop(director, 'KeyEnemy') is not None, 'Stage 1 guard missing')
+            require(prop(director, 'KeyEnemy') is not None, 'Stage 2 guard missing')
             require(not prop(director, 'AccessCollected'), 'Access leaked across reset')
             enemy_pos = prop(director, 'KeyEnemy').get_actor_location()
             nav = u.GameplayStatics.get_all_actors_of_class(world, u.RecastNavMesh)
@@ -167,19 +221,52 @@ def tick(delta):
             if 'guard_start' not in state:
                 state['guard_start'] = [enemy_pos.x, enemy_pos.y, enemy_pos.z]
             moved = ((enemy_pos.x - state['guard_start'][0])**2 + (enemy_pos.y - state['guard_start'][1])**2)**0.5
-            if moved < 12:
-                require(now - state['entered'] < 12, 'Guard AI did not move on the generated navigation mesh')
+            require(moved < 2, 'Guard moved before weapon pickup')
+            require(float(prop(pawn, 'Current HP')) == 500.0, 'Guard damaged player before weapon pickup')
+            require(prop(pawn, 'Current Weapon') is None, 'Weapon acquired without E interaction')
+            if now - state['entered'] < 1.5:
                 return
-            record('guard_moves_on_navigation', f'{moved:.1f} cm of AI movement')
+            record('guard_waits_for_weapon')
+            invoke(director, 'Interact')
+            require(not prop(director, 'WeaponCollected'), 'Distant interaction acquired weapon')
             record('death_applies_next_baseline')
             phase('weapon')
         elif mode == 'weapon':
-            aim(world, pc, u.Vector(1500, 0, 150))
-            move_to(pawn, (835, 0))
+            pickup = prop(director, 'WeaponPickup')
+            if move_to(pawn, (pickup.get_actor_location().x - 140, 0), 20):
+                if 'weapon_wait' not in state:
+                    state['weapon_wait'] = now
+                require(prop(pawn, 'Current Weapon') is None, 'Proximity picked up weapon automatically')
+                if now - state['weapon_wait'] < 0.5:
+                    return
+                aim(world, pc, pickup.get_actor_location() + u.Vector(-1000, 0, 300))
+                phase('weapon_look_away')
+        elif mode == 'weapon_look_away':
+            if now - state['entered'] < 0.15:
+                return
+            invoke(director, 'Interact')
+            require(not prop(director, 'WeaponCollected'), 'Weapon collected while looking away')
+            aim(world, pc, invoke(director, 'InteractionPoint', prop(director, 'WeaponPickup')))
+            phase('weapon_interact')
+        elif mode == 'weapon_interact':
+            if now - state['entered'] < 0.15:
+                return
+            require('[E] Pick up pistol' in prop(director, 'PromptText'), 'Missing E weapon prompt')
+            invoke(director, 'Interact')
             if prop(pawn, 'Current Weapon') is not None:
                 pawn.character_movement.stop_movement_immediately()
                 record('real_weapon_pickup', prop(pawn, 'Current Weapon').get_class().get_name())
-                phase('combat')
+                invoke(director, 'Interact')
+                require(len(prop(pawn, 'Owned Weapons')) == 1, 'Repeated E duplicated weapon')
+                phase('guard_active')
+        elif mode == 'guard_active':
+            enemy_pos = prop(director, 'KeyEnemy').get_actor_location()
+            moved = ((enemy_pos.x - state['guard_start'][0])**2 + (enemy_pos.y - state['guard_start'][1])**2)**0.5
+            if moved < 12:
+                require(now - state['entered'] < 12, 'Guard did not start after E weapon pickup')
+                return
+            record('guard_moves_on_navigation', f'{moved:.1f} cm after weapon pickup')
+            phase('combat')
         elif mode == 'combat':
             enemy = prop(director, 'KeyEnemy')
             if prop(director, 'GuardRewarded'):
@@ -195,7 +282,7 @@ def tick(delta):
                 invoke(pawn, 'Touch Shoot End')
                 invoke(pawn, 'Touch Shoot Start')
                 state['last_shot'] = now
-            require(current == 1, 'Combat unexpectedly reset stage')
+            require(current == 2, 'Combat unexpectedly reset stage')
         elif mode == 'access':
             target = prop(director, 'AccessItem').get_actor_location()
             aim(world, pc, target)
@@ -204,25 +291,32 @@ def tick(delta):
                 require(prop(director, 'AccessCollected'), 'Normal access-card pickup failed')
                 record('normal_access_card_pickup')
                 state['waypoint'] = 0
-                phase('terminal')
-        elif mode == 'terminal':
-            route = [(1600, -420), (1830, -410)]
+                phase('camera_approach')
+        elif mode == 'camera_approach':
+            route = [(1800, 0)]
             waypoint = route[state['waypoint']]
-            target = prop(director, 'Terminal').get_actor_location()
+            target = prop(director, 'Monitor').get_actor_location()
             aim(world, pc, target)
             if move_to(pawn, waypoint, 40):
                 state['waypoint'] += 1
                 if state['waypoint'] == len(route):
-                    body_pos = pawn.get_actor_location()
-                    state['body_before_remote'] = [body_pos.x, body_pos.y, body_pos.z]
-                    invoke(director, 'Interact')
-                    require(prop(director, 'RemoteActive'), 'Normal terminal interaction failed')
-                    record('normal_monitor_hack')
-                    phase('remote')
+                    phase('camera_interact')
+        elif mode == 'camera_interact':
+            if now - state['entered'] < 0.15:
+                return
+            require(prop(director, 'CameraPromptVisible'), 'Camera hack prompt missing')
+            body_pos = pawn.get_actor_location()
+            state['body_before_remote'] = [body_pos.x, body_pos.y, body_pos.z]
+            invoke(director, 'Interact')
+            require(prop(director, 'RemoteActive'), 'Looking at camera did not hack it')
+            record('normal_monitor_hack')
+            phase('remote')
         elif mode == 'remote':
             invoke(director, 'PanRemote', 1000.0, 1000.0)
             require(abs(float(prop(director, 'RemoteYaw')) - 280) < 0.01, 'Yaw limit failed')
-            require(abs(float(prop(director, 'RemotePitch')) + 45) < 0.01, 'Pitch limit failed')
+            require(abs(float(prop(director, 'RemotePitch')) - 5) < 0.01, 'Pitch upper limit failed')
+            invoke(director, 'PanRemote', 0.0, -1000.0)
+            require(abs(float(prop(director, 'RemotePitch')) + 45) < 0.01, 'Pitch lower limit failed')
             before = state['body_before_remote']
             pos = pawn.get_actor_location()
             require(abs(pos.x - before[0]) < 5 and abs(pos.y - before[1]) < 5, 'Body moved during remote control')
@@ -235,7 +329,7 @@ def tick(delta):
             route = [(2090, -410), (2090, 0), (2360, 0), (3030, 0), (3570, 0)]
             if prop(director, 'Completed'):
                 require(not prop(director, 'Alarm'), 'Completed despite alarm')
-                record('normal_playthrough_complete', 'No GM action was used; real movement, pickup, weapon projectiles and normal terminal entry')
+                record('normal_playthrough_complete', 'No GM action was used; real movement, pickup, weapon projectiles and direct camera interaction')
                 phase('done')
                 return
             require(not prop(director, 'Alarm'), 'Rotated camera still detected escape route')
@@ -251,7 +345,10 @@ def tick(delta):
         finish('failed', traceback.format_exc())
 
 
-require(EDITOR.load_level(LEVEL), 'Prototype map could not load')
+# Preserve unsaved map edits when validating in the already-open editor.
+editor_world = UE.get_editor_world()
+if not editor_world or editor_world.get_path_name().split('.')[0] != LEVEL:
+    require(EDITOR.load_level(LEVEL), 'Prototype map could not load')
 handle = u.register_slate_post_tick_callback(tick)
 EDITOR.editor_request_begin_play()
 write_result()

@@ -1,0 +1,30 @@
+{
+  "phase": "done",
+  "status": "passed",
+  "started": 22632.578,
+  "events": [
+    "real_E_picked_up_note",
+    "automatic_death_then_first_thought",
+    "first_thought_expired",
+    "real_E_triggered_box",
+    "real_enemy_death_then_second_thought",
+    "second_thought_expired"
+  ],
+  "max_locked_movement": 0.0,
+  "stage": 2,
+  "SystemResetActive": false,
+  "SystemResetRemaining": 0.0,
+  "ThoughtRemaining": 0.0,
+  "hp": 500.0,
+  "enemy_count": 1,
+  "seconds": 89.59,
+  "lock_position": [
+    125.0,
+    -170.0
+  ],
+  "trap_health_samples": [
+    100.0,
+    75.0,
+    50.0
+  ]
+}

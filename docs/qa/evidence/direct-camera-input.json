@@ -1,0 +1,67 @@
+{
+  "before_e": {
+    "phase": "ready",
+    "started": 13402.312,
+    "entered": 13403.593,
+    "screenshot": true,
+    "RemoteActive": false,
+    "RemotePitch": -18.0,
+    "RemoteYaw": 180.0,
+    "CameraPromptVisible": true,
+    "AccessCollected": true,
+    "Alarm": false,
+    "seconds": 17.59
+  },
+  "after_e": {
+    "phase": "ready",
+    "started": 13402.312,
+    "entered": 13403.593,
+    "screenshot": true,
+    "RemoteActive": true,
+    "RemotePitch": -18.0,
+    "RemoteYaw": 180.0,
+    "CameraPromptVisible": false,
+    "AccessCollected": true,
+    "Alarm": false,
+    "seconds": 18.2
+  },
+  "mouse_down": {
+    "phase": "ready",
+    "started": 13402.312,
+    "entered": 13403.593,
+    "screenshot": true,
+    "RemoteActive": true,
+    "RemotePitch": -18.816584944725037,
+    "RemoteYaw": 180.0,
+    "CameraPromptVisible": false,
+    "AccessCollected": true,
+    "Alarm": false,
+    "seconds": 18.56
+  },
+  "mouse_up": {
+    "phase": "ready",
+    "started": 13402.312,
+    "entered": 13403.593,
+    "screenshot": true,
+    "RemoteActive": true,
+    "RemotePitch": -18.0,
+    "RemoteYaw": 180.0,
+    "CameraPromptVisible": false,
+    "AccessCollected": true,
+    "Alarm": false,
+    "seconds": 18.92
+  },
+  "after_q": {
+    "phase": "ready",
+    "started": 13402.312,
+    "entered": 13403.593,
+    "screenshot": true,
+    "RemoteActive": false,
+    "RemotePitch": -18.0,
+    "RemoteYaw": 180.0,
+    "CameraPromptVisible": true,
+    "AccessCollected": true,
+    "Alarm": false,
+    "seconds": 34.92
+  }
+}

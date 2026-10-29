@@ -4,7 +4,19 @@
 
 环境：Windows x64，UE 5.8.3，MSVC 14.44，Windows SDK 10.0.22621.0，项目本地 .NET SDK 10.0.403。UnrealSharp 固定为 `115e6753b2f8c830f084a3e453b7ef3b1230eb33`，没有修改上游源码。
 
-## 已通过
+## 与远程三阶段原型合并后的复核
+
+用户要求提交推送时，远程 `main` 已前进到 `2522539`。将本地 UnrealSharp 提交 `2f901de` 与该远程版本合并，保留三阶段叙事、直接摄像机黑入、空格翻越、关卡布局、打包配置和编辑器连接配置；五处冲突仅为文档与忽略规则，按双方意图合并。
+
+- `python Tools/unrealsharp.py build --disable-plugin Fab` 通过，新的插件组合可与 UnrealSharp 一起构建。
+- `python Tools/unrealsharp.py test` 通过 **44 项**当前三阶段玩法回归，测试耗时 61.73 秒，不含编辑器启动。
+- `python Tools/unrealsharp.py smoke` 通过 **5 项**互调／生命周期检查，测试耗时 1.33 秒。测试重新生成的专用探针蓝图一并保存。
+- 两次测试日志未发现 `Error:`、`Fatal error`、`Accessed None` 或 `Traceback`；远程 `Content/OFFAIR/Core`、`Levels`、`UI` 与 `Input` 资产未被改写。
+- 本次合并未重新打包，也未重复翻越真实键鼠检查；下文 Windows 打包记录和当前 `Saved/Packages/Win64` 产物对应初次接入时的两阶段基线，不能作为最新三阶段包的验证结果。最新源代码打包仍使用接入说明中的命令。
+
+结果：[44 项三阶段回归](evidence/unrealsharp-merge-runtime.json)、[5 项接入检查](evidence/unrealsharp-merge-smoke.json)。
+
+## 初次接入已通过
 
 | 验收 | 命令与实际结果 |
 | --- | --- |

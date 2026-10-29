@@ -1,6 +1,6 @@
 # OFFAIR 原型游玩与开发说明
 
-默认地图为 `Content/OFFAIR/Levels/Lvl_Prototype.umap`。使用 UE 5.8 打开工程后运行 Play 即可进入。运行时使用蓝图，`Tools/unreal/` 下的 Python 仅用于编辑器资产生成和验证，不是游戏运行依赖。
+默认地图为 `Content/OFFAIR/Levels/Lvl_Prototype.umap`。完成 [UnrealSharp 依赖准备与构建](engineering/unrealsharp.md)后，使用 `python Tools/unrealsharp.py editor` 启动 UE 5.8，运行 Play 即可进入。现有玩法使用蓝图；C# 已作为独立脚本层接入。`Tools/unreal/` 下的 Python 仅用于编辑器资产生成和验证，不是游戏运行依赖。
 
 ## 不使用 GM 的完整路线
 
@@ -53,7 +53,7 @@ FPS 玩家继承 `BP_ShooterCharacter`，控制器继承 `BP_ShooterPlayerContro
 
 ## 构建与验证
 
-在工程根目录执行：
+先完成 UnrealSharp 原生／托管编译。只有需要重新生成玩法资产时才运行以下 Build；Test 会使用相同 .NET 环境执行原有 PIE 回归：
 
 ```powershell
 .\Tools\Run-Unreal.ps1 -Mode Build

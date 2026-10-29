@@ -53,6 +53,8 @@ OFFAIR 是 Unreal Engine 第一人称毕业设计游戏，核心为阶段循环�
 新增 C++ 或独立逻辑时运行与之相关的构建和测试；未实际验证的命令不能记为项目标准入口。
 当前标准入口已建立：`Tools/Run-Unreal.ps1 -Mode Build` 生成并编译原型，`-Mode Test` 执行 PIE 集成测试。生成逻辑在 `Tools/unreal/`，运行时资产在 `Content/OFFAIR/`。修改脚本管理的蓝图功能时同步作者脚本，避免下次生成覆盖手工修复；不要为普通关卡微调盲目重建全部资产。
 
+2026-10-28 起用户授权接入 UnrealSharp；插件是 `Plugins/UnrealSharp` 固定版本子模块，C# 作者代码在 `Script/OFFAIR/`。依赖准备、原生与托管编译、启动及验证使用 `Tools/unrealsharp.py`，实际命令与平台限制见 [UnrealSharp 接入](docs/engineering/unrealsharp.md)。不要直接修改插件源码或更新子模块版本来掩盖兼容问题；需要变更依赖时记录理由并重跑验证。目标平台包括 Windows x64 与 macOS Apple Silicon arm64，不能将 Windows 验证视为 Mac 已通过。
+
 导航构建必须校验可行走面，不能仅凭 Recast Actor 存在通过；新输入需实际键鼠验证，脚本直接调用交互函数不能替代按键检查。
 
 无法启动编辑器或运行测试时，应说明实际完成的静态检查及尚未验证的行为。最终交付简要列出改动、验证、未决事项与本地提交；不要把“尚未运行”写成“通过”。

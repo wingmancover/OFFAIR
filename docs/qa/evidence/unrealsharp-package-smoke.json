@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "platform": "Win64",
+  "command": [
+    "C:\\recent_project\\OFFAIR\\Saved\\Packages\\Win64\\OFFAIR\\Binaries\\Win64\\OFFAIR.exe",
+    "-unattended",
+    "-nullrhi",
+    "-nosound",
+    "-benchmark",
+    "-seconds=4",
+    "-fps=30",
+    "-abslog=C:\\recent_project\\OFFAIR\\Saved\\UnrealSharpPackageTests\\run.log"
+  ],
+  "checks": {
+    "self_contained_runtime": true,
+    "project_assembly_loaded": true,
+    "prototype_initialized": true,
+    "no_runtime_errors": true
+  }
+}

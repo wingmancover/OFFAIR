@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <Import Project="../../Plugins/UnrealSharp/UnrealSharp.Shared.props" />
+  <ItemGroup>
+    <Reference Include="OFFAIR">
+      <HintPath>..\..\Binaries\Managed\net10.0\OFFAIR.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

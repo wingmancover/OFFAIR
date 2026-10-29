@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "passed": [
+    "managed_uclass_registered",
+    "blueprint_child_compiles_and_saves",
+    "blueprint_calls_managed_actor",
+    "managed_instance_resets_after_death_map_reload",
+    "managed_instance_resets_in_second_pie_session"
+  ],
+  "phase": "second",
+  "started": 39098.531,
+  "run": 1,
+  "error": "",
+  "elapsed_seconds": 1.62
+}

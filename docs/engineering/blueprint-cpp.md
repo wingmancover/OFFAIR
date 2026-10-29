@@ -1,5 +1,7 @@
 # OFFAIR 蓝图与 C++ 技术路线
 
+2026-10-28：用户已明确授权引入 UnrealSharp。新增最小原生模块、固定版本插件和 C# 工程，现有玩法继续使用蓝图，暂不迁移阶段或监控规则。目标为 Windows x64 与 macOS Apple Silicon arm64；接入与验证范围见 [UnrealSharp 说明](unrealsharp.md)。以下蓝图职责表仍适用；纯蓝图工程的说明记录的是 2026-10-18 原型基线。
+
 当前目标已调整为[完整可玩原型](../design/game-design.md)与 [GM 工具](../design/gm-prototype.md)共同实现。技术路线仍优先复用蓝图模板，暂不因范围恢复而自动引入 C++；出现明确的维护、测试、引擎接口或性能需求时再迁移核心逻辑。这不是“最终项目必须纯蓝图”的限制。
 
 ## 为什么当前选蓝图
@@ -14,7 +16,7 @@ Epic 将蓝图的快速原型迭代列为优势，并指出 C++ 的性能收益�
 
 ## 当前职责划分
 
-当前实际资产与职责如下。运行时保持纯蓝图；编辑器生成脚本方便审阅和重复构建，不是游戏脚本运行时，也不要求增加项目 C++ 模块。
+当前玩法资产与职责如下。玩法逻辑仍在蓝图中；编辑器生成脚本方便审阅和重复构建，不是游戏脚本运行时。新增 C# 验证 Actor 独立于正常玩法，原生模块只提供项目构建入口。
 
 | 部分 | 蓝图承载方式 | 主要职责 |
 | --- | --- | --- |
@@ -39,7 +41,7 @@ Epic 将蓝图的快速原型迭代列为优势，并指出 C++ 的性能收益�
 | 性能分析确实定位到大量 AI 或密集蓝图计算 | 已测得的热点算法或批量处理 | 单体行为调参、动画和 UI |
 | 需要蓝图未暴露的引擎能力或稳定的原生控制台入口 | 小型原生接口与命令适配层 | 已有玩法逻辑和面板 |
 
-C++ 的文本存储更便于 diff 和合并，Epic 也提供蓝图 Diff 工具。本轮已通过本机 UE 官方图表 API 生成和编译运行时资产，并完成 PIE 集成验证；作者脚本在 `Tools/unreal/`，标准命令见 README。打包发布仍未验证。[官方对比与协作说明](https://dev.epicgames.com/documentation/en-us/unreal-engine/coding-in-unreal-engine-blueprint-vs-cplusplus)
+C++ 的文本存储更便于 diff 和合并，Epic 也提供蓝图 Diff 工具。原型已通过本机 UE 官方图表 API 生成和编译运行时资产，并完成 PIE 集成验证；作者脚本在 `Tools/unreal/`，标准命令见 README。2026-10-28 的 Windows Development 打包与启动结果见 [UnrealSharp 验证](../qa/unrealsharp-validation.md)，发布与其他平台验证另行进行。[官方对比与协作说明](https://dev.epicgames.com/documentation/en-us/unreal-engine/coding-in-unreal-engine-blueprint-vs-cplusplus)
 
 如果以后明确需要在 Unreal 原生控制台输入带参数的命令，可评估薄层 C++ `UFUNCTION(Exec)` 入口，再调用同一套游戏能力。`Exec` 只在特定类中生效；`BlueprintCallable` 只是蓝图可调用，并不等于注册了控制台命令。当前 GM 动作名不会被描述成现成控制台语法。[官方 UFunctions 说明](https://dev.epicgames.com/documentation/unreal-engine/ufunctions-in-unreal-engine?lang=en-US)
 
@@ -49,4 +51,4 @@ GM 层只提出死亡、切阶段、增减敌人和连接监控的请求；世�
 
 如果后续迁移，优先把稳定规则放到可向蓝图暴露的 C++ 基类或组件，保留关卡参数、UI 和表现资产。迁移需要调整引用并重新测试，不承诺一键无成本转换。每次迁移应由明确问题驱动，不同时重写所有模板与地图。
 
-本轮未新增 `Source/`、原生模块或持久化项目插件配置。PythonScriptPlugin 仅通过编辑器启动参数临时启用，正常打开工程游玩不需要它。实际验证及限制见[实现验证记录](../qa/prototype-implementation-validation.md)。
+2026-10-18 原型迭代未新增 `Source/`、原生模块或持久化项目插件配置；2026-10-28 UnrealSharp 接入新增了这些构建依赖。PythonScriptPlugin 仍仅通过编辑器启动参数临时启用，正常打开工程游玩不需要它。原型基线验证见[实现验证记录](../qa/prototype-implementation-validation.md)，C# 接入验证另行记录。

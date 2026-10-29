@@ -8,12 +8,13 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 
 当前目标是完整可玩的原型：正常游戏交互与 GM 配套实现。玩家应能通过实际拾取、短战斗、阶段循环和监控黑入走通关卡；GM 提供点击死亡、前后阶段切换、增减敌人和一键接入监控，帮助调试同一套系统。此前“只做 GM、暂缓实际交互”的范围已取消。
 
-当前已接入两阶段可玩灰盒、关键物品、模板 FPS 战斗、权限卡、监控黑入、告警与终点，以及配套 GM。运行时仍为纯蓝图，原模板资产保持不变。详细控制与正常通关路线见[游玩说明](docs/prototype-play-guide.md)，验证结果见[本轮测试记录](docs/qa/prototype-implementation-validation.md)。
+当前已接入两阶段可玩灰盒、关键物品、模板 FPS 战斗、权限卡、监控黑入、告警与终点，以及配套 GM。现有玩法仍由蓝图实现，另接入 UnrealSharp C# 开发环境与独立验证 Actor，原模板资产保持不变。详细控制与正常通关路线见[游玩说明](docs/prototype-play-guide.md)，原型验证结果见[测试记录](docs/qa/prototype-implementation-validation.md)。
 
 ## 当前工程
 
 - 引擎关联版本：`OFFAIR.uproject` 中的 `5.8`。
-- 当前仓库以蓝图资产为主，未发现 `Source/` 或项目 C++ 模块声明。
+- 蓝图玩法 + 最小 `Source/OFFAIR` 原生模块 + `Script/OFFAIR` C# 工程；UnrealSharp 作为固定版本 Git 子模块管理。
+- 目标平台为 Windows x64 与 macOS Apple Silicon arm64；各平台实际验证范围见 [UnrealSharp 接入记录](docs/engineering/unrealsharp.md)。
 - 默认启动地图：`/Game/OFFAIR/Levels/Lvl_Prototype`。
 - 项目专用玩家、控制器和 GameMode 继承射击模板；敌人、武器与投射物继续复用模板。
 - 已验证不开 GM 的正常流程及 25 项运行检查；当前为灰盒原型，未包含完整剧情、美术制作或跨进程存档。
@@ -23,6 +24,7 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 | 文档 | 用途 |
 | --- | --- |
 | [原型游玩与开发说明](docs/prototype-play-guide.md) | 运行、按键、正常通关、GM 与构建命令 |
+| [UnrealSharp 接入](docs/engineering/unrealsharp.md) | 固定依赖、C# 构建、启动、互调测试、双平台验证范围 |
 | [实现验证记录](docs/qa/prototype-implementation-validation.md) | 实际通过的检查、验证方式及未覆盖范围 |
 | [模板能力盘点](docs/engineering/template-inventory.md) | 已验证资产、实际地图配置、复用注意点与可玩原型缺口 |
 | [GM 配套工具范围](docs/design/gm-prototype.md) | 与真实交互共同实现的五类调试操作及边界 |
@@ -40,8 +42,8 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 
 ## 打开与验证
 
-使用 UE 5.8 打开 [OFFAIR.uproject](OFFAIR.uproject)，默认进入原型地图；点击 Play 后点击游戏视口取得输入焦点。
+首次克隆后先执行 `python Tools/unrealsharp.py setup`，再按 [UnrealSharp 接入说明](docs/engineering/unrealsharp.md)编译原生插件与 C#。使用 `python Tools/unrealsharp.py editor` 启动带项目本地 .NET 环境的 UE 5.8，默认进入原型地图；点击 Play 后点击游戏视口取得输入焦点。
 
-在工程根目录运行 `Tools/Run-Unreal.ps1 -Mode Build` 可重新生成脚本管理的原型资产，运行 `Tools/Run-Unreal.ps1 -Mode Test` 可执行 PIE 集成验证。重新生成会覆盖受管理的蓝图函数和关卡对象，详见游玩与开发说明。
+在工程根目录运行 `Tools/Run-Unreal.ps1 -Mode Build` 可重新生成脚本管理的原型资产，运行 `Tools/Run-Unreal.ps1 -Mode Test` 可执行 PIE 集成验证。接入 C# 后，普通源码编译使用 `python Tools/unrealsharp.py build`；原型回归使用 `python Tools/unrealsharp.py test`。原型资产重新生成会覆盖受管理的蓝图函数和关卡对象，详见游玩与开发说明。
 
 文档与玩法迭代需同步维护验收清单。功能完成情况以实际编辑器或构建验证记录为准；“计划检查”不等于“已通过”。

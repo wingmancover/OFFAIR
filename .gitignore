@@ -1,5 +1,6 @@
 # Visual Studio 2015 user specific files
 .vs/
+.vsconfig
 
 # Compiled Object files
 *.slo
@@ -76,3 +77,15 @@ DerivedDataCache/*
 # Python editor-authoring tools
 __pycache__/
 *.pyc
+
+# C# outputs and machine-specific IDE settings
+**/bin/
+**/obj/
+**/Properties/launchSettings.json
+*.user
+.idea/
+Script/obj/
+Script/global.json
+*.slnx
+*.sln.projects.json
+Script/OFFAIR.RuntimeGlue/

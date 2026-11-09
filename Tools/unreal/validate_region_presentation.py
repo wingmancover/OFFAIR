@@ -91,7 +91,10 @@ def run():
     yield from shot('vista-start');yield 2
     check('Camera rises and pulls back',prop('VistaCamera').get_actor_location().z>initialZ+300 and prop('VistaCamera').get_actor_location().x<10400)
     check('Body remains on platform',(q.p.get_actor_location()-body).length()<5)
-    yield from shot('vista-mid');yield 1.4;yield from shot('vista-wide');yield 4
+    yield from shot('vista-mid');yield 1.4;yield from shot('vista-wide')
+    check('Vista endpoint gives elevated overview',prop('VistaEnd').get_actor_location().z>=14000)
+    check('Vista fills wide viewport without engine pillarboxes',not prop('VistaCamera').get_component_by_class(u.CameraComponent).get_editor_property('constrain_aspect_ratio'))
+    yield from shot('vista-ultrawide','2560x1080');yield 4
     check('Normal end restores player view and controls',not prop('VistaActive') and q.pc.get_view_target()==q.p and not q.pc.is_move_input_ignored())
     check('Save and puzzle intact after vista',prop('CheckpointSaved') and prop('PuzzleSolved') and prop('HasGun') and prop('PuzzleMask')==457)
     yield from shot('ui-after-vista')
@@ -126,6 +129,33 @@ def run():
     check('Death flushes all queued speakers',prop('SubtitleText')=='' and prop('DialogueQueueCount')==0)
     yield 1
     check('New attempt inner voice does not resurrect old host',prop('SubtitleSpeaker')==2 and prop('AttemptId')==old+1)
+
+    # User regression: re-enter C1 in one life, then repeat the whole teaching room after
+    # an actual wrong-answer death. Experience is retained, access/door conditions are not.
+    q.L.editor_request_end_play();yield 1;q.L.editor_request_begin_play();yield 3;q.setup()
+    check('New session clears camera narrative memories',not prop('CameraLessonNarrated') and not prop('CardDiscoveryNarrated'))
+    yield from q.interact(q.actors['OA_RedNote'],(600,1800));yield 4
+    yield from q.teaching()
+    check('First C1 completion records narrative experience',prop('CameraLessonNarrated') and prop('CardDiscoveryNarrated'))
+    yield 16
+    for turn in [60.,-60.,60.]:
+        yield from q.interact(q.actors['OA_C1_Housing'],(4000,2350))
+        check('Repeated C1 can still be controlled',prop('RemoteActive'))
+        call('PanTutorialCamera',turn,0.);key('Q');yield .3
+        check('Repeated C1 adds no dialogue',prop('SubtitleText')=='' and prop('DialogueQueueCount')==0)
+    pos(6100,3800);yield .3
+    yield from shot('puzzle-help-corner')
+    yield from q.interact(q.actors['OA_PuzzleSubmitButton'],(6150,3370))
+    check('Wrong puzzle answer triggers real penalty',prop('PuzzleSubmitting'))
+    yield 2
+    check('Death retains experience but resets access and C1 gate',prop('CameraLessonNarrated') and prop('CardDiscoveryNarrated')
+        and not prop('HasAccessCard') and not prop('CameraLearned') and q.actors['OA_TutorialGate'].get_actor_enable_collision())
+    yield from q.teaching()
+    check('Retry still requires and completes normal C1 lesson',prop('CameraLearned') and not q.actors['OA_TutorialGate'].get_actor_enable_collision())
+    check('Retry suppresses old card/lesson inner discovery',"point of view" not in prop('ThoughtText') and "maybe I can see" not in prop('ThoughtText'))
+    check('Retry host guides current run without remembering death',"Follow the lights" in prop('HostText'))
+    yield 12
+    check('No old C1 dialogue remains queued after retry',prop('DialogueQueueCount')==0 and prop('SubtitleText')=='')
 
 q.run=run
 if __name__=='__main__':q.start()

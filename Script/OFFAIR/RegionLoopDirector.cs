@@ -381,6 +381,9 @@ public partial class ARegionLoopDirector : AActor
     private AActor? heldWeapon, remoteTarget;
     private FRotator bodyRotation, remoteEntryRotation;
     private bool remoteLesson, gunIntroduction;
+    // Experienced knowledge survives an A-B retry, unlike the camera access/lesson gates.
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool CameraLessonNarrated { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool CardDiscoveryNarrated { get; set; }
     private int requiredKills, savedChoice, previousChoice;
     private float hostRemaining;
 
@@ -427,7 +430,11 @@ public partial class ARegionLoopDirector : AActor
             {
                 AccessCard.ActorHiddenInGame = true;
                 Host("There's your access. Look up at the training camera and take control.");
-                Say("Their cameras... maybe I can see what they see.");
+                if (!CardDiscoveryNarrated)
+                {
+                    CardDiscoveryNarrated=true;
+                    Say("Their cameras... maybe I can see what they see.");
+                }
             }
             return true;
         }
@@ -541,14 +548,18 @@ public partial class ARegionLoopDirector : AActor
     private void CompleteRemoteLesson(bool normal)
     {
         if (!RemoteActive) return;
-        if (normal && remoteLesson && LessonTurned && HasAccessCard && !CheckpointSaved)
+        if (normal && remoteLesson && LessonTurned && HasAccessCard && !CheckpointSaved && !CameraLearned)
         {
             ReportRegionProgress(AttemptId,2); SetTutorialGate(true);
             Host("Excellent. Follow the lights to the Signal Lab.");
-            Say("A different point of view. That could be useful.");
+            if (!CameraLessonNarrated)
+            {
+                CameraLessonNarrated=true;
+                Say("A different point of view. That could be useful.");
+            }
         }
         else if (normal && remoteLesson && !CameraLearned)
-            Say("I should turn the camera and look around before leaving it.");
+            Notice("Turn the training camera before returning.");
         remoteLesson = false;
         if (CameraExitSound is not null) UGameplayStatics.PlaySound2D(CameraExitSound,.45f);
     }
@@ -782,7 +793,13 @@ public partial class ARegionLoopDirector : AActor
             if (alignmentTime>=.7f && !PatternObserved)
             {
                 PatternObserved=true; puzzleEverObserved=true;
-                Say("An L, not the broadcast's T. I'll reproduce what this camera shows.",7);
+                if (!PuzzleSolved)
+                {
+                    if (PuzzleMask==CorrectPatternMask)
+                        Say("That matches what I've already entered. I can submit it now.",7,"ready-to-submit");
+                    else
+                        Say("An L, not the broadcast's T. I'll reproduce what this camera shows.",7,"needs-pattern");
+                }
             }
         }
         else alignmentTime=0;
@@ -858,7 +875,9 @@ public partial class ARegionLoopDirector : AActor
         : MemoryExperienced ? "weapons" : "intro";
 
     private bool Relevant(DialogueLine line) => line.Attempt==AttemptId && line.Scope==DialogueScope()
-        && (line.Guard!="unobserved" || !PatternObserved);
+        && (line.Guard!="unobserved" || !PatternObserved)
+        && (line.Guard!="needs-pattern" || (!PuzzleSolved && PuzzleMask!=CorrectPatternMask))
+        && (line.Guard!="ready-to-submit" || (!PuzzleSolved && PuzzleMask==CorrectPatternMask));
 
     private void QueueDialogue(string text,int speaker,string guard)
     {

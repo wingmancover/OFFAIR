@@ -1,0 +1,67 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "B fixture explicitly saved",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Authored vista starts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "No camera aspect lock",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Wider overview lens",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Final camera is high and behind both rooms",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Capture vista-final-16x9",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Capture vista-final-wide",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Returns to body with controls restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Memory and weapon preserved",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "captures": [
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\PresentationFix\\Vista\\vista-final-16x9.png",
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\PresentationFix\\Vista\\vista-final-wide.png"
+  ],
+  "input": "Explicit GM fixture for final authored camera framing; no physical keys",
+  "canvas_sizes": {
+    "vista-final-16x9": [
+      687,
+      199
+    ],
+    "vista-final-wide": [
+      687,
+      199
+    ]
+  },
+  "error": null,
+  "seconds": 18.62
+}

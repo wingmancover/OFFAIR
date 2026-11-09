@@ -1,0 +1,295 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "BP_RegionLoopDirector compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionHUD compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Cyan encounter has two guards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 0",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Real clear drops access card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Card collected by E",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C1 normal lesson opens D1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "First lesson includes host and discovery",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Same-life C1 revisit does not replay completed teaching",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Correct board entered before observing or submitting",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Normal input connects C2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Camera still detects aligned pattern",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Already-filled answer gets confirmation instead of reproduce instruction",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Confirmation actually appears on subtitle channel",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Clearing does not retain ready-to-submit narration",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual wrong submission resets access but retains inner experience",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Cyan encounter has two guards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 0",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Real clear drops access card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Card collected by E",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C1 normal lesson opens D1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Retry restores host current-run completion line",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Retry host is visible, with no rediscovery inner voice",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Blind correct submit opens exit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Blind success retains alternate host response",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Normal input connects C2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Camera still detects aligned pattern",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Post-solve observation does not overwrite progress narration",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "No pattern-use instructions after successful submission",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Solved camera exit restores body with exit still open",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Cyan encounter has two guards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 0",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Real clear drops access card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Card collected by E",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C1 normal lesson opens D1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Normal input connects C2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Camera still detects aligned pattern",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Observe-first still gives appropriate pattern instruction",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Filling answer invalidates queued reproduce instruction",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "No stale reproduce sentence resumes after filling",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Normal prerequisites used throughout",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "dialogue": {
+    "first_C1": [
+      [
+        1,
+        "Excellent."
+      ],
+      [
+        1,
+        "Follow the lights to the Signal Lab."
+      ],
+      [
+        2,
+        "A different point of view."
+      ],
+      [
+        2,
+        "That could be useful."
+      ]
+    ],
+    "filled_before_observation": [
+      [
+        2,
+        "That matches what I've already entered."
+      ],
+      [
+        2,
+        "I can submit it now."
+      ]
+    ],
+    "retry_C1": [
+      [
+        1,
+        "Excellent."
+      ],
+      [
+        1,
+        "Follow the lights to the Signal Lab."
+      ]
+    ],
+    "solved_before_observation": [
+      [
+        1,
+        "Straight to the answer, without my reference?"
+      ],
+      [
+        1,
+        "Confident."
+      ],
+      [
+        1,
+        "Well played."
+      ],
+      [
+        1,
+        "The door is yours."
+      ],
+      [
+        2,
+        "That memory beyond the door..."
+      ],
+      [
+        2,
+        "I should recover it before going any further."
+      ]
+    ],
+    "filled_after_observation": []
+  },
+  "input": "Normal teaching and real projectile input; runtime input handlers, no GM grants or physical keys",
+  "error": null,
+  "seconds": 109.23
+}

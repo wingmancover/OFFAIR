@@ -24,8 +24,13 @@ def build():
     trigger.set_actor_enable_collision(False)
     focus=add(u.TargetPoint,'OA_VistaFocus',(23000,7000,350))
     camera=add(u.CameraActor,'OA_VistaCamera',(10400,4400,170))
-    camera.camera_component.set_field_of_view(80.)
+    camera.camera_component.set_field_of_view(95.)
+    # The HUD supplies horizontal letterboxing. Engine aspect locking would add side bars
+    # in wide editor viewports, so this camera must fill the entire viewport.
+    camera.camera_component.set_editor_property('constrain_aspect_ratio',False)
     camera.camera_component.set_mobility(u.ComponentMobility.MOVABLE)
+    actors['OA_POI_K2'].set_actor_location(u.Vector(-1000,1000,14500),False,True)
+    focus.set_actor_location(u.Vector(24000,6500,4000),False,True)
     camera.set_actor_rotation(u.MathLibrary.find_look_at_rotation(camera.get_actor_location(),focus.get_actor_location()),False)
     director=actors['OA_RegionLoopDirector']
     for k,v in dict(VistaCamera=camera,VistaTrigger=trigger,VistaStart=actors['OA_POI_K1'],

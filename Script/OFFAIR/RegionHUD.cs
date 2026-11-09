@@ -65,10 +65,13 @@ public partial class ARegionHUD : AHUD
         {
             float panelW=Math.Min(560*s,sizeX*.48f);
             var objectives=Wrap(objective,panelW-36*s,true);
-            float panelH=(44+objectives.Count*27)*s;
+            bool puzzleHelp=d.InPuzzleRoom && !d.PuzzleSolved && !d.RemoteActive && !d.PuzzleSubmitting;
+            var help=puzzleHelp ? Wrap("LMB: Toggle tile   /   E: Console",panelW-36*s,true) : new List<string>();
+            float panelH=(44+(objectives.Count+help.Count)*27)*s;
             DrawRect(dark,m,m,panelW,panelH);DrawRect(cyan,m,m,3*s,panelH);
             Text(d.CheckpointSaved ? "MEMORY B  /  SAVED" : d.InPuzzleRoom ? "02  /  SIGNAL LAB" : "OFF AIR  /  CURRENT OBJECTIVE",m+16*s,m+10*s,cyan,true);
             for(int i=0;i<objectives.Count;i++) Text(objectives[i],m+16*s,m+(40+i*27)*s,white,true);
+            for(int i=0;i<help.Count;i++) Text(help[i],m+16*s,m+(40+(objectives.Count+i)*27)*s,muted,true);
             RightText("F1  /  GM",m,muted);
             if(d.RemoteActive)
             {
@@ -96,8 +99,6 @@ public partial class ARegionHUD : AHUD
                 }
             }
             if(!string.IsNullOrEmpty(d.PromptText)) Card(d.PromptText,sizeY*.64f,white);
-            else if(d.InPuzzleRoom && !d.PuzzleSolved && !d.RemoteActive && !d.PuzzleSubmitting)
-                Card("LMB  Toggle tile     E at console  Clear / Submit",sizeY*.64f,muted,660);
             else if(!d.MemoryExperienced)
                 Text("WASD  Move     SPACE  Jump     E  Interact",m,sizeY-m-104*s,muted,true);
             if(!string.IsNullOrEmpty(d.PuzzleStatus)) Card(d.PuzzleStatus,sizeY*.38f,d.PuzzleSubmitting ? red : cyan);
@@ -105,8 +106,10 @@ public partial class ARegionHUD : AHUD
         }
         if(d.VistaActive)
         {
-            DrawRect(new FLinearColor(0,0,0,1),0,0,sizeX,48*s);
-            DrawRect(new FLinearColor(0,0,0,1),0,sizeY-48*s,sizeX,48*s);
+            // Crop only top/bottom: 16:9 becomes 16:8; wider viewports keep their full width.
+            float bar=sizeY/18f;
+            DrawRect(new FLinearColor(0,0,0,1),0,0,sizeX,bar);
+            DrawRect(new FLinearColor(0,0,0,1),0,sizeY-bar,sizeX,bar);
             Text("MEMORY B SECURED",m,12*s,muted,true);
             RightText("SPACE  Skip view",12*s,white);
         }

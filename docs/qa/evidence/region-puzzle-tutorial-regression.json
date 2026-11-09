@@ -1,0 +1,480 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Walkable (1270, 1200)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (1270, 2400)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (3600, 2800)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (3600, 800)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (4050, 3200)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (4050, 400)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (4350, 2850)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (4350, 750)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (6000, 1800)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (6000, 3300)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Navigation saved",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionLoopDirector compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionShooterCharacter compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionBullet compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionAmberPistol compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionCyanPistol compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionGuardPistol compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionGuard compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionHUD compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionGameMode compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Initialized without setup error",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Shooter pawn reused",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM hidden / no guards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Hidden GM / R do nothing",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Gun unavailable before first memory",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "B rejects missing prerequisites",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "First note starts three-second lock",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "No early loop from repeated input",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "First death returns A with memory",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Note and guns restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Gun rejects excessive range",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Gun rejects looking away",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Gun rejects occluding wall",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Cyan equips weapon and spawns two guards",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "One inventory weapon",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Picking up a gun switches the player pose",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Repeated pickup does not spawn duplicate wave",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Guard AI attacks player",
+      "passed": true,
+      "detail": {
+        "before": 500.0,
+        "after": 475.0,
+        "guards": [
+          "<Struct 'Vector' (0x000001D371DC3300) {x: 3692.082031, y: 2885.380803, z: 98.149998}>",
+          "<Struct 'Vector' (0x000001D371DC3300) {x: 4284.226029, y: 1581.972605, z: 98.149998}>"
+        ]
+      }
+    },
+    {
+      "name": "Guard AI moves on navigation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Two-guard fight remains alive for test",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Real player projectile damages guard",
+      "passed": true,
+      "detail": 75.0
+    },
+    {
+      "name": "Ammo reduced by actual shot",
+      "passed": true,
+      "detail": 9
+    },
+    {
+      "name": "First guard defeated using actual pistol shots",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "No card before complete wave",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Repeated dead-guard event counted once",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Second guard defeated using actual pistol shots",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Last kill drops one card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM cannot restart combat after card drop",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "E collects card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Camera rejects beyond 20m",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Aim/E enters C1",
+      "passed": true,
+      "detail": "[E] Hack training camera"
+    },
+    {
+      "name": "Exit without turning cannot complete lesson",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Camera upward input increases pitch",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Turn plus normal exit learns camera and opens D1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Body view and input restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual movement through D1 / corridor <Struct 'Vector' (0x000001D371DC3B20) {x: 5100.000000, y: 1800.000000, z: 100.000000}>",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001D371DC3BC0) {x: 5036.014677, y: 1800.000000, z: 98.149998}>"
+    },
+    {
+      "name": "Actual movement through D1 / corridor <Struct 'Vector' (0x000001D371DC33F0) {x: 6000.000000, y: 1800.000000, z: 100.000000}>",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001D371DC3C10) {x: 5936.025239, y: 1800.000000, z: 98.149998}>"
+    },
+    {
+      "name": "Actual movement through D1 / corridor <Struct 'Vector' (0x000001D371DC3300) {x: 6000.000000, y: 2800.000000, z: 100.000000}>",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001D371DC3760) {x: 6000.372800, y: 2735.972005, z: 98.149998}>"
+    },
+    {
+      "name": "One death per attempt / stale event rejected",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Death resets all unsaved tutorial state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Both guns / gate / camera baseline restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Destroyed weapons removed from inventory",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM death restores first and third person unarmed animation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "No orphan AI controllers after death",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "No old projectiles after death",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Amber equips and spawns ten guards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM adds guard",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM removal does not count / invalidates reward",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM removal cannot produce card after clearing",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Knowledge thought suggests other gun",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Amber retry restores unarmed animation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Amber nine kills is not a victory",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Amber tenth kill drops card and plays exclusive praise",
+      "passed": true,
+      "detail": "Ten guards, and you're still standing! Now THAT is a performance. Your access card is well earned."
+    },
+    {
+      "name": "Wall-hit projectiles cleaned after 2 gun reset",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Pose remains unarmed after delayed hit effects 2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Wall-hit projectiles cleaned after 1 gun reset",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Pose remains unarmed after delayed hit effects 1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Real lethal projectile triggers death",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Combat death restores unarmed pose and clears projectiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM camera bypass does not grant access",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Death in camera restores body without lesson reward",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C2 starts away from answer",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C2 preview does not complete C1 lesson",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C2 resets after unsaved death",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Explicit GM B setup supplies real weapon",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "B save requires explicit E",
+      "passed": true,
+      "detail": "MEMORY RECOVERED / Checkpoint B saved for this session."
+    },
+    {
+      "name": "B death keeps progress and restores equipped gun",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "B restore retains the armed pose for its saved weapon",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "B does not reclose completed teaching room",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Fresh PIE clears session memory/save",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Invalid camera returns to body without reward",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Missing baseline actor fails closed",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "input": "Runtime handler + real simulated AI/projectiles; physical keys pending user",
+  "initial_animation_classes": [
+    "<Object '/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed.ABP_Unarmed_C' (0x000001C34A1F1C00) Class 'AnimBlueprintGeneratedClass'>",
+    "<Object '/Game/FirstPerson/Anims/ABP_FP_Copy.ABP_FP_Copy_C' (0x000001D355527000) Class 'AnimBlueprintGeneratedClass'>"
+  ],
+  "initial_ai_controllers": [],
+  "error": null,
+  "seconds": 65.62
+}

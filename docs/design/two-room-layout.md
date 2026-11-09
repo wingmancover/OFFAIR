@@ -4,6 +4,8 @@
 
 ## 本轮交付与试玩
 
+**第 4 步更新**：已实现 [Signal Lab 谜题房](region-puzzle.md)，可通过正常教学、C2 观察与射击提交走到 B 保存；以下第 1 步布局说明保留为历史。
+
 **第 2 步更新**：本图已接入区域循环与会话 B，巨蛋面积减半、真图案移入遮挡结构并限制 C2 可见。当前玩法／操作以[区域循环与存档](region-loop-checkpoint.md)为准；以下“第 1 步”说明作为布局验收历史，不表示当前仍是纯预览。第 2 步将 GameMode 改为独立 `BP_RegionGameMode`，未改默认启动地图。
 
 第 1 步地图：`/Game/OFFAIR/Levels/Lvl_TwoRoom_Blockout`。

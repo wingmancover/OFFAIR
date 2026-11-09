@@ -79,3 +79,7 @@ python Tools/unrealsharp.py editor-rebuild-test
 ## 新双房间第 3 步
 
 `RegionLoopDirector.cs` 管理区域循环和教学交互，蓝图适配复用 Shooter 角色、守卫、手枪和子弹，`RegionHUD.cs` 使用运行时字体。先 `managed-build`，再按需运行 `Tools/unreal/build_region_tutorial.py` 增量作者脚本；后台 PIE 入口为 `validate_region_tutorial.py`，画面检查用 `capture_region_tutorial.py`。不要把旧原型 `test` 的结果当成新地图验证。详见[当前记录](../qa/region-tutorial-validation.md)。
+
+## 双房间第 4 步
+
+谜题仍由同一 `RegionLoopDirector.cs` 管理，子弹注册时绑定原生碰撞通知，不修改共享模板蓝图。增量作者入口为 `Tools/unreal/build_region_puzzle.py`，正常流程回归为 `Tools/unreal/validate_region_puzzle.py`；后者需渲染离屏截图。当前源生成器要求新增反射成员与带 UClass 的声明在同一文件，不能把 UProperty 随意拆入无 UClass 标记的 partial 文件。作者脚本只在内存编译既有导演／HUD 蓝图，地图保存新引用；不为未变更的图表额外重存资产。

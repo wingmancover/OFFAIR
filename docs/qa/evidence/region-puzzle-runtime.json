@@ -1,0 +1,432 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "BP_RegionLoopDirector compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionHUD compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionBullet compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Puzzle configuration initializes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "No card cannot hack C2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "No prerequisites cannot submit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "First memory loop occurred",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Cyan encounter has two guards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 0",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Real clear drops access card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Card collected by E",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C1 normal lesson opens D1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Room host recommends broadcast reference",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Capture puzzle-broadcast",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Real bullet toggles top-left on",
+      "passed": true,
+      "detail": 1
+    },
+    {
+      "name": "Second bullet toggles same tile off",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "Clear is safe and empties board",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Register fixture with current player",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Duplicate hit toggles only once",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots reproduce false T",
+      "passed": true,
+      "detail": 151
+    },
+    {
+      "name": "Capture puzzle-false-input",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Wrong submit locks with explicit feedback",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Repeated input cannot cancel lethal result",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Wrong answer causes exactly one loop to A",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Puzzle death restores room baseline",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Only experience retained",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "All tile materials reset to off",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C2 initial orientation restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "No delayed second death",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Cyan encounter has two guards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 0",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Real clear drops access card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Card collected by E",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C1 normal lesson opens D1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C2 out of range rejected",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C2 occlusion rejected",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Aim/E enters C2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Camera starts away from answer",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Capture puzzle-camera-initial",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Panning centers and identifies pattern",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Camera observation alone does not solve",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Capture puzzle-camera-aligned",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C2 exit restores view and controls",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Capture puzzle-body-hidden-answer",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Answer meshes restricted to C2 ownership",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots reproduce correct L",
+      "passed": true,
+      "detail": 457
+    },
+    {
+      "name": "Correct submit opens D2 while alive",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Host reacts to independent camera answer",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Capture puzzle-success",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Solved submit cannot repeat reward",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Solved board cannot change",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Success banner clears instead of blocking view",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "No GM prerequisites used",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Character walks through opened D2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Crossing D2 does not silently save",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Normal route saves B with E",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Capture puzzle-checkpoint-b",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "B death preserves puzzle and equipment",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Completed camera direction retained",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Fresh PIE clears puzzle memories and save",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Cyan encounter has two guards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 0",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Real clear drops access card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Card collected by E",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C1 normal lesson opens D1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Known correct answer accepted without C2 visit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Direct solution has alternate host line",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Solved but unsaved puzzle resets",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM C2 entry cannot grant card or lesson",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C2 death restores body",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Destroyed C2 exits without completion",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Missing baseline fails closed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Cyan encounter has two guards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 0",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Real clear drops access card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Card collected by E",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C1 normal lesson opens D1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Empty submission is an explicit wrong answer",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM death cancels pending result timer",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "captures": [
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\RegionPuzzle\\puzzle-broadcast.png",
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\RegionPuzzle\\puzzle-false-input.png",
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\RegionPuzzle\\puzzle-camera-initial.png",
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\RegionPuzzle\\puzzle-camera-aligned.png",
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\RegionPuzzle\\puzzle-body-hidden-answer.png",
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\RegionPuzzle\\puzzle-success.png",
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\RegionPuzzle\\puzzle-checkpoint-b.png"
+  ],
+  "input": "Runtime handlers; real projectile collision; no physical keyboard/mouse",
+  "error": null,
+  "seconds": 106.64
+}

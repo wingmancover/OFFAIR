@@ -85,6 +85,7 @@ public partial class ARegionLoopDirector : AActor
             Health = MaximumHealth > 0 ? MaximumHealth : 500; AttemptId = 1; Initialized = true;
             PromptText = ""; ThoughtText = ""; FailureText = "";
             InitializeTutorial();
+            if (Initialized) InitializePuzzle();
         }
         if (!Alive(player) || !Alive(controller)) { FailureText = "Player unavailable. Restart PIE."; return; }
         if (RemoteActive && !Alive(remoteTarget)) ExitRemote(false);
@@ -101,6 +102,7 @@ public partial class ARegionLoopDirector : AActor
         }
         UpdateFocus();
         TickTutorial(delta);
+        TickPuzzle(delta);
         // Real engine input, independent of desktop focus automation. Never synthesize OS keys.
         foreach (var key in new[] { "F1", "E", "Q", "One", "Two", "Three", "Four", "Five", "Six", "Seven" })
             if (controller!.WasInputKeyJustPressed(new FKey(key))) HandleRegionInput(key);
@@ -130,6 +132,7 @@ public partial class ARegionLoopDirector : AActor
         focused = null; PromptText = "";
         if (!Initialized || Transition != 0 || RemoteActive) return;
         if (UpdateTutorialFocus()) return;
+        if (UpdatePuzzleFocus()) return;
         if (!CheckpointSaved && !NoteCollected && Alive(Note) && AimAt(Note, 330))
         { focused = Note; PromptText = "[E] Read the red note"; }
         else if (Alive(CheckpointTerminal) && AimAt(CheckpointTerminal, 360))
@@ -141,13 +144,14 @@ public partial class ARegionLoopDirector : AActor
     {
         if (!Initialized) return;
         if (key == "F1") { SetRegionFiring(false); GMOpen = !GMOpen; return; }
-        if (Transition != 0) return;
+        if (Transition != 0 || (PuzzleSubmitting && !(GMOpen && key == "One"))) return;
         if (key == "Q") { ExitRemote(); return; }
         if (key == "E")
         {
             if (RemoteActive) { ExitRemote(); return; }
             UpdateFocus(); // Never trust an old prompt when the player turns away.
             if (InteractTutorialFocus()) return;
+            if (InteractPuzzleFocus()) return;
             if (focused == Note) ReadNote();
             else if (focused == CheckpointTerminal) TrySaveCheckpoint();
             return;
@@ -207,6 +211,7 @@ public partial class ARegionLoopDirector : AActor
     private void BeginDeath(bool memory)
     {
         firstMemoryDeath = memory;
+        CancelPuzzleAttempt();
         ExitRemote(false); StopTutorialCombat(); Transition = 2; remaining = .65f; AttemptId++; DeathCount++; Health = 0;
         ThoughtText = ""; thoughtRemaining = 0; focused = null; PromptText = "";
         LockInput(true);
@@ -230,6 +235,7 @@ public partial class ARegionLoopDirector : AActor
             }
             NoteCollected = false; HasGun = false; HasAccessCard = false; CameraLearned = false;
             PuzzleSolved = false; PuzzleMask = 0; DebugPrepared = false;
+            ResetPuzzle();
         }
         else
         {
@@ -295,6 +301,7 @@ public partial class ARegionLoopDirector : AActor
         if (Alive(TestWeapon)) TestWeapon.ActorHiddenInGame = true;
         SetTutorialGate(true);
         PuzzleMask = 73;
+        RefreshPuzzleTiles();
         Say("GM TEST ONLY: prerequisites granted. Go to B and press E to save.");
     }
 
@@ -479,7 +486,7 @@ public partial class ARegionLoopDirector : AActor
     public void SetRegionFiring(bool firing)
     {
         if (!Alive(heldWeapon)) return;
-        FireTutorialWeapon(heldWeapon!, firing && HasGun && Transition == 0 && !RemoteActive && !GMOpen);
+        FireTutorialWeapon(heldWeapon!, firing && HasGun && Transition == 0 && !RemoteActive && !GMOpen && !PuzzleSubmitting);
     }
 
     [UFunction(FunctionFlags.BlueprintCallable)]
@@ -487,7 +494,9 @@ public partial class ARegionLoopDirector : AActor
     {
         if (!Initialized || Transition != 0 || !Alive(projectile) || !Alive(shooter) || !(shooter == player || guards.Contains(shooter)))
         { RetireProjectile(projectile); return false; }
-        regionProjectiles.Add(projectile); return true;
+        regionProjectiles.Add(projectile);
+        TrackPuzzleProjectile(projectile, shooter);
+        return true;
     }
 
     private void EnterTutorialRemote(AActor camera, bool lesson)
@@ -536,6 +545,7 @@ public partial class ARegionLoopDirector : AActor
 
     private void ClearProjectiles()
     {
+        puzzleShots.Clear();
         foreach (var a in regionProjectiles) RetireProjectile(a);
         regionProjectiles.Clear();
     }
@@ -599,7 +609,10 @@ public partial class ARegionLoopDirector : AActor
         ChosenWeapon=savedChoice;
     }
 
-    private string RepeatThought() => previousChoice==1
+    private string RepeatThought() => PuzzleFailedBefore
+        ? (puzzleEverObserved ? "The room reset, but I remember the real pattern. I still need my gun and access card."
+            : "The wrong pattern killed me. I can skip the note, rearm, and check the camera this time.")
+        : previousChoice==1
         ? "The amber pistol brought a crowd. Maybe I should choose the cyan one."
         : "I remember the note. I can skip it and go straight to the guns.";
 
@@ -627,4 +640,173 @@ public partial class ARegionLoopDirector : AActor
 
     private void Host(string text) { HostText=text; hostRemaining=7; }
 
+
+    [UProperty(PropertyFlags.EditAnywhere)] public partial IList<AActor> PuzzleTiles { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial AActor PuzzleCameraTarget { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial AActor PuzzlePatternTarget { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial AActor PuzzleSubmit { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial AActor PuzzleClear { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial AActor PuzzleArea { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial UMaterialInterface PuzzleOffMaterial { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial UMaterialInterface PuzzleOnMaterial { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial USoundBase PuzzleSuccessSound { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial USoundBase PuzzleFailureSound { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial int CorrectPatternMask { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial int BroadcastPatternMask { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool InPuzzleRoom { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool PatternObserved { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool PatternAligned { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool PuzzleFailedBefore { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool PuzzleSubmitting { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial int PuzzleSubmitCount { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial int PuzzleToggleCount { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial string PuzzleStatus { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool PuzzleRemote { get; set; }
+    private readonly Dictionary<AActor,(int Attempt,AActor Shooter)> puzzleShots = new(ReferenceEqualityComparer.Instance);
+    private bool puzzleIntroduced, puzzleFailurePending, puzzleEverObserved;
+    private float alignmentTime, puzzleResultTime;
+    private bool PuzzleReady => Initialized && Transition == 0 && !CheckpointSaved && !PuzzleSolved
+        && HasGun && HasAccessCard && CameraLearned && !PuzzleSubmitting;
+
+    private void InitializePuzzle()
+    {
+        if (PuzzleTiles.Count != 9 || PuzzleTiles.Any(a=>!Alive(a)) || !Alive(PuzzleCamera)
+            || !Alive(PuzzleCameraTarget) || !Alive(PuzzlePatternTarget) || !Alive(PuzzleSubmit)
+            || !Alive(PuzzleClear) || !Alive(PuzzleArea) || PuzzleOffMaterial is null || PuzzleOnMaterial is null
+            || CorrectPatternMask <= 0 || CorrectPatternMask > 511 || CorrectPatternMask == BroadcastPatternMask)
+        { Initialized=false; FailureText="SIGNAL LAB SETUP INCOMPLETE - check assigned references."; return; }
+        PuzzleStatus=""; RefreshPuzzleTiles();
+    }
+
+    private bool UpdatePuzzleFocus()
+    {
+        if (CheckpointSaved || PuzzleSubmitting) return false;
+        if (Alive(PuzzleCamera) && Alive(PuzzleCameraTarget) && AimAt(PuzzleCameraTarget,2000,.998))
+        { focused=PuzzleCamera; PromptText=HasAccessCard && CameraLearned ? "[E] Hack Signal Lab camera" : "Complete the training camera lesson first"; return true; }
+        foreach (var a in new[]{PuzzleSubmit,PuzzleClear})
+        {
+            if (!Alive(a) || !AimAt(a,360,.985)) continue;
+            focused=a;
+            PromptText=PuzzleSolved ? "PATTERN ACCEPTED / Exit unlocked" : !PuzzleReady ? "Weapon and camera access required"
+                : a==PuzzleSubmit ? "[E] Submit pattern / Wrong answer is lethal" : "[E] Clear all tiles / Safe";
+            return true;
+        }
+        return false;
+    }
+
+    private bool InteractPuzzleFocus()
+    {
+        if (focused==PuzzleCamera)
+        { if (HasAccessCard && CameraLearned && !PuzzleSubmitting) EnterTutorialRemote(PuzzleCamera,false); return true; }
+        if (focused==PuzzleClear)
+        { if (PuzzleReady) { PuzzleMask=0; RefreshPuzzleTiles(); Say("A clean board. I can try a different pattern.",3); } return true; }
+        if (focused!=PuzzleSubmit) return false;
+        if (!PuzzleReady) return true;
+        PuzzleSubmitCount++; SetRegionFiring(false); ClearProjectiles();
+        if (PuzzleMask==CorrectPatternMask)
+        {
+            ReportRegionProgress(AttemptId,3); PuzzleStatus="PATTERN ACCEPTED / EXIT UNLOCKED"; puzzleResultTime=3;
+            if (PuzzleSuccessSound is not null) UGameplayStatics.PlaySound2D(PuzzleSuccessSound,.65f);
+            Host(PatternObserved ? "You found your own answer. Ignoring my instructions? Well played. The door is yours."
+                : "Straight to the answer, without my reference? Confident. Well played. The door is yours.");
+            Say("That memory beyond the door... I should recover it before going any further.",7);
+        }
+        else
+        {
+            PuzzleSubmitting=true; puzzleFailurePending=true; puzzleResultTime=1.4f;
+            PuzzleStatus="PATTERN REJECTED / LETHAL RESET"; PuzzleFailedBefore=true;
+            Host(PuzzleMask==BroadcastPatternMask ? "You followed the broadcast perfectly. Unfortunately, that was the wrong answer."
+                : "That pattern doesn't belong here. End of the round.");
+            if (PuzzleFailureSound is not null) UGameplayStatics.PlaySound2D(PuzzleFailureSound,.65f);
+            LockInput(true);
+        }
+        return true;
+    }
+
+    private void TickPuzzle(float delta)
+    {
+        if (!Initialized) return;
+        PuzzleRemote=RemoteActive && remoteTarget==PuzzleCamera;
+        if (Alive(PuzzleArea) && Alive(player))
+        {
+            PuzzleArea.GetActorBounds(false,out var center,out var extent,false);
+            var q=player!.ActorLocation-center;
+            InPuzzleRoom=Math.Abs(q.X)<=extent.X && Math.Abs(q.Y)<=extent.Y && Math.Abs(q.Z)<=extent.Z;
+        }
+        if (Transition!=0) return;
+        if (PuzzleSolved && !string.IsNullOrEmpty(PuzzleStatus))
+        {
+            puzzleResultTime-=delta;
+            if (puzzleResultTime<=0) PuzzleStatus="";
+        }
+        if (puzzleFailurePending)
+        {
+            puzzleResultTime-=delta;
+            if (puzzleResultTime<=0) { puzzleFailurePending=false; ApplyRegionDamage(Health,AttemptId); }
+            return;
+        }
+        if (PuzzleReady && InPuzzleRoom && !puzzleIntroduced)
+        {
+            puzzleIntroduced=true;
+            Host("Welcome to the Signal Lab. Copy the amber broadcast reference, then submit. Simple instructions. Lethal consequences.");
+            Say(PuzzleFailedBefore ? "His reference killed me. The camera might show a different answer."
+                : "There is another camera here. Maybe I should look before I commit.",7);
+        }
+        PatternAligned=false;
+        if (PuzzleRemote && Alive(PuzzlePatternTarget) && HasAccessCard && CameraLearned && !CheckpointSaved)
+        {
+            var direction=PuzzlePatternTarget.ActorLocation-PuzzleCamera.ActorLocation;
+            var f=MathLibrary.GetForwardVector(PuzzleCamera.ActorRotation);
+            var cosine=(direction.X*f.X+direction.Y*f.Y+direction.Z*f.Z)/direction.Length();
+            PatternAligned=cosine>=Math.Cos(3*Math.PI/180);
+            alignmentTime=PatternAligned ? alignmentTime+delta : 0;
+            if (alignmentTime>=.7f && !PatternObserved)
+            {
+                PatternObserved=true; puzzleEverObserved=true;
+                Say("An L, not the broadcast's T. I'll reproduce what this camera shows.",7);
+            }
+        }
+        else alignmentTime=0;
+    }
+
+    private void TrackPuzzleProjectile(AActor projectile,AActor shooter)
+    {
+        if (puzzleShots.ContainsKey(projectile)) return;
+        puzzleShots[projectile]=(AttemptId,shooter);
+        projectile.OnActorHit.Add(OnPuzzleProjectileHit);
+        // Dead objects are removed here as well as on reset; no unbounded shot registry.
+        foreach(var old in puzzleShots.Keys.Where(a=>!Alive(a)).ToArray()) puzzleShots.Remove(old);
+    }
+
+    [UFunction]
+    public void OnPuzzleProjectileHit(AActor selfActor,AActor otherActor,FVector normalImpulse,FHitResult hit)
+    {
+        if (!puzzleShots.Remove(selfActor,out var shot) || shot.Attempt!=AttemptId || shot.Shooter!=player
+            || !PuzzleReady || RemoteActive || GMOpen || !Alive(otherActor)) return;
+        int index=PuzzleTiles.IndexOf(otherActor);
+        if (index<0) return;
+        PuzzleMask ^= 1<<index; PuzzleToggleCount++; RefreshPuzzleTiles();
+        // Template wall-impact effects may hide the tile. Retire safely after the Hit stack finishes.
+        RetireProjectile(selfActor);
+    }
+
+    private void RefreshPuzzleTiles()
+    {
+        for(int i=0;i<PuzzleTiles.Count;i++)
+            if(Alive(PuzzleTiles[i]))
+                foreach(var mesh in PuzzleTiles[i].GetComponentsByClass<UStaticMeshComponent>())
+                    mesh.SetMaterial(0,(PuzzleMask&(1<<i))!=0 ? PuzzleOnMaterial : PuzzleOffMaterial);
+    }
+
+    private void CancelPuzzleAttempt()
+    {
+        puzzleFailurePending=false; PuzzleSubmitting=false; puzzleResultTime=0; alignmentTime=0;
+        PatternAligned=false; PuzzleRemote=false; PuzzleStatus=""; puzzleShots.Clear();
+    }
+
+    private void ResetPuzzle()
+    {
+        CancelPuzzleAttempt(); PatternObserved=false; puzzleIntroduced=false; InPuzzleRoom=false;
+        RefreshPuzzleTiles();
+    }
 }

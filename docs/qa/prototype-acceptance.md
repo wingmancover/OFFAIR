@@ -1,5 +1,7 @@
 # OFFAIR 原型验收清单
 
+第 4 步按[谜题房规范](../design/region-puzzle.md)检查：C2 权限／距离／遮挡、初始偏离与鼠标寻图、仅 C2 可见真图案、真实子弹切换与重复命中保护、CLEAR 安全、SUBMIT 正误、重复输入和错误倒计时清理、A—B 整区重置、知识直答、正常开门和 B 保存。需继续复核第三步空手动画和子弹延迟清理。自动入口为 `Tools/unreal/validate_region_puzzle.py`，物理操作与音效听感仍需用户试玩。实际结果见[第 4 步验证](region-puzzle-validation.md)。
+
 第 3 步按[教学房规范](../design/region-tutorial.md)验收：首次记忆门槛、两枪 10／2 分支、真实子弹清场、最后掉卡、距离与遮挡、C1 转动退出条件、重置与 B 库存恢复、GM 移除无奖励、R 禁用、C2 初始偏离答案。实际结果与物理键鼠待确认项见[第 3 步验证](region-tutorial-validation.md)。
 
 2026-11-08 新区域按[双房间六步计划](../design/two-room-layout.md)另行推进。第 1 步的尺度、碰撞、导航及步行验收见[布局验证](two-room-layout-validation.md)；本页旧原型 T/G 结果不能用于宣称新区域玩法已实现。

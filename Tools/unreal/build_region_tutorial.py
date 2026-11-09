@@ -172,5 +172,8 @@ def build():
         'compiled':[a.get_path_name() for a in [bp,player,bullet,*weapons,guard,hud,mode]],
         'guard_spawns':10,'player_maximum_health':500,'old_prototype_modified':False},indent=2),encoding='utf-8')
     u.log('OFFAIR_REGION_TUTORIAL_AUTHORED')
+    # Rebuilding the teaching adapters must preserve the current puzzle-room references.
+    import build_region_puzzle
+    build_region_puzzle.build()
 
 if __name__=='__main__':build()

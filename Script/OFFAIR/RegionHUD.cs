@@ -51,7 +51,8 @@ public partial class ARegionHUD : AHUD
         DrawRect(white,sizeX/2f-3,sizeY/2f-1,6,2);
         string objective = d.CheckpointSaved ? "MEMORY B / SESSION SAVED" : !d.MemoryExperienced ? "FIND THE RED NOTE"
             : !d.HasGun ? "CHOOSE A WEAPON" : d.LivingGuards > 0 ? $"CLEAR THE ROOM / {d.LivingGuards} GUARDS"
-            : !d.HasAccessCard ? "COLLECT THE ACCESS CARD" : !d.CameraLearned ? "TAKE CONTROL OF THE TRAINING CAMERA" : "ENTER THE SIGNAL LAB";
+            : !d.HasAccessCard ? "COLLECT THE ACCESS CARD" : !d.CameraLearned ? "TAKE CONTROL OF THE TRAINING CAMERA"
+            : d.PuzzleSolved ? "RECOVER MEMORY B BEYOND THE DOOR" : d.InPuzzleRoom || d.PuzzleRemote ? "FIND THE PATTERN / SHOOT / SUBMIT" : "ENTER THE SIGNAL LAB";
         const string controls="WASD Move   SPACE Jump   E Interact   LMB Fire   F1 GM";
         GetTextSize(objective,out var objectiveWidth,out var objectiveHeight,PlayFont,1);
         GetTextSize(controls,out var controlsWidth,out var controlsHeight,SmallPlayFont,1);
@@ -66,7 +67,12 @@ public partial class ARegionHUD : AHUD
         if (!string.IsNullOrEmpty(d.PromptText)) Panel(d.PromptText,sizeY*.70f,white);
         if (!string.IsNullOrEmpty(d.HostText)) Panel("HOST: " + d.HostText,sizeY-180*scale,new FLinearColor(1,.75f,.3f,1));
         if (!string.IsNullOrEmpty(d.ThoughtText)) Panel(d.ThoughtText,sizeY-124*scale,cyan);
-        if (d.RemoteActive) Panel(d.LessonTurned ? "CAMERA / E or Q to return" : "CAMERA / Move mouse to look around / E or Q to return",controlsY+controlsHeight+30,cyan);
+        if (d.RemoteActive) Panel(d.PuzzleRemote ? (d.PatternAligned ? "SIGNAL ALIGNED / Remember the pattern / E or Q to return"
+            : "SIGNAL CAMERA / Find the cyan fragments and center them / E or Q to return")
+            : d.LessonTurned ? "CAMERA / E or Q to return" : "CAMERA / Move mouse to look around / E or Q to return",controlsY+controlsHeight+30,cyan);
+        if (d.InPuzzleRoom && !d.RemoteActive && !d.PuzzleSolved && !d.PuzzleSubmitting)
+            Panel("Shoot tiles to toggle / Clear is safe / Only SUBMIT judges your answer",controlsY+controlsHeight+30,cyan);
+        if (!string.IsNullOrEmpty(d.PuzzleStatus)) Panel(d.PuzzleStatus,sizeY*.38f,d.PuzzleSubmitting ? new FLinearColor(1,.3f,.2f,1) : cyan);
         if (d.GMOpen)
         {
             DrawRect(dark,20*scale,150*scale,790*scale,330*scale);
@@ -78,7 +84,7 @@ public partial class ARegionHUD : AHUD
                 "3  Teleport near B (does not save)",
                 "4  Add guard (teaching fight only)",
                 "5  Remove guard (NO kill credit / NO card reward)",
-                "6  Training camera / 7  Puzzle camera preview",
+                "6  Training camera / 7  Puzzle camera",
                 $"Kills {d.KilledGuards}  Alive {d.LivingGuards}  Card reward eligible {d.WaveRewardEligible}"
             };
             for (int i=0;i<rows.Length;i++) DrawText(rows[i],white,32*scale,(164+i*32)*scale,null,1.7f*scale);

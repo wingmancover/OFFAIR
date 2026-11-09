@@ -83,3 +83,7 @@ python Tools/unrealsharp.py editor-rebuild-test
 ## 双房间第 4 步
 
 谜题仍由同一 `RegionLoopDirector.cs` 管理，子弹注册时绑定原生碰撞通知，不修改共享模板蓝图。增量作者入口为 `Tools/unreal/build_region_puzzle.py`，正常流程回归为 `Tools/unreal/validate_region_puzzle.py`；后者需渲染离屏截图。当前源生成器要求新增反射成员与带 UClass 的声明在同一文件，不能把 UProperty 随意拆入无 UClass 标记的 partial 文件。作者脚本只在内存编译既有导演／HUD 蓝图，地图保存新引用；不为未变更的图表额外重存资产。
+
+## 双房间第 5 步
+
+`build_region_presentation.py` 增量保存观景相机、触发区和 K1／K2 引用；谜题作者入口末尾会接回本步。`validate_region_presentation.py` 复用可导入的谜题验证辅助函数，正式运行谜题验证脚本仍按原入口启动。逐句字幕和观景状态仍归同一会话导演管理；HUD 只绘制单个 SubtitleText 通道。当前显示尺寸诊断是 PIE 视口尺寸，HighResShot 后会恢复，不应混称为实际显示器分辨率测试。

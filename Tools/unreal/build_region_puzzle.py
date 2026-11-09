@@ -98,5 +98,7 @@ def build():
     (OUT/'build-result.json').write_text(json.dumps({'status':'authored','tiles':9,'true_mask':457,
         'false_mask':151,'camera_fov':50,'camera_only_pieces':len(pieces),'map':layout.MAP},indent=2))
     u.log('OFFAIR_REGION_PUZZLE_AUTHORED')
+    import build_region_presentation
+    build_region_presentation.build()
 
 if __name__=='__main__':build()

@@ -184,7 +184,7 @@ def finish(error=None):
     (OUT/'puzzle-result.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
     u.unregister_slate_post_tick_callback(handle);L.editor_request_end_play()
     u.EditorPythonScripting.set_keep_python_script_alive(False);u.SystemLibrary.quit_editor()
-job=run()
+job=None
 def tick(dt):
     global busy,wait
     if busy:return
@@ -196,6 +196,10 @@ def tick(dt):
     except StopIteration:finish()
     except Exception:finish(traceback.format_exc())
     finally:busy=False
-OUT.mkdir(parents=True,exist_ok=True)
-u.EditorPythonScripting.set_keep_python_script_alive(True)
-handle=u.register_slate_post_tick_callback(tick)
+def start():
+    global job,handle,started
+    started=time.monotonic();job=run()
+    OUT.mkdir(parents=True,exist_ok=True)
+    u.EditorPythonScripting.set_keep_python_script_alive(True)
+    handle=u.register_slate_post_tick_callback(tick)
+if __name__=='__main__':start()

@@ -1,6 +1,6 @@
 # Signal Lab：摄像头与射击谜题（第 4 步）
 
-2026-11-08，地图 `/Game/OFFAIR/Levels/Lvl_TwoRoom_Blockout`。用户授权实现、测试和保存；不打包，Git 提交／上传由用户处理。教学房维持琥珀 10 名、青色 2 名；本房间不生成敌人。完整 UI、叙事时序和观景镜头仍为第 5 步。
+2026-11-08，地图 `/Game/OFFAIR/Levels/Lvl_TwoRoom_Blockout`。用户授权实现、测试和保存；不打包，Git 提交／上传由用户处理。教学房维持琥珀 10 名、青色 2 名；本房间不生成敌人。第 5 步已接入逐句叙事、游玩 UI 和 B 后观景，见[呈现规范](region-presentation.md)。
 
 ## 正常流程与操作
 
@@ -30,7 +30,7 @@
 - 进入谜题房，主持人推荐假图案并说明提交有致命风险；主角提醒可以观察摄像头。失败后的心理文字提示重取装备、改查摄像头。
 - 观察真图案后成功：“You found your own answer. Ignoring my instructions? Well played. The door is yours.”
 - 没有观察 C2 就直接答对：“Straight to the answer, without my reference? Confident. Well played. The door is yours.”
-- 提交假 T：“You followed the broadcast perfectly. Unfortunately, that was the wrong answer.” 其他错误有普通拒绝台词。主持人不提上次循环，不表现出知道主角复活。
+- 第 5 步将错误提交台词缩短为 “Wrong answer.”，让它能在 1.4 秒反馈内读完；完整判定仍由系统结果提示表达。主持人不提上次循环，不表现出知道主角复活。
 - 提交成功／失败各接入一个原创短提示音；不添加配音或音乐。
 
 ## 重置与保留

@@ -4,97 +4,141 @@ using UnrealSharp.Engine;
 
 namespace Offair.Managed;
 
-/// <summary>Readable prototype HUD; debug content appears only behind F1. Final art/dialogue is step 5.</summary>
+/// <summary>One subtitle channel, compact gameplay hierarchy, separate optional diagnostics.</summary>
 [UClass]
 public partial class ARegionHUD : AHUD
 {
     [UProperty(PropertyFlags.EditAnywhere)] public partial UFont PlayFont { get; set; }
     [UProperty(PropertyFlags.EditAnywhere)] public partial UFont SmallPlayFont { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial int CanvasWidth { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial int CanvasHeight { get; set; }
     private ARegionLoopDirector? director;
-    public override void ReceiveDrawHUD(int sizeX, int sizeY)
+    public override void ReceiveDrawHUD(int sizeX,int sizeY)
     {
-        if (director is null || !SystemLibrary.IsValid(director))
+        CanvasWidth=sizeX;CanvasHeight=sizeY;
+        if(director is null || !SystemLibrary.IsValid(director))
+        { UGameplayStatics.GetAllActorsOfClass<ARegionLoopDirector>(out var found);director=found.FirstOrDefault(); }
+        if(director is null) return;
+        var d=director;
+        float s=Math.Clamp(Math.Min(sizeX/1600f,sizeY/900f),.5f,1.6f),m=32*s;
+        var white=new FLinearColor(.94f,.97f,1,1);
+        var muted=new FLinearColor(.58f,.68f,.74f,1);
+        var cyan=new FLinearColor(.28f,.86f,.96f,1);
+        var amber=new FLinearColor(1,.74f,.32f,1);
+        var red=new FLinearColor(1,.31f,.25f,1);
+        var dark=new FLinearColor(.005f,.012f,.02f,.87f);
+        void Text(string text,float x,float y,FLinearColor color,bool small=false)
+            => DrawText(text,color,x,y,small ? SmallPlayFont : PlayFont,s);
+        void RightText(string text,float y,FLinearColor color,bool small=true)
         {
-            UGameplayStatics.GetAllActorsOfClass<ARegionLoopDirector>(out var found);
-            director = found.FirstOrDefault();
+            GetTextSize(text,out var width,out _,small ? SmallPlayFont : PlayFont,s);
+            Text(text,sizeX-m-width,y,color,small);
         }
-        if (director is null) return;
-        var d = director;
-        float scale = Math.Clamp(sizeX / 1600f, .65f, 1.7f);
-        void Text(string s, float x, float y, FLinearColor color, float font = 1)
-            => DrawText(s, color, x, y, font < 1 ? SmallPlayFont : PlayFont, 1);
-        var white = new FLinearColor(.96f,.98f,1,1);
-        var cyan = new FLinearColor(.3f,.86f,1,1);
-        var dark = new FLinearColor(.007f,.016f,.025f,.94f);
-        void Panel(string s, float y, FLinearColor color)
+        List<string> Wrap(string text,float width,bool small=false)
         {
-            var lines = new List<string>(); string line = "";
-            foreach (var word in s.Split(' '))
+            var lines=new List<string>();string line="";
+            foreach(var word in text.Split(' ',StringSplitOptions.RemoveEmptyEntries))
             {
-                var candidate = line.Length == 0 ? word : line + " " + word;
-                GetTextSize(candidate, out var width, out _, PlayFont, 1);
-                if (width > sizeX - 80 && line.Length > 0) { lines.Add(line); line = word; }
-                else line = candidate;
+                var next=line.Length==0 ? word : line+" "+word;
+                GetTextSize(next,out var w,out _,small ? SmallPlayFont : PlayFont,s);
+                if(w>width && line.Length>0) { lines.Add(line);line=word; } else line=next;
             }
-            lines.Add(line);
-            GetTextSize("Ag", out _, out var lineHeight, PlayFont, 1);
-            float spacing = lineHeight + 4;
-            // Wrap upward, keeping host and inner-thought subtitles in separate bottom slots.
-            for (int i=0; i<lines.Count; i++)
+            if(line.Length>0) lines.Add(line);
+            return lines;
+        }
+        void Card(string text,float centerY,FLinearColor color,float maxWidth=850)
+        {
+            var lines=Wrap(text,Math.Min(maxWidth*s,sizeX-2*m)-32*s,true);
+            if(lines.Count==0) return;
+            float w=0;
+            foreach(var line in lines) { GetTextSize(line,out var lw,out _,SmallPlayFont,s);w=Math.Max(w,lw); }
+            float h=(lines.Count*27+16)*s,x=(sizeX-w-32*s)/2,y=centerY-h/2;
+            DrawRect(dark,x,y,w+32*s,h);DrawRect(color,x,y,3*s,h);
+            for(int i=0;i<lines.Count;i++) Text(lines[i],x+16*s,y+(8+i*27)*s,color,true);
+        }
+        string objective=d.CheckpointSaved ? (d.VistaPlayed ? "Explore the overlook" : "Step onto the overlook")
+            : !d.MemoryExperienced ? "Find the red note" : !d.HasGun ? "Choose a weapon"
+            : d.LivingGuards>0 ? $"Clear the room  /  {d.LivingGuards} remaining"
+            : !d.HasAccessCard ? "Collect the access card" : !d.CameraLearned ? "Take control of the training camera"
+            : d.PuzzleSolved ? "Recover memory B beyond the door" : d.InPuzzleRoom || d.PuzzleRemote ? "Find the pattern. Reproduce it. Submit." : "Enter the Signal Lab";
+        if(!d.VistaActive && d.Transition==0)
+        {
+            float panelW=Math.Min(560*s,sizeX*.48f);
+            var objectives=Wrap(objective,panelW-36*s,true);
+            float panelH=(44+objectives.Count*27)*s;
+            DrawRect(dark,m,m,panelW,panelH);DrawRect(cyan,m,m,3*s,panelH);
+            Text(d.CheckpointSaved ? "MEMORY B  /  SAVED" : d.InPuzzleRoom ? "02  /  SIGNAL LAB" : "OFF AIR  /  CURRENT OBJECTIVE",m+16*s,m+10*s,cyan,true);
+            for(int i=0;i<objectives.Count;i++) Text(objectives[i],m+16*s,m+(40+i*27)*s,white,true);
+            RightText("F1  /  GM",m,muted);
+            if(d.RemoteActive)
             {
-                GetTextSize(lines[i],out var w,out _,PlayFont,1);
-                float x=(sizeX-w)/2, top=y-(lines.Count-1-i)*spacing;
-                DrawRect(dark,x-16,top-4,w+32,spacing);
-                Text(lines[i],x,top,color);
+                string hint=d.PuzzleRemote ? (d.PatternAligned ? "SIGNAL ALIGNED" : "FIND THE CYAN SIGNAL") : "TRAINING CAMERA";
+                RightText(hint,m+36*s,cyan);
+                RightText("MOUSE  Look   E / Q  Return",m+66*s,white);
+                float r=22*s,cx=sizeX/2f,cy=sizeY/2f;
+                DrawLine(cx-r,cy-r,cx-r/2,cy-r,cyan,s);DrawLine(cx-r,cy-r,cx-r,cy-r/2,cyan,s);
+                DrawLine(cx+r,cy+r,cx+r/2,cy+r,cyan,s);DrawLine(cx+r,cy+r,cx+r,cy+r/2,cyan,s);
             }
+            else
+            {
+                DrawRect(white,sizeX/2f-2*s,sizeY/2f-s,4*s,2*s);
+                DrawRect(dark,m,sizeY-m-64*s,180*s,64*s);
+                Text($"HEALTH  {Math.Ceiling(d.Health)}",m+12*s,sizeY-m-55*s,d.Health<d.MaximumHealth*.25 ? red : white,true);
+                DrawRect(muted,m+12*s,sizeY-m-15*s,152*s,3*s);
+                DrawRect(cyan,m+12*s,sizeY-m-15*s,152*s*Math.Clamp(d.Health/Math.Max(1,d.MaximumHealth),0,1),3*s);
+                if(d.HasGun)
+                {
+                    string ammo=$"{d.Ammo:00}  /  AMMO";
+                    GetTextSize(ammo,out var width,out _,PlayFont,s);
+                    float x=sizeX-m-width-24*s;
+                    DrawRect(dark,x,sizeY-m-64*s,width+24*s,64*s);
+                    Text(ammo,x+12*s,sizeY-m-52*s,white);
+                }
+            }
+            if(!string.IsNullOrEmpty(d.PromptText)) Card(d.PromptText,sizeY*.64f,white);
+            else if(d.InPuzzleRoom && !d.PuzzleSolved && !d.RemoteActive && !d.PuzzleSubmitting)
+                Card("LMB  Toggle tile     E at console  Clear / Submit",sizeY*.64f,muted,660);
+            else if(!d.MemoryExperienced)
+                Text("WASD  Move     SPACE  Jump     E  Interact",m,sizeY-m-104*s,muted,true);
+            if(!string.IsNullOrEmpty(d.PuzzleStatus)) Card(d.PuzzleStatus,sizeY*.38f,d.PuzzleSubmitting ? red : cyan);
+            if(!string.IsNullOrEmpty(d.NoticeText)) Card(d.NoticeText,sizeY*.27f,cyan);
         }
-        DrawRect(white,sizeX/2f-3,sizeY/2f-1,6,2);
-        string objective = d.CheckpointSaved ? "MEMORY B / SESSION SAVED" : !d.MemoryExperienced ? "FIND THE RED NOTE"
-            : !d.HasGun ? "CHOOSE A WEAPON" : d.LivingGuards > 0 ? $"CLEAR THE ROOM / {d.LivingGuards} GUARDS"
-            : !d.HasAccessCard ? "COLLECT THE ACCESS CARD" : !d.CameraLearned ? "TAKE CONTROL OF THE TRAINING CAMERA"
-            : d.PuzzleSolved ? "RECOVER MEMORY B BEYOND THE DOOR" : d.InPuzzleRoom || d.PuzzleRemote ? "FIND THE PATTERN / SHOOT / SUBMIT" : "ENTER THE SIGNAL LAB";
-        const string controls="WASD Move   SPACE Jump   E Interact   LMB Fire   F1 GM";
-        GetTextSize(objective,out var objectiveWidth,out var objectiveHeight,PlayFont,1);
-        GetTextSize(controls,out var controlsWidth,out var controlsHeight,SmallPlayFont,1);
-        float left=20*scale, topEdge=20*scale, controlsY=topEdge+objectiveHeight+14;
-        DrawRect(dark,left,topEdge,Math.Max(objectiveWidth,controlsWidth)+24,objectiveHeight+controlsHeight+24);
-        Text(objective,left+12,topEdge+6,white);
-        Text(controls,left+12,controlsY,cyan,.72f);
-        string health=$"HEALTH {Math.Ceiling(d.Health)} / {d.MaximumHealth:0}"+(d.HasGun ? $"    AMMO {d.Ammo}" : "");
-        GetTextSize(health,out var healthWidth,out var healthHeight,SmallPlayFont,1);
-        DrawRect(dark,left,sizeY-72*scale,healthWidth+24,healthHeight+16);
-        Text(health,left+12,sizeY-72*scale+6,white,.8f);
-        if (!string.IsNullOrEmpty(d.PromptText)) Panel(d.PromptText,sizeY*.70f,white);
-        if (!string.IsNullOrEmpty(d.HostText)) Panel("HOST: " + d.HostText,sizeY-180*scale,new FLinearColor(1,.75f,.3f,1));
-        if (!string.IsNullOrEmpty(d.ThoughtText)) Panel(d.ThoughtText,sizeY-124*scale,cyan);
-        if (d.RemoteActive) Panel(d.PuzzleRemote ? (d.PatternAligned ? "SIGNAL ALIGNED / Remember the pattern / E or Q to return"
-            : "SIGNAL CAMERA / Find the cyan fragments and center them / E or Q to return")
-            : d.LessonTurned ? "CAMERA / E or Q to return" : "CAMERA / Move mouse to look around / E or Q to return",controlsY+controlsHeight+30,cyan);
-        if (d.InPuzzleRoom && !d.RemoteActive && !d.PuzzleSolved && !d.PuzzleSubmitting)
-            Panel("Shoot tiles to toggle / Clear is safe / Only SUBMIT judges your answer",controlsY+controlsHeight+30,cyan);
-        if (!string.IsNullOrEmpty(d.PuzzleStatus)) Panel(d.PuzzleStatus,sizeY*.38f,d.PuzzleSubmitting ? new FLinearColor(1,.3f,.2f,1) : cyan);
-        if (d.GMOpen)
+        if(d.VistaActive)
         {
-            DrawRect(dark,20*scale,150*scale,790*scale,330*scale);
-            string[] rows = {
-                "GM / TEACHING ROOM - F1 CLOSE",
-                $"Attempt {d.AttemptId}   Deaths {d.DeathCount}   HP {d.Health:0}   B {d.CheckpointSaved}",
-                $"Gun {d.HasGun}   Card {d.HasAccessCard}   Camera {d.CameraLearned}   Puzzle {d.PuzzleSolved}",
-                "1  Die / retry     2  TEST ONLY: grant B prerequisites",
-                "3  Teleport near B (does not save)",
-                "4  Add guard (teaching fight only)",
-                "5  Remove guard (NO kill credit / NO card reward)",
-                "6  Training camera / 7  Puzzle camera",
-                $"Kills {d.KilledGuards}  Alive {d.LivingGuards}  Card reward eligible {d.WaveRewardEligible}"
-            };
-            for (int i=0;i<rows.Length;i++) DrawText(rows[i],white,32*scale,(164+i*32)*scale,null,1.7f*scale);
+            DrawRect(new FLinearColor(0,0,0,1),0,0,sizeX,48*s);
+            DrawRect(new FLinearColor(0,0,0,1),0,sizeY-48*s,sizeX,48*s);
+            Text("MEMORY B SECURED",m,12*s,muted,true);
+            RightText("SPACE  Skip view",12*s,white);
         }
-        if (d.Transition != 0)
+        // A single card: host and inner voice never occupy simultaneous subtitle slots.
+        if(d.Transition==0 && !string.IsNullOrEmpty(d.SubtitleText))
         {
-            DrawRect(new FLinearColor(.005f,.008f,.015f,.90f),0,0,sizeX,sizeY);
-            Panel(d.Transition == 1 ? "MEMORY OVERLOAD" : "OFF AIR / REWINDING",sizeY*.45f,white);
-            Panel(d.Transition == 1 ? "The memory is tearing through me..." : "Returning to the last memory anchor...",sizeY*.53f,cyan);
+            float w=Math.Min(940*s,sizeX-2*m),x=(sizeX-w)/2;
+            var lines=Wrap(d.SubtitleText,w-48*s);
+            float h=(48+lines.Count*34)*s,y=sizeY-122*s-h;
+            var color=d.SubtitleSpeaker==1 ? amber : cyan;
+            DrawRect(dark,x,y,w,h);DrawRect(color,x,y,3*s,h);
+            Text(d.SubtitleSpeaker==1 ? "HOST  /  BROADCAST" : "INNER VOICE",x+22*s,y+10*s,color,true);
+            for(int i=0;i<lines.Count;i++) Text(lines[i],x+22*s,y+(42+i*34)*s,white);
         }
-        if (!string.IsNullOrEmpty(d.FailureText)) Panel(d.FailureText,sizeY*.25f,new FLinearColor(1,.25f,.2f,1));
+        if(d.GMOpen)
+        {
+            string[] rows={"GM  /  F1 CLOSE",$"Attempt {d.AttemptId}   Deaths {d.DeathCount}   HP {d.Health:0}   B {d.CheckpointSaved}",
+                $"Gun {d.HasGun}  Card {d.HasAccessCard}  Camera {d.CameraLearned}  Puzzle {d.PuzzleSolved}",
+                "1 Die / retry     2 TEST ONLY: grant B prerequisites","3 Teleport near B (does not save)",
+                "4 Add guard     5 Remove guard (NO reward)","6 Training camera     7 Puzzle camera",
+                $"Kills {d.KilledGuards}  Alive {d.LivingGuards}  Reward {d.WaveRewardEligible}",
+                $"Dialogue queued {d.DialogueQueueCount}  Vista {d.VistaActive} / played {d.VistaPlayed}"};
+            float w=Math.Min(820*s,sizeX-2*m),y=140*s;
+            DrawRect(new FLinearColor(.005f,.012f,.02f,.98f),m,y,w,(rows.Length*30+24)*s);
+            for(int i=0;i<rows.Length;i++) Text(rows[i],m+14*s,y+(12+i*30)*s,white,true);
+        }
+        if(d.Transition!=0)
+        {
+            DrawRect(new FLinearColor(.003f,.007f,.012f,.96f),0,0,sizeX,sizeY);
+            Card(d.Transition==1 ? "MEMORY OVERLOAD" : "OFF AIR / REWINDING",sizeY*.46f,white);
+            Card(d.Transition==1 ? "The memory is tearing through me..." : "Returning to the last memory anchor...",sizeY*.55f,cyan);
+        }
+        if(!string.IsNullOrEmpty(d.FailureText)) Card(d.FailureText,sizeY*.3f,red);
     }
 }

@@ -103,8 +103,10 @@ public partial class ARegionLoopDirector : AActor
         UpdateFocus();
         TickTutorial(delta);
         TickPuzzle(delta);
+        TickVista(delta);
+        TickNarrative(delta);
         // Real engine input, independent of desktop focus automation. Never synthesize OS keys.
-        foreach (var key in new[] { "F1", "E", "Q", "One", "Two", "Three", "Four", "Five", "Six", "Seven" })
+        foreach (var key in new[] { "F1", "E", "Q", "SpaceBar", "One", "Two", "Three", "Four", "Five", "Six", "Seven" })
             if (controller!.WasInputKeyJustPressed(new FKey(key))) HandleRegionInput(key);
         if (controller!.WasInputKeyJustReleased(new FKey("LeftMouseButton"))) SetRegionFiring(false);
         if (controller.WasInputKeyJustPressed(new FKey("LeftMouseButton"))) SetRegionFiring(true);
@@ -130,7 +132,7 @@ public partial class ARegionLoopDirector : AActor
     private void UpdateFocus()
     {
         focused = null; PromptText = "";
-        if (!Initialized || Transition != 0 || RemoteActive) return;
+        if (!Initialized || Transition != 0 || RemoteActive || VistaActive) return;
         if (UpdateTutorialFocus()) return;
         if (UpdatePuzzleFocus()) return;
         if (!CheckpointSaved && !NoteCollected && Alive(Note) && AimAt(Note, 330))
@@ -145,6 +147,12 @@ public partial class ARegionLoopDirector : AActor
         if (!Initialized) return;
         if (key == "F1") { SetRegionFiring(false); GMOpen = !GMOpen; return; }
         if (Transition != 0 || (PuzzleSubmitting && !(GMOpen && key == "One"))) return;
+        if (VistaActive)
+        {
+            if (key == "SpaceBar" || key == "E" || key == "Q") ReturnFromVista(true);
+            else if (GMOpen && key == "One") RequestRegionDeath(AttemptId);
+            return;
+        }
         if (key == "Q") { ExitRemote(); return; }
         if (key == "E")
         {
@@ -175,6 +183,7 @@ public partial class ARegionLoopDirector : AActor
         foreach (var a in NoteParts) if (Alive(a)) { a.ActorHiddenInGame = true; a.ActorEnableCollision = false; }
         if (!MemoryExperienced)
         {
+            ClearDialogue();
             Transition = 1; remaining = 3; ThoughtText = ""; thoughtRemaining = 0;
             LockInput(true);
         }
@@ -211,6 +220,7 @@ public partial class ARegionLoopDirector : AActor
     private void BeginDeath(bool memory)
     {
         firstMemoryDeath = memory;
+        FinishVista(); ClearDialogue(); NoticeText=""; noticeRemaining=0;
         CancelPuzzleAttempt();
         ExitRemote(false); StopTutorialCombat(); Transition = 2; remaining = .65f; AttemptId++; DeathCount++; Health = 0;
         ThoughtText = ""; thoughtRemaining = 0; focused = null; PromptText = "";
@@ -291,7 +301,7 @@ public partial class ARegionLoopDirector : AActor
 
     private void DebugPrepareCheckpoint()
     {
-        if (!MemoryExperienced) { Say("TEST SETUP requires the first note / memory death first."); return; }
+        if (!MemoryExperienced) { Notice("TEST SETUP requires the first note / memory death first."); return; }
         if (CheckpointSaved) return;
         DebugPrepared = true;
         StopTutorialCombat();
@@ -302,14 +312,14 @@ public partial class ARegionLoopDirector : AActor
         SetTutorialGate(true);
         PuzzleMask = 73;
         RefreshPuzzleTiles();
-        Say("GM TEST ONLY: prerequisites granted. Go to B and press E to save.");
+        Notice("GM TEST ONLY: prerequisites granted. Go to B and press E to save.");
     }
 
     private void TrySaveCheckpoint()
     {
         if (CheckpointSaved || Transition != 0) return;
         if (!(MemoryExperienced && HasGun && HasAccessCard && CameraLearned && PuzzleSolved))
-        { Say("Memory locked: weapon, camera access, camera learning and puzzle completion required."); return; }
+        { Notice("Memory locked: complete the weapon, camera and puzzle objectives."); return; }
         ExitRemote();
         savedGun = HasGun; savedCard = HasAccessCard; savedLearned = CameraLearned;
         savedNote = NoteCollected; savedMask = PuzzleMask; savedDebug = DebugPrepared;
@@ -318,10 +328,16 @@ public partial class ARegionLoopDirector : AActor
         ClearProjectiles();
         transients.Clear(); // Remaining A-B actors now belong to the frozen, completed region.
         if (SaveSound is not null) { UGameplayStatics.PlaySound2D(SaveSound, .65f); SaveSoundCount++; }
-        Say("MEMORY RECOVERED / Checkpoint B saved for this session.");
+        ClearDialogue();
+        Notice("MEMORY B RECOVERED / Progress saved for this session.");
+        Say("This memory is mine. I won't lose what I've learned here.");
     }
 
-    private void Say(string text, float seconds = 5) { ThoughtText = text; thoughtRemaining = seconds; }
+    private void Say(string text, float seconds = 5, string guard = "")
+    {
+        ThoughtText=text; thoughtRemaining=seconds; // Last-event diagnostics, not parallel HUD subtitles.
+        QueueDialogue(text,2,guard);
+    }
 
     // Teaching room: template adapters, encounters, and camera lesson.
 
@@ -486,7 +502,7 @@ public partial class ARegionLoopDirector : AActor
     public void SetRegionFiring(bool firing)
     {
         if (!Alive(heldWeapon)) return;
-        FireTutorialWeapon(heldWeapon!, firing && HasGun && Transition == 0 && !RemoteActive && !GMOpen && !PuzzleSubmitting);
+        FireTutorialWeapon(heldWeapon!, firing && HasGun && Transition == 0 && !RemoteActive && !GMOpen && !PuzzleSubmitting && !VistaActive);
     }
 
     [UFunction(FunctionFlags.BlueprintCallable)]
@@ -621,7 +637,7 @@ public partial class ARegionLoopDirector : AActor
         if (key == "Four")
         {
             if (!HasGun || CardDropped || HasAccessCard || CameraLearned || CheckpointSaved || guards.Count>=16)
-            { Say("GM: add guards during the teaching fight only (limit 16)."); return; }
+            { Notice("GM: add guards during the teaching fight only (limit 16)."); return; }
             var guard=SpawnTutorialGuard(GuardSpawnPoints[guards.Count%GuardSpawnPoints.Count].ActorTransform);
             if (Alive(guard)) { TrackGuard(guard); requiredKills++; }
         }
@@ -630,7 +646,7 @@ public partial class ARegionLoopDirector : AActor
             var guard=guards.LastOrDefault(a=>Alive(a)&&GetTutorialGuardHealth(a)>0);
             if (guard is null) return;
             WaveRewardEligible=false; guards.Remove(guard); RemoveTutorialGuard(guard);
-            Say("GM removed a guard: no kill credit or card reward. Retry to restore the encounter.");
+            Notice("GM removed a guard: no kill credit or card reward. Retry to restore the encounter.");
         }
         if (key == "Six" && Alive(TutorialCamera))
         { GMOpen=false; EnterTutorialRemote(TutorialCamera,HasAccessCard); }
@@ -638,7 +654,11 @@ public partial class ARegionLoopDirector : AActor
         { GMOpen=false; EnterTutorialRemote(PuzzleCamera,false); }
     }
 
-    private void Host(string text) { HostText=text; hostRemaining=7; }
+    private void Host(string text, string guard = "")
+    {
+        HostText=text; hostRemaining=7;
+        QueueDialogue(text,1,guard);
+    }
 
 
     [UProperty(PropertyFlags.EditAnywhere)] public partial IList<AActor> PuzzleTiles { get; set; }
@@ -699,7 +719,7 @@ public partial class ARegionLoopDirector : AActor
         if (focused==PuzzleCamera)
         { if (HasAccessCard && CameraLearned && !PuzzleSubmitting) EnterTutorialRemote(PuzzleCamera,false); return true; }
         if (focused==PuzzleClear)
-        { if (PuzzleReady) { PuzzleMask=0; RefreshPuzzleTiles(); Say("A clean board. I can try a different pattern.",3); } return true; }
+        { if (PuzzleReady) { PuzzleMask=0; RefreshPuzzleTiles(); Notice("PATTERN CLEARED",2); } return true; }
         if (focused!=PuzzleSubmit) return false;
         if (!PuzzleReady) return true;
         PuzzleSubmitCount++; SetRegionFiring(false); ClearProjectiles();
@@ -715,8 +735,7 @@ public partial class ARegionLoopDirector : AActor
         {
             PuzzleSubmitting=true; puzzleFailurePending=true; puzzleResultTime=1.4f;
             PuzzleStatus="PATTERN REJECTED / LETHAL RESET"; PuzzleFailedBefore=true;
-            Host(PuzzleMask==BroadcastPatternMask ? "You followed the broadcast perfectly. Unfortunately, that was the wrong answer."
-                : "That pattern doesn't belong here. End of the round.");
+            ClearDialogue(); Host("Wrong answer.");
             if (PuzzleFailureSound is not null) UGameplayStatics.PlaySound2D(PuzzleFailureSound,.65f);
             LockInput(true);
         }
@@ -748,9 +767,9 @@ public partial class ARegionLoopDirector : AActor
         if (PuzzleReady && InPuzzleRoom && !puzzleIntroduced)
         {
             puzzleIntroduced=true;
-            Host("Welcome to the Signal Lab. Copy the amber broadcast reference, then submit. Simple instructions. Lethal consequences.");
+            Host("Copy the amber broadcast reference, then submit. A wrong answer is lethal.","unobserved");
             Say(PuzzleFailedBefore ? "His reference killed me. The camera might show a different answer."
-                : "There is another camera here. Maybe I should look before I commit.",7);
+                : "There is another camera here. Maybe I should look before I commit.",7,"unobserved");
         }
         PatternAligned=false;
         if (PuzzleRemote && Alive(PuzzlePatternTarget) && HasAccessCard && CameraLearned && !CheckpointSaved)
@@ -808,5 +827,144 @@ public partial class ARegionLoopDirector : AActor
     {
         CancelPuzzleAttempt(); PatternObserved=false; puzzleIntroduced=false; InPuzzleRoom=false;
         RefreshPuzzleTiles();
+    }
+
+    // Presentation owns no progression. Dialogue is scoped to the current attempt/objective.
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial string SubtitleText { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial int SubtitleSpeaker { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial float SubtitleRemaining { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial int DialogueQueueCount { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial string NoticeText { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial AActor VistaCamera { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial AActor VistaTrigger { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial AActor VistaStart { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial AActor VistaEnd { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial AActor VistaFocus { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool VistaActive { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool VistaPlayed { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial float VistaProgress { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial int VistaPlayCount { get; set; }
+    private sealed record DialogueLine(string Text,int Speaker,string Scope,string Guard,int Attempt,float Duration);
+    private readonly List<DialogueLine> dialogue = new();
+    private DialogueLine? activeLine;
+    private float dialogueGap,noticeRemaining,vistaTime;
+    private int vistaPhase;
+    private FRotator vistaBodyRotation;
+
+    private string DialogueScope() => CheckpointSaved ? (VistaPlayed ? "vista" : "memory")
+        : PuzzleSubmitting ? "rejected" : PuzzleSolved ? "solved"
+        : CameraLearned ? (InPuzzleRoom ? "puzzle" : "travel")
+        : HasAccessCard ? "camera" : CardDropped ? "card" : HasGun ? "fight"
+        : MemoryExperienced ? "weapons" : "intro";
+
+    private bool Relevant(DialogueLine line) => line.Attempt==AttemptId && line.Scope==DialogueScope()
+        && (line.Guard!="unobserved" || !PatternObserved);
+
+    private void QueueDialogue(string text,int speaker,string guard)
+    {
+        if (string.IsNullOrWhiteSpace(text) || Transition!=0) return;
+        dialogue.RemoveAll(line=>!Relevant(line));
+        // Sentence-sized cards, never two speakers at once. Ellipses remain part of a sentence.
+        foreach(var sentence in System.Text.RegularExpressions.Regex.Split(text,@"(?<=[.!?])\s+(?=[A-Z])"))
+        {
+            var s=sentence.Trim(); if (s.Length==0) continue;
+            if ((activeLine?.Text==s && Relevant(activeLine)) || dialogue.Any(line=>line.Text==s && line.Scope==DialogueScope())) continue;
+            float duration=Math.Clamp(.8f+s.Split(' ',StringSplitOptions.RemoveEmptyEntries).Length/2.7f,2.5f,7);
+            if (dialogue.Count>=12) dialogue.RemoveAt(0);
+            dialogue.Add(new(s,speaker,DialogueScope(),guard,AttemptId,duration));
+        }
+        DialogueQueueCount=dialogue.Count;
+    }
+
+    private void TickNarrative(float delta)
+    {
+        noticeRemaining=Math.Max(0,noticeRemaining-delta);
+        if(noticeRemaining==0) NoticeText="";
+        if(!Initialized || Transition!=0) { ClearDialogue(); return; }
+        dialogue.RemoveAll(line=>!Relevant(line));
+        if(activeLine is not null && !Relevant(activeLine))
+        { activeLine=null; SubtitleText=""; SubtitleSpeaker=0; SubtitleRemaining=0; dialogueGap=.15f; }
+        if(activeLine is not null)
+        {
+            SubtitleRemaining=Math.Max(0,SubtitleRemaining-delta);
+            if(SubtitleRemaining==0)
+            { activeLine=null; SubtitleText=""; SubtitleSpeaker=0; dialogueGap=.3f; }
+        }
+        else
+        {
+            dialogueGap=Math.Max(0,dialogueGap-delta);
+            if(dialogueGap==0 && dialogue.Count>0)
+            {
+                activeLine=dialogue[0];dialogue.RemoveAt(0);
+                SubtitleText=activeLine.Text;SubtitleSpeaker=activeLine.Speaker;SubtitleRemaining=activeLine.Duration;
+            }
+        }
+        DialogueQueueCount=dialogue.Count;
+    }
+
+    private void ClearDialogue()
+    {
+        dialogue.Clear();activeLine=null;SubtitleText="";SubtitleSpeaker=0;
+        SubtitleRemaining=0;DialogueQueueCount=0;dialogueGap=0;
+    }
+
+    private void Notice(string text,float seconds=4)
+    {
+        NoticeText=text;noticeRemaining=seconds;
+        ThoughtText=text;thoughtRemaining=seconds; // Backward-compatible GM diagnostics.
+    }
+
+    private void TickVista(float delta)
+    {
+        if (!Initialized || Transition!=0) return;
+        if(!VistaActive)
+        {
+            if(!CheckpointSaved || VistaPlayed || RemoteActive || GMOpen || !Alive(VistaTrigger)) return;
+            VistaTrigger.GetActorBounds(false,out var center,out var extent,false);
+            var q=player!.ActorLocation-center;
+            if(Math.Abs(q.X)>extent.X || Math.Abs(q.Y)>extent.Y || Math.Abs(q.Z)>extent.Z) return;
+            if(!Alive(VistaCamera) || !Alive(VistaStart) || !Alive(VistaEnd) || !Alive(VistaFocus))
+            { VistaPlayed=true;Notice("Overlook camera unavailable. Your checkpoint is safe.");return; }
+            SetRegionFiring(false);ClearProjectiles();ClearDialogue();
+            vistaBodyRotation=controller!.ControlRotation;VistaPlayed=true;VistaActive=true;VistaPlayCount++;
+            vistaPhase=1;vistaTime=0;VistaProgress=0;GMOpen=false;
+            VistaCamera.SetActorLocationAndRotation(VistaStart.ActorLocation,
+                MathLibrary.FindLookAtRotation(VistaStart.ActorLocation,VistaFocus.ActorLocation),false,out _,true);
+            LockInput(true);controller.SetViewTargetWithBlend(VistaCamera,.6f);
+            Host("Welcome to the main arena.");
+            Say("All this space... and every angle is watched.");
+            return;
+        }
+        if(!Alive(VistaCamera) || !Alive(VistaStart) || !Alive(VistaEnd) || !Alive(VistaFocus))
+        { FinishVista();ClearDialogue();Notice("View interrupted. Memory B is safe.");return; }
+        vistaTime+=delta;
+        if(vistaPhase==1)
+        {
+            float t=Math.Clamp(vistaTime/5,0,1);VistaProgress=t;
+            double smooth=t*t*(3-2*t);
+            var at=VistaStart.ActorLocation+(VistaEnd.ActorLocation-VistaStart.ActorLocation)*smooth;
+            VistaCamera.SetActorLocationAndRotation(at,MathLibrary.FindLookAtRotation(at,VistaFocus.ActorLocation),false,out _,true);
+            if(t>=1) { vistaPhase=2;vistaTime=0; }
+        }
+        else if(vistaPhase==2 && vistaTime>=2) ReturnFromVista(false);
+        else if(vistaPhase==3 && vistaTime>=1) FinishVista();
+    }
+
+    private void ReturnFromVista(bool skipped)
+    {
+        if(!VistaActive || vistaPhase==3) return;
+        if(skipped) ClearDialogue();
+        vistaPhase=3;vistaTime=0;
+        if(Alive(controller) && Alive(player))
+        { controller!.ControlRotation=vistaBodyRotation;controller.SetViewTargetWithBlend(player!,1); }
+    }
+
+    private void FinishVista()
+    {
+        if(!VistaActive) return;
+        VistaActive=false;vistaPhase=0;vistaTime=0;
+        if(Alive(controller) && Alive(player))
+        { controller!.SetViewTargetWithBlend(player!);controller.ControlRotation=vistaBodyRotation; }
+        if(Transition==0) LockInput(false);
     }
 }

@@ -12,7 +12,7 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 
 ## 当前工程
 
-2026-11-08 新区域地图 `/Game/OFFAIR/Levels/Lvl_TwoRoom_Blockout` 已进入第 2 步：首次信件记忆死亡、A—B 区域重置、B 会话存档、F1 隐藏 GM、两种关键音效；巨蛋占地减半，真图案仅 C2 视角可见。枪械／战斗／正式黑入／射击谜题仍待后续接入，B 当前通过明确的 GM 测试条件验证。旧 `Lvl_Prototype` 仍是已有完整原型和默认地图。见[本轮操作与边界](docs/design/region-loop-checkpoint.md)及[双房间实施范围](docs/design/two-room-layout.md)。
+2026-11-08 新区域地图 `/Game/OFFAIR/Levels/Lvl_TwoRoom_Blockout` 已接入第 3 步教学房：首次记忆后可跳过信件，两枪二选一生成 10／2 名守卫，清场取权限卡，直接看向 C1 按 E 黑入，转动并退出后开放 D1。R 主动循环已取消；F1 默认隐藏 GM；普通 HUD 改用实时字体。C2 初始不朝向真图案，射击谜题与完整叙事呈现仍待后续接入，B 当前继续由明确标识的 GM 条件验证。旧 `Lvl_Prototype` 仍是默认地图。见[第 3 步试玩与边界](docs/design/region-tutorial.md)、[验证记录](docs/qa/region-tutorial-validation.md)及[双房间实施范围](docs/design/two-room-layout.md)。
 
 - 引擎关联版本：`OFFAIR.uproject` 中的 `5.8`。
 - 蓝图玩法 + 最小 `Source/OFFAIR` 原生模块 + `Script/OFFAIR` C# 工程；UnrealSharp 作为固定版本 Git 子模块管理。

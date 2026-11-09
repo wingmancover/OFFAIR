@@ -75,3 +75,7 @@ python Tools/unrealsharp.py editor-rebuild-test
 - [安装](https://www.unrealsharp.com/getting-started-and-fundamentals/quickstart)
 - [C# 类型与蓝图](https://www.unrealsharp.com/getting-started-and-fundamentals/your-first-script)
 - [打包流程](https://www.unrealsharp.com/getting-started-and-fundamentals/packaging)
+
+## 新双房间第 3 步
+
+`RegionLoopDirector.cs` 管理区域循环和教学交互，蓝图适配复用 Shooter 角色、守卫、手枪和子弹，`RegionHUD.cs` 使用运行时字体。先 `managed-build`，再按需运行 `Tools/unreal/build_region_tutorial.py` 增量作者脚本；后台 PIE 入口为 `validate_region_tutorial.py`，画面检查用 `capture_region_tutorial.py`。不要把旧原型 `test` 的结果当成新地图验证。详见[当前记录](../qa/region-tutorial-validation.md)。

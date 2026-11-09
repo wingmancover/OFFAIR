@@ -173,4 +173,9 @@ def build():
     u.log('OFFAIR_REGION_STEP2_AUTHORED')
 
 
-if __name__=='__main__': build()
+if __name__=='__main__':
+    build()
+    # The current managed runtime requires the step-3 references and template adapters.
+    # Reapply them after rebuilding foundations, rather than silently reverting gameplay.
+    import build_region_tutorial
+    build_region_tutorial.build()

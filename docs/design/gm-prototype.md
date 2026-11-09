@@ -1,5 +1,7 @@
 # OFFAIR 可玩原型的 GM 配套工具
 
+**新区域范围**：`Lvl_TwoRoom_Blockout` 使用区域循环 GM，不沿用旧阶段跳转按钮。F1 默认隐藏，1 死亡、2 测试条件、3 传送 B、4／5 增减守卫、6／7 摄像头；R 无作用。见[教学房与 GM](region-tutorial.md)。
+
 2026-10-18 最新范围：完整可玩的原型与 GM 一起实现。此前“只做 GM、暂缓实际交互”的解释已取消；本文件定义配套调试操作，正常玩法见[游戏设计](game-design.md)。当前六个按钮和 F1／数字快捷键均已接入，操作与实际验证见[游玩说明](../prototype-play-guide.md)和[实现验证记录](../qa/prototype-implementation-validation.md)。
 
 依据为用户本轮说明及[GM 功能清单原图](assets/user-gm-functions.png)。清单包括点击死亡、进入下一阶段、返回上一阶段、增加或减少敌人 AI、一键入侵摄像头。附件作为需求素材，不作为执行命令。

@@ -4,10 +4,12 @@ using UnrealSharp.Engine;
 
 namespace Offair.Managed;
 
-/// <summary>Small step-2 HUD; debug content appears only behind F1. Final art/dialogue is step 5.</summary>
+/// <summary>Readable prototype HUD; debug content appears only behind F1. Final art/dialogue is step 5.</summary>
 [UClass]
 public partial class ARegionHUD : AHUD
 {
+    [UProperty(PropertyFlags.EditAnywhere)] public partial UFont PlayFont { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial UFont SmallPlayFont { get; set; }
     private ARegionLoopDirector? director;
     public override void ReceiveDrawHUD(int sizeX, int sizeY)
     {
@@ -20,37 +22,66 @@ public partial class ARegionHUD : AHUD
         var d = director;
         float scale = Math.Clamp(sizeX / 1600f, .65f, 1.7f);
         void Text(string s, float x, float y, FLinearColor color, float font = 1)
-            => DrawText(s, color, x, y, null, 2 * scale * font);
+            => DrawText(s, color, x, y, font < 1 ? SmallPlayFont : PlayFont, 1);
         var white = new FLinearColor(.96f,.98f,1,1);
         var cyan = new FLinearColor(.3f,.86f,1,1);
         var dark = new FLinearColor(.007f,.016f,.025f,.94f);
         void Panel(string s, float y, FLinearColor color)
         {
-            GetTextSize(s, out var w, out _, null, 2 * scale);
-            float x = (sizeX-w)/2;
-            DrawRect(dark, x-16*scale,y-10*scale,w+32*scale,44*scale);
-            Text(s,x,y,color);
+            var lines = new List<string>(); string line = "";
+            foreach (var word in s.Split(' '))
+            {
+                var candidate = line.Length == 0 ? word : line + " " + word;
+                GetTextSize(candidate, out var width, out _, PlayFont, 1);
+                if (width > sizeX - 80 && line.Length > 0) { lines.Add(line); line = word; }
+                else line = candidate;
+            }
+            lines.Add(line);
+            GetTextSize("Ag", out _, out var lineHeight, PlayFont, 1);
+            float spacing = lineHeight + 4;
+            // Wrap upward, keeping host and inner-thought subtitles in separate bottom slots.
+            for (int i=0; i<lines.Count; i++)
+            {
+                GetTextSize(lines[i],out var w,out _,PlayFont,1);
+                float x=(sizeX-w)/2, top=y-(lines.Count-1-i)*spacing;
+                DrawRect(dark,x-16,top-4,w+32,spacing);
+                Text(lines[i],x,top,color);
+            }
         }
         DrawRect(white,sizeX/2f-3,sizeY/2f-1,6,2);
-        DrawRect(dark,20*scale,20*scale,Math.Min(sizeX-40*scale,650*scale),62*scale);
-        Text(d.CheckpointSaved ? "MEMORY B / SESSION SAVED" : d.MemoryExperienced ? "A-B REGION / EXPLORE" : "FIND THE RED NOTE",32*scale,28*scale,white);
-        Text("WASD Move   SPACE Jump   E Interact   R Loop   F1 GM",32*scale,55*scale,cyan,.72f);
+        string objective = d.CheckpointSaved ? "MEMORY B / SESSION SAVED" : !d.MemoryExperienced ? "FIND THE RED NOTE"
+            : !d.HasGun ? "CHOOSE A WEAPON" : d.LivingGuards > 0 ? $"CLEAR THE ROOM / {d.LivingGuards} GUARDS"
+            : !d.HasAccessCard ? "COLLECT THE ACCESS CARD" : !d.CameraLearned ? "TAKE CONTROL OF THE TRAINING CAMERA" : "ENTER THE SIGNAL LAB";
+        const string controls="WASD Move   SPACE Jump   E Interact   LMB Fire   F1 GM";
+        GetTextSize(objective,out var objectiveWidth,out var objectiveHeight,PlayFont,1);
+        GetTextSize(controls,out var controlsWidth,out var controlsHeight,SmallPlayFont,1);
+        float left=20*scale, topEdge=20*scale, controlsY=topEdge+objectiveHeight+14;
+        DrawRect(dark,left,topEdge,Math.Max(objectiveWidth,controlsWidth)+24,objectiveHeight+controlsHeight+24);
+        Text(objective,left+12,topEdge+6,white);
+        Text(controls,left+12,controlsY,cyan,.72f);
+        string health=$"HEALTH {Math.Ceiling(d.Health)} / {d.MaximumHealth:0}"+(d.HasGun ? $"    AMMO {d.Ammo}" : "");
+        GetTextSize(health,out var healthWidth,out var healthHeight,SmallPlayFont,1);
+        DrawRect(dark,left,sizeY-72*scale,healthWidth+24,healthHeight+16);
+        Text(health,left+12,sizeY-72*scale+6,white,.8f);
         if (!string.IsNullOrEmpty(d.PromptText)) Panel(d.PromptText,sizeY*.70f,white);
-        if (!string.IsNullOrEmpty(d.ThoughtText)) Panel(d.ThoughtText,sizeY-100*scale,cyan);
-        if (d.RemoteActive) Panel("GM CAMERA PREVIEW / E or Q to return",100*scale,cyan);
+        if (!string.IsNullOrEmpty(d.HostText)) Panel("HOST: " + d.HostText,sizeY-180*scale,new FLinearColor(1,.75f,.3f,1));
+        if (!string.IsNullOrEmpty(d.ThoughtText)) Panel(d.ThoughtText,sizeY-124*scale,cyan);
+        if (d.RemoteActive) Panel(d.LessonTurned ? "CAMERA / E or Q to return" : "CAMERA / Move mouse to look around / E or Q to return",controlsY+controlsHeight+30,cyan);
         if (d.GMOpen)
         {
-            DrawRect(dark,20*scale,110*scale,690*scale,250*scale);
+            DrawRect(dark,20*scale,150*scale,790*scale,330*scale);
             string[] rows = {
-                "GM / STEP 2 TEST TOOLS - F1 CLOSE",
+                "GM / TEACHING ROOM - F1 CLOSE",
                 $"Attempt {d.AttemptId}   Deaths {d.DeathCount}   HP {d.Health:0}   B {d.CheckpointSaved}",
                 $"Gun {d.HasGun}   Card {d.HasAccessCard}   Camera {d.CameraLearned}   Puzzle {d.PuzzleSolved}",
                 "1  Die / retry     2  TEST ONLY: grant B prerequisites",
                 "3  Teleport near B (does not save)",
-                "4  TEST: hide gun / change puzzle state before B",
-                "5  TEST: preview C2 camera (no puzzle interaction)"
+                "4  Add guard (teaching fight only)",
+                "5  Remove guard (NO kill credit / NO card reward)",
+                "6  Training camera / 7  Puzzle camera preview",
+                $"Kills {d.KilledGuards}  Alive {d.LivingGuards}  Card reward eligible {d.WaveRewardEligible}"
             };
-            for (int i=0;i<rows.Length;i++) Text(rows[i],32*scale,(124+i*32)*scale,white,.85f);
+            for (int i=0;i<rows.Length;i++) DrawText(rows[i],white,32*scale,(164+i*32)*scale,null,1.7f*scale);
         }
         if (d.Transition != 0)
         {

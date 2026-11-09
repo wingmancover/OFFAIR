@@ -1,5 +1,7 @@
 # 双房间第 2 步验证记录
 
+本页保留第 2 步历史验证。第 3 步取消 R、替换 GM 按键并接入真实教学战斗；当前使用 `validate_region_tutorial.py` / `capture_region_tutorial.py`，以[第 3 步记录](region-tutorial-validation.md)为准，不能直接用本页旧按键复测当前地图。
+
 2026-11-08，Windows x64，Unreal Engine 5.8.4，UnrealSharp 固定依赖未更新。本轮工作保存但未暂存、提交、推送或打包。上轮布局尚未提交的文件保留；旧 `Lvl_Prototype`、模板蓝图、工程默认地图和打包配置未改动。
 
 ## 实际结果

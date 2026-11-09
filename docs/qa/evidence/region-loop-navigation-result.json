@@ -1,0 +1,181 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Recast generated",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (800, 1800)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (1500, 1800)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (2200, 1800)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (3000, 1600)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (4000, 1800)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (4800, 1800)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (6000, 1800)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (6000, 2600)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (6000, 3300)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (6200, 3800)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (6200, 3100)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (7400, 3100)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (8300, 3100)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (8500, 4400)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (9200, 4400)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walkable (10400, 4400)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Saved rebuilt navigation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 0",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 6",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 7",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 8",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 9",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 10",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 11",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walked waypoint 13",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Closed D2 blocks player",
+      "passed": true,
+      "detail": 8750.901520826206
+    },
+    {
+      "name": "Memory death completed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Opened D2 allows actual movement to B",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "error": null
+}

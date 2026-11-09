@@ -1,0 +1,375 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Both rooms and corridor authored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "OA_TutorialFloor dimensions",
+      "passed": true,
+      "detail": [
+        4800.0,
+        3600.0
+      ]
+    },
+    {
+      "name": "OA_PuzzleFloor dimensions",
+      "passed": true,
+      "detail": [
+        3600.0,
+        3600.0
+      ]
+    },
+    {
+      "name": "Recast data exists",
+      "passed": true,
+      "detail": 1
+    },
+    {
+      "name": "Navigation (400, 1800)",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001EAED414240) {x: 400.000000, y: 1800.000000, z: 10.000000}>"
+    },
+    {
+      "name": "Navigation (1500, 1800)",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001EAED4142E0) {x: 1500.000000, y: 1800.000000, z: 10.000000}>"
+    },
+    {
+      "name": "Navigation (3600, 2800)",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001EAED414330) {x: 3600.000000, y: 2800.000000, z: 10.000000}>"
+    },
+    {
+      "name": "Navigation (3600, 800)",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001EAED414380) {x: 3600.000000, y: 800.000000, z: 10.000000}>"
+    },
+    {
+      "name": "Navigation (4800, 1800)",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001EAED4143D0) {x: 4800.000000, y: 1800.000000, z: 10.000000}>"
+    },
+    {
+      "name": "Navigation (6000, 1800)",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001EAED414420) {x: 6000.000000, y: 1800.000000, z: 10.000000}>"
+    },
+    {
+      "name": "Navigation (6000, 2400)",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001EAED414470) {x: 6000.000000, y: 2400.000000, z: 10.000000}>"
+    },
+    {
+      "name": "Navigation (6200, 3800)",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001EAED4144C0) {x: 6200.000000, y: 3800.000000, z: 10.000000}>"
+    },
+    {
+      "name": "Navigation (8300, 3100)",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001EAED414510) {x: 8300.000000, y: 3100.000000, z: 10.000000}>"
+    },
+    {
+      "name": "Navigation (9200, 4400)",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001EAED414560) {x: 9200.000000, y: 4400.000000, z: 10.000000}>"
+    },
+    {
+      "name": "Navigation (10400, 4400)",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x000001EAED4145B0) {x: 10400.000000, y: 4400.000000, z: 10.000000}>"
+    },
+    {
+      "name": "Corner occludes premature puzzle view",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Tutorial has no local roof",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Puzzle has no local roof",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Camera C1 line of sight",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Camera C2 line of sight",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Platform outside edge blocks",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Preview dependency compiles /Game/FirstPerson/Blueprints/BP_FirstPersonCharacter",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Preview dependency compiles /Game/FirstPerson/Blueprints/BP_FirstPersonPlayerController",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Preview dependency compiles /Game/FirstPerson/Blueprints/BP_FirstPersonGameMode",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Save map with navigation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Preview pawn is template first person",
+      "passed": true,
+      "detail": "BP_FirstPersonCharacter_C"
+    },
+    {
+      "name": "Walk speed 600cm/s",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Spawn A",
+      "passed": true,
+      "detail": [
+        400.0,
+        1800.0,
+        98.14999771118164
+      ]
+    },
+    {
+      "name": "No old director in new map",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walk waypoint 0",
+      "passed": true,
+      "detail": [
+        779.6,
+        1800.0,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 1",
+      "passed": true,
+      "detail": [
+        1479.6,
+        1800.0,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 2",
+      "passed": true,
+      "detail": [
+        2179.7,
+        1800.0,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 3",
+      "passed": true,
+      "detail": [
+        2980.7,
+        1605.0,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 4",
+      "passed": true,
+      "detail": [
+        3980.3,
+        1795.7,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 5",
+      "passed": true,
+      "detail": [
+        4779.8,
+        1800.2,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 6",
+      "passed": true,
+      "detail": [
+        5979.9,
+        1800.0,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 7",
+      "passed": true,
+      "detail": [
+        6001.3,
+        2579.6,
+        98.1
+      ]
+    },
+    {
+      "name": "Corridor traverses in 3-4s simulation time",
+      "passed": true,
+      "detail": 3.367
+    },
+    {
+      "name": "Walk waypoint 8",
+      "passed": true,
+      "detail": [
+        5999.9,
+        3279.6,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 9",
+      "passed": true,
+      "detail": [
+        6192.4,
+        3782.3,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 10",
+      "passed": true,
+      "detail": [
+        6200.5,
+        3117.1,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 11",
+      "passed": true,
+      "detail": [
+        7379.9,
+        3099.1,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 12",
+      "passed": true,
+      "detail": [
+        8279.9,
+        3100.0,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 13",
+      "passed": true,
+      "detail": [
+        8300.8,
+        4379.8,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 14",
+      "passed": true,
+      "detail": [
+        9182.8,
+        4401.0,
+        98.1
+      ]
+    },
+    {
+      "name": "Walk waypoint 15",
+      "passed": true,
+      "detail": [
+        10382.8,
+        4400.0,
+        98.1
+      ]
+    },
+    {
+      "name": "Continuous route reaches overlook",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "movement_method": "Character.add_movement_input; not OS keyboard",
+  "corridor_seconds": 3.367,
+  "navigation_projections": [
+    [
+      400.0,
+      1800.0,
+      10.0
+    ],
+    [
+      1500.0,
+      1800.0,
+      10.0
+    ],
+    [
+      3600.0,
+      2800.0,
+      10.0
+    ],
+    [
+      3600.0,
+      800.0,
+      10.0
+    ],
+    [
+      4800.0,
+      1800.0,
+      10.0
+    ],
+    [
+      6000.0,
+      1800.0,
+      10.0
+    ],
+    [
+      6000.0,
+      2400.0,
+      10.0
+    ],
+    [
+      6200.0,
+      3800.0,
+      10.0
+    ],
+    [
+      8300.0,
+      3100.0,
+      10.0
+    ],
+    [
+      9200.0,
+      4400.0,
+      10.0
+    ],
+    [
+      10400.0,
+      4400.0,
+      10.0
+    ]
+  ],
+  "error": null,
+  "elapsed_wall_seconds": 33.03
+}

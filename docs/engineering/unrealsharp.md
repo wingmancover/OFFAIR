@@ -4,13 +4,17 @@
 
 ## 范围与依赖
 
-- UE 保持 5.8；本机 Windows 安装为 5.8.3。
+- UE 保持 5.8；第 2 步本机 Windows 实际验证为 5.8.4（早期接入记录为 5.8.3）。
 - UnrealSharp 子模块：`Plugins/UnrealSharp`，固定提交 `115e6753b2f8c830f084a3e453b7ef3b1230eb33`，保留上游 MIT 许可证。
 - .NET SDK 固定为 `10.0.403`；下载地址与 SHA-512 在 `Tools/unrealsharp.lock.json`。安装到被忽略的 `Saved/Toolchains/`，不提交 SDK 或修改系统 PATH。
 - 目标为 Windows x64 与 macOS arm64。Mac 需要实际 Apple Silicon 机器、匹配 UE 5.8 的 Xcode 和系统；本机不能完成 Mac 构建或运行验收。
 - 工具入口要求 Python 3.12+。Windows 还需要 UE C++ 工具链；本机使用 VS 2022 的 MSVC 14.44 与 Windows SDK 10.0.22621.0。VS 2022 不支持 .NET 10 C# 项目；命令行构建与编辑器脚本迭代不依赖其 C# IDE 支持。
 
 现有角色、武器、敌人、阶段状态、监控与 GM 继续使用原蓝图。`Source/OFFAIR` 注册项目原生模块，在 Windows 编辑器启动时准备进程内 SDK 环境，并提供限定在 PIE 世界中生效的测试 Actor 生成入口；`Script/OFFAIR/Offair.Managed.csproj` 是项目 C# 工程。`AOffairScriptProbe` 是独立互调样例，没有正式玩法职责。
+
+2026-11-08 用户授权按效率选择实现语言。新 `Lvl_TwoRoom_Blockout` 的第 2 步循环／会话存档与小型 HUD 分别由 `RegionLoopDirector.cs`、`RegionHUD.cs` 实现；蓝图继承 FirstPerson 角色并连接伤害事件。旧地图未迁移，插件固定版本未改变。状态生命周期与验证见[区域循环](../design/region-loop-checkpoint.md)。
+
+新增 `python Tools/unrealsharp.py managed-build --engine-root Y:/UE_5.8`，使用项目既有 SDK 和 UAT `BuildUserSolution` 只编译托管代码，适用于完成初次原生构建后的 C# 迭代；本轮已实际成功执行。首次克隆／依赖改变仍需 setup/build，不能用 managed-build 替代原生编译。C# 与 Python 作者源码入库，`Binaries/Managed` 等生成结果不提交。
 
 探针只有实例内 `CallCount`，初始为 0，随 Actor／世界销毁，不跨死亡或 PIE 保留；没有计时器、输入绑定、静态 Actor 引用和跨循环状态。验证蓝图位于 `/Game/OFFAIR/Tests/BP_UnrealSharpProbe`，不会自动放进正式地图。
 

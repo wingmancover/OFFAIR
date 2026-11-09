@@ -1,0 +1,353 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Dome footprint halved",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Rooms and A unchanged",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "OA_TruePatternBack restricted to C2 view",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "OA_TrueFragment0 restricted to C2 view",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "OA_TrueFragment1 restricted to C2 view",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "OA_TrueFragment2 restricted to C2 view",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "OA_TrueFragment3 restricted to C2 view",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "OA_TrueFragment4 restricted to C2 view",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionLoopDirector compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionHUD compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionCharacter compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionGameMode compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Fresh session has no memory/save",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM hidden by default",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM shortcuts disabled while hidden",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM prerequisite setup cannot skip first memory",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Progress cannot skip first memory",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "B rejects missing gameplay prerequisites",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "B explains missing prerequisites",
+      "passed": true,
+      "detail": "Memory locked: weapon, camera access, camera learning and puzzle completion required."
+    },
+    {
+      "name": "Note outside 330cm does not collect",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Looking away does not collect",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Occluding wall prevents note interaction",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "E with aim and range starts memory event",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Note parts hidden",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Movement and look locked",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Repeated input cannot interrupt or duplicate note death",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Three-second memory wait not skipped",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Exactly one first death",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "First memory experience retained",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Note restored after regional reset",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Respawn at A",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Input restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Death cue triggered once",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Reread collects without another forced death",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Optional note repeat no additional death",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Explicit GM setup grants all flags",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "GM mutation changes world and puzzle",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Temporary actor registered",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Remote test preview entered",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Remote death clears view immediately",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Duplicate death rejected",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Late progress rejected",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Second reset clears unsaved inventory and puzzle",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Gun prop restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Exit gate baseline restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Camera orientation baseline restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Temporary actor cleaned up",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Old attempt remains invalid after reset",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Camera learning cannot bypass access card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Access card cannot bypass weapon requirement",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Late spawned actor rejected and destroyed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Current actor registered before B",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Can skip note after first death",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Teleport alone does not save",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "E activates qualified B",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Save is idempotent",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "B retains explicit debug provenance",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Completed region rejects late progression",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Post-B respawn uses B",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Saved inventory retained",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Completed puzzle and door retained",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Completed region not reset (collected gun stays absent)",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Completed region spawned actors retained",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Saved B health reset",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Damage affects health",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Real AnyDamage bridge requests death",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Damage respawn restores saved player state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Missing refs fail closed without locking input",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Fresh PIE clears session save and memory",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "input_method": "HandleRegionInput through engine actor; view/range/LOS checked; physical keys pending user playtest",
+  "error": null,
+  "elapsed_seconds": 7.47
+}

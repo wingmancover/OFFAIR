@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "layout_actors": 1155,
+  "poi_count": 25,
+  "material_nanite_usage": {
+    "amber": true,
+    "cyan": true
+  },
+  "note_route_clear": true,
+  "map_check_log": "Saved/TwoRoomLayout/final-audit.log"
+}

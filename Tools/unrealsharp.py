@@ -274,7 +274,7 @@ def package_smoke():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=["setup", "build", "editor", "test", "smoke", "package", "package-smoke", "prototype-build", "editor-rebuild-test"])
+    parser.add_argument("mode", choices=["setup", "build", "managed-build", "editor", "test", "smoke", "package", "package-smoke", "prototype-build", "editor-rebuild-test"])
     parser.add_argument("--engine-root")
     parser.add_argument("--disable-plugin", action="append", default=[],
                         help="Exclude a plugin from the editor build (also before packaging); repeatable.")
@@ -298,6 +298,11 @@ def main():
     engine = engine_root(args.engine_root)
     if args.mode == "build":
         build(engine, dotnet, env, args.disable_plugin)
+    elif args.mode == "managed-build":
+        target, _, _ = host_target()
+        uat(engine, dotnet, env, "BuildUserSolution", "-TargetType=Editor",
+            "-TargetConfiguration=Development", f"-TargetPlatform={target}",
+            f"-OutputPath={ROOT / 'Binaries/Managed/net10.0'}")
     elif args.mode == "package":
         package(engine, dotnet, env, args.disable_plugin)
     elif args.mode == "prototype-build":

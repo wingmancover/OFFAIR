@@ -103,6 +103,7 @@ public partial class ARegionLoopDirector : AActor
         UpdateFocus();
         TickTutorial(delta);
         TickPuzzle(delta);
+        TickTitle(delta);
         TickVista(delta);
         TickNarrative(delta);
         // Real engine input, independent of desktop focus automation. Never synthesize OS keys.
@@ -220,7 +221,7 @@ public partial class ARegionLoopDirector : AActor
     private void BeginDeath(bool memory)
     {
         firstMemoryDeath = memory;
-        FinishVista(); ClearDialogue(); NoticeText=""; noticeRemaining=0;
+        CancelTitle(); FinishVista(); ClearDialogue(); NoticeText=""; noticeRemaining=0;
         CancelPuzzleAttempt();
         ExitRemote(false); StopTutorialCombat(); Transition = 2; remaining = .65f; AttemptId++; DeathCount++; Health = 0;
         ThoughtText = ""; thoughtRemaining = 0; focused = null; PromptText = "";
@@ -861,6 +862,10 @@ public partial class ARegionLoopDirector : AActor
     [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool VistaPlayed { get; set; }
     [UProperty(PropertyFlags.BlueprintReadOnly)] public partial float VistaProgress { get; set; }
     [UProperty(PropertyFlags.BlueprintReadOnly)] public partial int VistaPlayCount { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool TitleActive { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial bool TitlePlayed { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial float TitleRemaining { get; set; }
+    [UProperty(PropertyFlags.BlueprintReadOnly)] public partial int TitlePlayCount { get; set; }
     private sealed record DialogueLine(string Text,int Speaker,string Scope,string Guard,int Attempt,float Duration);
     private readonly List<DialogueLine> dialogue = new();
     private DialogueLine? activeLine;
@@ -897,6 +902,8 @@ public partial class ARegionLoopDirector : AActor
 
     private void TickNarrative(float delta)
     {
+        // Preserve both the current sentence and its remaining reading time during the title.
+        if(TitleActive) return;
         noticeRemaining=Math.Max(0,noticeRemaining-delta);
         if(noticeRemaining==0) NoticeText="";
         if(!Initialized || Transition!=0) { ClearDialogue(); return; }
@@ -966,7 +973,7 @@ public partial class ARegionLoopDirector : AActor
             if(t>=1) { vistaPhase=2;vistaTime=0; }
         }
         else if(vistaPhase==2 && vistaTime>=2) ReturnFromVista(false);
-        else if(vistaPhase==3 && vistaTime>=1) FinishVista();
+        else if(vistaPhase==3 && vistaTime>=1) FinishVista(true);
     }
 
     private void ReturnFromVista(bool skipped)
@@ -978,12 +985,29 @@ public partial class ARegionLoopDirector : AActor
         { controller!.ControlRotation=vistaBodyRotation;controller.SetViewTargetWithBlend(player!,1); }
     }
 
-    private void FinishVista()
+    private void FinishVista(bool completed=false)
     {
         if(!VistaActive) return;
         VistaActive=false;vistaPhase=0;vistaTime=0;
         if(Alive(controller) && Alive(player))
         { controller!.SetViewTargetWithBlend(player!);controller.ControlRotation=vistaBodyRotation; }
         if(Transition==0) LockInput(false);
+        if(completed && Transition==0 && CheckpointSaved && Alive(controller) && Alive(player) && !TitlePlayed)
+        {
+            TitlePlayed=true;TitleActive=true;TitleRemaining=3;TitlePlayCount++;
+        }
+    }
+
+    private void TickTitle(float delta)
+    {
+        if(!TitleActive) return;
+        if(!Initialized || Transition!=0 || !Alive(player) || !Alive(controller)) { CancelTitle();return; }
+        TitleRemaining=Math.Max(0,TitleRemaining-delta);
+        if(TitleRemaining==0) TitleActive=false;
+    }
+
+    private void CancelTitle()
+    {
+        TitleActive=false;TitleRemaining=0;
     }
 }

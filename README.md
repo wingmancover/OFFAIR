@@ -12,12 +12,12 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 
 ## 当前工程
 
-2026-11-08 新区域地图 `/Game/OFFAIR/Levels/Lvl_TwoRoom_Blockout` 已接入第 3 步教学房：首次记忆后可跳过信件，两枪二选一生成 10／2 名守卫，清场取权限卡，直接看向 C1 按 E 黑入，转动并退出后开放 D1。R 主动循环已取消；F1 默认隐藏 GM；普通 HUD 改用实时字体。第 4 步已接入 C2 找图案、真实子弹切换 3×3 答案、主动提交、错误死亡区域重置、正确开 D2 及正常 E 保存 B。C2 初始不朝向真图案；第 5 步已接入单通道逐句字幕、紧凑 HUD，以及 B 保存后走上平台触发的可跳过观景镜头。旧 `Lvl_Prototype` 仍是默认地图。见[第 5 步界面与观景](docs/design/region-presentation.md)、[第 4 步谜题试玩](docs/design/region-puzzle.md)、[第 3 步试玩与边界](docs/design/region-tutorial.md)、[验证记录](docs/qa/region-tutorial-validation.md)及[双房间实施范围](docs/design/two-room-layout.md)。
+2026-11-08 新区域地图 `/Game/OFFAIR/Levels/Lvl_TwoRoom_Blockout` 已接入第 3 步教学房：首次记忆后可跳过信件，两枪二选一生成 10／2 名守卫，清场取权限卡，直接看向 C1 按 E 黑入，转动并退出后开放 D1。R 主动循环已取消；F1 默认隐藏 GM；普通 HUD 改用实时字体。第 4 步已接入 C2 找图案、真实子弹切换 3×3 答案、主动提交、错误死亡区域重置、正确开 D2 及正常 E 保存 B。C2 初始不朝向真图案；第 5 步已接入单通道逐句字幕、紧凑 HUD，以及 B 保存后走上平台触发的可跳过观景镜头。2026-11-12 起默认启动与打包地图列表已切换为新图，旧 `Lvl_Prototype` 资产保留；观景返回控制后显示三秒 OFFAIR 标题。见[第 5 步界面与观景](docs/design/region-presentation.md)、[第 4 步谜题试玩](docs/design/region-puzzle.md)、[第 3 步试玩与边界](docs/design/region-tutorial.md)、[验证记录](docs/qa/region-tutorial-validation.md)及[双房间实施范围](docs/design/two-room-layout.md)。
 
 - 引擎关联版本：`OFFAIR.uproject` 中的 `5.8`。
 - 蓝图玩法 + 最小 `Source/OFFAIR` 原生模块 + `Script/OFFAIR` C# 工程；UnrealSharp 作为固定版本 Git 子模块管理。
 - 目标平台为 Windows x64 与 macOS Apple Silicon arm64；各平台实际验证范围见 [UnrealSharp 接入记录](docs/engineering/unrealsharp.md)。
-- 默认启动地图：`/Game/OFFAIR/Levels/Lvl_Prototype`。
+- 默认启动地图及打包地图列表：`/Game/OFFAIR/Levels/Lvl_TwoRoom_Blockout`；本次仅配置，未打包。
 - 项目专用玩家、控制器和 GameMode 继承射击模板；敌人、武器与投射物继续复用模板。
 - 出生点左前方有低障碍翻越测试，面向并靠近后按空格优先翻越，其余情况下空格跳跃；编辑器连接样例集中在 [Tools/EditorSetup](Tools/EditorSetup/README.md)，当前 Codex 项目配置保留在根目录。
 - 最新三阶段流程已生成并保存，验证范围见[本轮记录](docs/qa/narrative-prototype-validation.md)；当前为灰盒原型，未包含完整剧情、美术制作或跨进程存档。

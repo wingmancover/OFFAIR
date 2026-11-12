@@ -40,5 +40,7 @@ def build():
     (OUT/'build-result.json').write_text(json.dumps({'status':'authored','map':layout.MAP,
         'vista_start':str(actors['OA_POI_K1'].get_actor_location()),'vista_end':str(actors['OA_POI_K2'].get_actor_location()),
         'focus':str(focus.get_actor_location()),'duration':8,'new_geometry':False},indent=2),encoding='utf-8')
+    import build_region_title
+    build_region_title.build()
     u.log('OFFAIR_REGION_PRESENTATION_AUTHORED')
 if __name__=='__main__':build()

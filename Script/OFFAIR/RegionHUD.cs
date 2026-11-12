@@ -4,12 +4,14 @@ using UnrealSharp.Engine;
 
 namespace Offair.Managed;
 
-/// <summary>One subtitle channel, compact gameplay hierarchy, separate optional diagnostics.</summary>
+/// <summary>Compact gameplay HUD, single subtitle channel, and a hard-cut OFFAIR title over live play.</summary>
 [UClass]
 public partial class ARegionHUD : AHUD
 {
     [UProperty(PropertyFlags.EditAnywhere)] public partial UFont PlayFont { get; set; }
     [UProperty(PropertyFlags.EditAnywhere)] public partial UFont SmallPlayFont { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial UFont TitleFont { get; set; }
+    [UProperty(PropertyFlags.EditAnywhere)] public partial UTexture2D TitleWordmark { get; set; }
     [UProperty(PropertyFlags.BlueprintReadOnly)] public partial int CanvasWidth { get; set; }
     [UProperty(PropertyFlags.BlueprintReadOnly)] public partial int CanvasHeight { get; set; }
     private ARegionLoopDirector? director;
@@ -27,6 +29,38 @@ public partial class ARegionHUD : AHUD
         var amber=new FLinearColor(1,.74f,.32f,1);
         var red=new FLinearColor(1,.31f,.25f,1);
         var dark=new FLinearColor(.005f,.012f,.02f,.87f);
+        if(d.TitleActive && d.Transition==0)
+        {
+            // Original A wordmark, authored at 6400px; downsample rather than enlarge a font atlas.
+            if(TitleWordmark is not null)
+            {
+                float w=Math.Min(sizeX*.86f,sizeY*.5f*(1600f/300f)),h=w*(300f/1600f);
+                DrawTexture(TitleWordmark,(sizeX-w)/2,(sizeY-h)/2,w,h,0,0,1,1,new FLinearColor(1,1,1,1));
+            }
+            else
+            {
+                // Readable fallback if the authored UI asset is missing.
+                const string title="OFFAIR";
+                var font=TitleFont ?? PlayFont;
+                const float tracking=18;
+                float width=tracking*(title.Length-1),height=0;
+                var widths=new List<float>();
+                foreach(char c in title)
+                {
+                    GetTextSize(c.ToString(),out var w,out var h,font,1);
+                    widths.Add(w);width+=w;height=Math.Max(height,h);
+                }
+                float scale=Math.Min(sizeX*.86f/Math.Max(1,width),sizeY*.5f/Math.Max(1,height));
+                float x=(sizeX-width*scale)/2,y=(sizeY-height*scale)/2;
+                for(int i=0;i<title.Length;i++)
+                {
+                    DrawText(title[i].ToString(),new FLinearColor(1,1,1,1),x,y,font,scale);
+                    x+=(widths[i]+tracking)*scale;
+                }
+            }
+            // Explicitly opened GM remains available for death testing; ordinary HUD stays hidden.
+            if(!d.GMOpen) return;
+        }
         void Text(string text,float x,float y,FLinearColor color,bool small=false)
             => DrawText(text,color,x,y,small ? SmallPlayFont : PlayFont,s);
         void RightText(string text,float y,FLinearColor color,bool small=true)
@@ -61,7 +95,7 @@ public partial class ARegionHUD : AHUD
             : d.LivingGuards>0 ? $"Clear the room  /  {d.LivingGuards} remaining"
             : !d.HasAccessCard ? "Collect the access card" : !d.CameraLearned ? "Take control of the training camera"
             : d.PuzzleSolved ? "Recover memory B beyond the door" : d.InPuzzleRoom || d.PuzzleRemote ? "Find the pattern. Reproduce it. Submit." : "Enter the Signal Lab";
-        if(!d.VistaActive && d.Transition==0)
+        if(!d.VistaActive && !d.TitleActive && d.Transition==0)
         {
             float panelW=Math.Min(560*s,sizeX*.48f);
             var objectives=Wrap(objective,panelW-36*s,true);
@@ -114,7 +148,7 @@ public partial class ARegionHUD : AHUD
             RightText("SPACE  Skip view",12*s,white);
         }
         // A single card: host and inner voice never occupy simultaneous subtitle slots.
-        if(d.Transition==0 && !string.IsNullOrEmpty(d.SubtitleText))
+        if(d.Transition==0 && !d.TitleActive && !string.IsNullOrEmpty(d.SubtitleText))
         {
             float w=Math.Min(940*s,sizeX-2*m),x=(sizeX-w)/2;
             var lines=Wrap(d.SubtitleText,w-48*s);

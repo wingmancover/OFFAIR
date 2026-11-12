@@ -1,0 +1,295 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Persisted editor default uses new map",
+      "passed": true,
+      "detail": "/Game/OFFAIR/Levels/Lvl_TwoRoom_Blockout.Lvl_TwoRoom_Blockout"
+    },
+    {
+      "name": "Persisted game default uses new map",
+      "passed": true,
+      "detail": "/Game/OFFAIR/Levels/Lvl_TwoRoom_Blockout.Lvl_TwoRoom_Blockout"
+    },
+    {
+      "name": "Cook list contains new map only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Fresh editor automatically opened new map",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Old map asset remains",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionLoopDirector compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "BP_RegionHUD compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "New map starts region gameplay",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "HUD serializes runtime bold title font",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "A wordmark is serialized at full source resolution",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Wordmark keeps lossless UI alpha without streaming or mips",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Title is absent at spawn",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Cyan encounter has two guards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 0",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Actual shots defeat guard 1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Real clear drops access card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Card collected by E",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "C1 normal lesson opens D1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "B saved by normal teaching and puzzle route",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Saving alone does not show title",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Walk to <Struct 'Vector' (0x0000022D4EEF3580) {x: 9900.000000, y: 4400.000000, z: 100.000000}>",
+      "passed": true,
+      "detail": "<Struct 'Vector' (0x0000022D4EEF3530) {x: 9849.751699, y: 4400.000000, z: 98.149998}>"
+    },
+    {
+      "name": "Normal walk starts cinematic without title",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Title absent while cinematic runs",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Legitimate vista subtitle available for timing fixture",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Title starts after completed return",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Title restores move and look input",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Title has three seconds and one-shot state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Capture offair-title-a-16x9",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Player moves during title",
+      "passed": true,
+      "detail": {
+        "distance_cm": 130.29982436115642,
+        "seconds": 0.35835810005664825
+      }
+    },
+    {
+      "name": "Firing remains available during title",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Subtitle clock and text paused during title",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Capture offair-title-a-wide",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Title ends at three seconds without a second phase",
+      "passed": true,
+      "detail": 2.990388013422489
+    },
+    {
+      "name": "Subtitle resumes its remaining reading time",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Capture offair-title-a-hud-restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Returning to platform does not replay title",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Fixture saved B",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Skip return blend does not show title early",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Title starts after completed return",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Skipping still shows one title",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Capture offair-title-a-4k",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Repeated gameplay input cannot restart title",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Death immediately clears active title",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Death retains B and never replays used title",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Fixture saved B",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Cinematic death never shows title",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Old cinematic timer cannot display title after death",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Fixture saved B",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Death during skip return cancels pending title",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Fixture saved B",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Camera loss restores body without title",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "New session resets title state",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "captures": [
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\OffairTitleA\\offair-title-a-16x9.png",
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\OffairTitleA\\offair-title-a-wide.png",
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\OffairTitleA\\offair-title-a-hud-restored.png",
+    "Y:\\Unreal Projects\\OFFAIR\\Saved\\OffairTitleA\\offair-title-a-4k.png"
+  ],
+  "input": "Normal E/shot handlers and CharacterMovement; explicit GM interruption fixtures; physical keys pending user",
+  "canvas_sizes": {
+    "offair-title-a-16x9": [
+      687,
+      199
+    ],
+    "offair-title-a-wide": [
+      687,
+      199
+    ],
+    "offair-title-a-hud-restored": [
+      687,
+      199
+    ],
+    "offair-title-a-4k": [
+      687,
+      199
+    ]
+  },
+  "error": null,
+  "seconds": 101.38
+}

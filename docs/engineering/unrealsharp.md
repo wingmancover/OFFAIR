@@ -59,11 +59,13 @@ python Tools/unrealsharp.py editor-rebuild-test
 
 - `smoke`：通过 UE 图表 API 生成／编译独立蓝图子类，调用 C# 并读取反射属性，测试死亡重载后的新实例及第二次 PIE。只保存专用测试资产。
 - `test`：运行原有 `validate_prototype.py`，覆盖正常通关、阶段推进、监控与 GM 回归。
-- `package`：在当前平台构建 Development 包，然后运行 UnrealSharp 的托管打包步骤，输出到 `Saved/Packages/`。Windows 为 x64，Mac 为 arm64。此命令不发布或上传产物。
-- `package-smoke`：清除子进程中的项目 SDK 环境，在编辑器外以 NullRHI 启动 Development 包，检查自包含运行时、作者程序集加载和原型初始化。它不验证画面、性能或完整键鼠通关。
+- `package`：在当前平台构建 Development 包，使用项目 Packaging 地图列表（不再写死旧 `Lvl_Prototype`），包含平台运行依赖并排除原生调试符号，然后运行 UnrealSharp 的托管打包步骤，输出到 `Saved/Packages/`。托管发布仍会附带少量 PDB。Windows 为 x64，Mac 为 arm64。此命令不发布或上传产物。
+- `package-smoke`：清除子进程中的项目 SDK 环境，在编辑器外以 NullRHI 启动 Development 包，检查自包含运行时、作者程序集加载及 `GameDefaultMap` 对应世界进入游玩状态。测试使用独立 UserDir，避免覆盖玩家本地设置。它不验证完整玩法初始化、画面、性能或键鼠通关。
 - `editor-rebuild-test`：Windows 专用，故意不注入启动器 SDK 环境，启动普通编辑器并在其中实际执行 RunUAT 重建、加载 C# 类和内存编译 7 个项目蓝图，防止“命令行通过但普通编辑器打不开／重建失败”的回归。详情见[普通编辑器重建修复](../qa/editor-rebuild-validation.md)。
 
 本机 Windows 包位于 `Saved/Packages/Win64/OFFAIR.exe`；应保留整个 `Win64` 目录，不能只复制单个 exe。托管程序集和 .NET 运行时位于其中的 `OFFAIR/Binaries/Managed/net10.0/`。
+
+2026-11-16 已为当前双房间地图生成 Windows x64 试玩包，通过独立启动和离屏画面检查，另有完整 ZIP；范围与待补测项见[双房间打包记录](../qa/two-room-package-validation.md)。
 
 旧 `Tools/Run-Unreal.ps1 -Mode Build` 是重建玩法资产的命令，不能代替 C++/.NET 编译。普通 C# 修改不需要重建关卡。后续将玩法函数迁入 C# 时必须同步对应蓝图生成器，避免生成器写回另一套实现。
 

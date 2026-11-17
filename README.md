@@ -17,9 +17,9 @@ OFFAIR 是处于原型阶段的毕业设计游戏项目：以第一人称探索�
 - 引擎关联版本：`OFFAIR.uproject` 中的 `5.8`。
 - 蓝图玩法 + 最小 `Source/OFFAIR` 原生模块 + `Script/OFFAIR` C# 工程；UnrealSharp 作为固定版本 Git 子模块管理。
 - 目标平台为 Windows x64 与 macOS Apple Silicon arm64；各平台实际验证范围见 [UnrealSharp 接入记录](docs/engineering/unrealsharp.md)。
-- 默认启动地图及打包地图列表：`/Game/OFFAIR/Levels/Lvl_TwoRoom_Blockout`；本次仅配置，未打包。
+- 默认启动地图及打包地图列表：`/Game/OFFAIR/Levels/Lvl_TwoRoom_Blockout`；2026-11-16 已生成 Windows x64 试玩包，通过独立启动与离屏画面检查，完整包内通关待用户试玩。位置与范围见[打包记录](docs/qa/two-room-package-validation.md)。
 - 项目专用玩家、控制器和 GameMode 继承射击模板；敌人、武器与投射物继续复用模板。
-- 出生点左前方有低障碍翻越测试，面向并靠近后按空格优先翻越，其余情况下空格跳跃；编辑器连接样例集中在 [Tools/EditorSetup](Tools/EditorSetup/README.md)，当前 Codex 项目配置保留在根目录。
+- 旧 `Lvl_Prototype` 出生点左前方有低障碍翻越测试，面向并靠近后按空格优先翻越，其余情况下空格跳跃；新双房间的翻越暂缓。编辑器连接样例集中在 [Tools/EditorSetup](Tools/EditorSetup/README.md)，当前 Codex 项目配置保留在根目录。
 - 最新三阶段流程已生成并保存，验证范围见[本轮记录](docs/qa/narrative-prototype-validation.md)；当前为灰盒原型，未包含完整剧情、美术制作或跨进程存档。
 
 ## 文档导航

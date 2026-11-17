@@ -212,10 +212,10 @@ def package(engine, dotnet, env, disabled_plugins):
     build(engine, dotnet, env, disabled_plugins)
     target, architecture, _ = host_target()
     archive = ROOT / "Saved" / "Packages" / target
+    # Respect the project's Packaging map list; do not force the legacy prototype.
     uat(engine, dotnet, env, "BuildCookRun", "-noP4", "-nocompileeditor", "-build", "-cook", "-stage", "-pak",
         "-archive", f"-archivedirectory={archive}", f"-platform={target}",
-        f"-architecture={architecture}", "-clientconfig=Development", "-utf8output",
-        "-map=/Game/OFFAIR/Levels/Lvl_Prototype")
+        f"-architecture={architecture}", "-clientconfig=Development", "-prereqs", "-nodebuginfo", "-utf8output")
     # Managed binaries are relative to FPaths::ProjectDir, not the archive root.
     layouts = ("OFFAIR", "Windows/OFFAIR") if WINDOWS else (
         "OFFAIR.app/Contents/UE/OFFAIR", "Mac/OFFAIR.app/Contents/UE/OFFAIR")
@@ -240,6 +240,11 @@ def package_smoke():
     output.mkdir(parents=True, exist_ok=True)
     log = output / "run.log"
     report_path = output / "result.json"
+    config = (ROOT / "Config/DefaultEngine.ini").read_text(encoding="utf-8-sig")
+    default_map = re.search(r"^GameDefaultMap=(.+)$", config, re.MULTILINE)
+    if not default_map:
+        raise RuntimeError("GameDefaultMap is missing; cannot validate packaged startup.")
+    expected_map = default_map.group(1).strip().split(".", 1)[0]
     log.unlink(missing_ok=True)
     report_path.unlink(missing_ok=True)
     # Exercise the bundled runtime, without the launcher's project-local SDK.
@@ -247,9 +252,10 @@ def package_smoke():
     env["PATH"] = os.pathsep.join(path for path in env.get("PATH", "").split(os.pathsep)
                                  if "dotnet" not in path.lower())
     command = [str(executables[0]), "-unattended", "-nullrhi", "-nosound",
-               "-benchmark", "-seconds=4", "-fps=30", f"-abslog={log}"]
+               "-benchmark", "-seconds=4", "-fps=30", f"-abslog={log}",
+               f"-UserDir={output / 'User'}"]
     print("Running:", subprocess.list2cmdline(command), flush=True)
-    report = {"status": "failed", "platform": target, "command": command}
+    report = {"status": "failed", "platform": target, "command": command, "expected_map": expected_map}
     try:
         subprocess.run(command, cwd=archive, env=env, check=True, timeout=120,
                        creationflags=subprocess.CREATE_NO_WINDOW if WINDOWS else 0)
@@ -257,7 +263,8 @@ def package_smoke():
         checks = {
             "self_contained_runtime": "Runtime config is self-contained: true" in content,
             "project_assembly_loaded": bool(re.search(r"Successfully loaded assembly at .*Offair\.Managed\.dll", content)),
-            "prototype_initialized": "OFFAIR_RUN_READY" in content,
+            "default_map_started": any("Bringing World " in line and expected_map in line
+                                       and "up for play" in line for line in content.splitlines()),
             "no_runtime_errors": not re.search(r": Error:|Fatal error|Unhandled exception", content, re.IGNORECASE),
         }
         report["checks"] = checks
